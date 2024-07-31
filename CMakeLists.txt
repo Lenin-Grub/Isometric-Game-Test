@@ -21,10 +21,12 @@ set(EXTERNAL_DIR $ENV{External})
 
 add_subdirectory(${EXTERNAL_DIR}/glfw   External/glfw)
 add_subdirectory(${EXTERNAL_DIR}/glad   External/glad)
+add_subdirectory(${EXTERNAL_DIR}/glm    External/glm)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	${EXTERNAL_DIR}/glfw/include
 	${EXTERNAL_DIR}/glad/include
+	${EXTERNAL_DIR}/glm/include
 )
 
 
@@ -36,6 +38,7 @@ include(FetchContent)
 target_link_libraries(${PROJECT_NAME}
 	glfw
 	glad
+	glm
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
