@@ -11,7 +11,6 @@ public:
 
 	bool create(const unsigned int widht, const unsigned int height, const std::string title);
 	bool close();
-
 	void clear();
 
 	GLFWwindow* m_window;
