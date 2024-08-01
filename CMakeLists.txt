@@ -22,23 +22,31 @@ set(EXTERNAL_DIR $ENV{External})
 add_subdirectory(${EXTERNAL_DIR}/glfw   External/glfw)
 add_subdirectory(${EXTERNAL_DIR}/glad   External/glad)
 add_subdirectory(${EXTERNAL_DIR}/glm    External/glm)
+add_subdirectory(${EXTERNAL_DIR}/spdlog External/spdlog)
+#add_subdirectory(${EXTERNAL_DIR}/glew   External/glew)
+add_subdirectory(${EXTERNAL_DIR}/imgui  External/imgui)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	${EXTERNAL_DIR}/glfw/include
 	${EXTERNAL_DIR}/glad/include
 	${EXTERNAL_DIR}/glm/include
+	${EXTERNAL_DIR}/spdlog/include
+#	${EXTERNAL_DIR}/glew/include
+	${EXTERNAL_DIR}/imgui/include
 )
 
 
 include_directories(${EXTERNAL_DIR}/glad/include)
+include_directories(${imgui_SOURCE_DIR})
 link_directories(${EXTERNAL_DIR}/glad/lib)
-
-include(FetchContent)
 
 target_link_libraries(${PROJECT_NAME}
 	glfw
 	glad
 	glm
+	spdlog
+#	glew
+	imgui
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
