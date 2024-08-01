@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "../Log.h"
 #include "Window.h"
 
 Window::Window()
@@ -33,14 +34,13 @@ bool Window::create(const unsigned int widht, const unsigned int height, const s
     m_window = glfwCreateWindow(widht, height, title.c_str(), nullptr, nullptr);
     if (m_window == nullptr)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        LOG_CRITICAL("Failed to create GLFW window");
         glfwTerminate();
         return false;
     }
 
     glfwMakeContextCurrent(m_window);
     gladLoadGL();
-
     return true;
 }
 
