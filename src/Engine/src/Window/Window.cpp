@@ -6,8 +6,6 @@
 #include <Log/Log.hpp>
 #include <Window/Window.hpp>
 
-#include <Shader/Shader.hpp>
-
 smpl::Window::Window()
     : m_widht  (0)
     , m_height (0)
@@ -103,4 +101,14 @@ void smpl::Window::display()
     glfwSwapBuffers(window);
 }
 
+void smpl::Window::processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
 
+GLFWwindow& smpl::Window::getWindow() const
+{
+    assert(window && "Window is not created!");
+    return *window;
+}
