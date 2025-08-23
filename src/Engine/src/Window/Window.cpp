@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "../Log.h"
-#include "Window.h"
+#include <Log/Log.hpp>
+#include <Window/Window.hpp>
 
 Window::Window()
     : m_widht  (0)

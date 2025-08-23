@@ -6,36 +6,30 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "Window/Window.h"
-#include "Log.h"
+#include <Window/Window.hpp>
+#include <Log/Log.hpp>
 
 GLfloat point[] = {
     0.0f,  0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,
-   -0.5f, -0.5f, 0.0f
+   -0.5f, -0.5f, 0.0f,
 };
 
 GLfloat colors [] = {
     1.0f,  0.0f, 0.0f,
     0.0f,  1.0f, 0.0f,
-    0.0f,  0.0f, 1.0f
+    0.0f,  0.0f, 1.0f,
 };
 
 const char* vertex_shader = {
     "#version 460\n"
     "layout (location = 0 )in vec3 vertex_position;"
     "layout (location = 1 )in vec3 vertex_color;"
-    "uniform float angle;"
     "out vec3 color;"
     "void main()"
     "{"
     "color = vertex_color;"
-    "float c = cos(angle);"
-    "float s = sin(angle);"
-    "float y = c * vertex_position.y - s * vertex_position.z;"
-    "float z = s * vertex_position.y + c * vertex_position.z;"
-    "vec3 rotated_position = vec3(vertex_position.x, y, z);"
-    "gl_Position = vec4(rotated_position, 1.0);"
+    "gl_Position = vec4(vertex_position, 1.0);"
     "}"
 };
 
@@ -163,8 +157,6 @@ int main()
 
     Color color{ 50,50,50 };
 
-    float angle = 0.0f;
-
     while (!glfwWindowShouldClose(window.window))
     {
         window.clear(color);
@@ -172,16 +164,12 @@ int main()
         initBackEndImGui();
 
         glUseProgram(shader);
-        glUniform1f(uniform_angle, angle);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         ImGui::NewFrame();
 
         //ImGui::ShowDemoWindow();
-        ImGui::Begin("Transform");
-        ImGui::SliderFloat ("Roataion", &angle, 0, 3.0f, "%.1f");
-        ImGui::End();
         
         ImGui::Render();
         

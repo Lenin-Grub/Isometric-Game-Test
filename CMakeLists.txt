@@ -1,21 +1,10 @@
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
-project(Medievalution)
+project(Medievalution3D)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-file(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/src/*.hpp ${PROJECT_SOURCE_DIR}/src/*.h ${PROJECT_SOURCE_DIR}/src/*.inl)
-file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Medievalution3D)
 
 add_compile_definitions("DEBUG=$<CONFIG:Debug>")
-
-add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
-
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HEADERS} ${SOURCES})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/)
-
-set(BUILD_SHARED_LIBS OFF)
 
 set(EXTERNAL_DIR $ENV{External} CACHE PATH "Path to external dependencies")
 
@@ -24,8 +13,10 @@ add_subdirectory(${EXTERNAL_DIR}/glad    External/glad)
 add_subdirectory(${EXTERNAL_DIR}/glm     External/glm)
 add_subdirectory(${EXTERNAL_DIR}/spdlog  External/spdlog)
 
+add_subdirectory(src/Engine)
+add_subdirectory(src/Medievalution)
 
-list(APPEND SOURCES
+list(APPEND IMGUI_SOURCES
     ${EXTERNAL_DIR}/imgui/imgui.cpp
     ${EXTERNAL_DIR}/imgui/imgui_demo.cpp
     ${EXTERNAL_DIR}/imgui/imgui_draw.cpp
@@ -35,25 +26,35 @@ list(APPEND SOURCES
     ${EXTERNAL_DIR}/imgui/backends/imgui_impl_opengl3.cpp
 )
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY SOURCES ${HEADERS} ${SOURCES})
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PRIVATE
+    ${EXTERNAL_DIR}/imgui
+    ${EXTERNAL_DIR}/imgui/backends
+)
+target_compile_definitions(imgui PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
+target_link_libraries(imgui PRIVATE glfw glad)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_link_libraries(Medievalution3D PRIVATE imgui)
+
+target_include_directories(Medievalution3D PRIVATE
     ${EXTERNAL_DIR}/glfw/include
     ${EXTERNAL_DIR}/glad/include
     ${EXTERNAL_DIR}/glm/include
     ${EXTERNAL_DIR}/spdlog/include
     ${EXTERNAL_DIR}/imgui
     ${EXTERNAL_DIR}/imgui/backends
+    src/Engine/includes
+    src/Medievalution/src
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
-
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        glfw
-        glad
-        glm::glm
-        spdlog
+target_link_libraries(Medievalution3D PRIVATE
+    Samopal_Engine
+    glfw
+    glad
+    glm::glm
+    spdlog
 )
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+set_target_properties(Medievalution3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+target_compile_features(Medievalution3D PUBLIC cxx_std_20)
