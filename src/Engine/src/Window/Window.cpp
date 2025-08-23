@@ -6,7 +6,9 @@
 #include <Log/Log.hpp>
 #include <Window/Window.hpp>
 
-Window::Window()
+#include <Shader/Shader.hpp>
+
+smpl::Window::Window()
     : m_widht  (0)
     , m_height (0)
     , m_title  ("No Title")
@@ -14,7 +16,7 @@ Window::Window()
 {
 }
 
-Window::Window(const unsigned int widht, const unsigned int height, const std::string& title)
+smpl::Window::Window(const unsigned int widht, const unsigned int height, const std::string& title)
     : m_widht  (widht)
     , m_height (height)
     , m_title  (title)
@@ -22,20 +24,21 @@ Window::Window(const unsigned int widht, const unsigned int height, const std::s
 {
 }
 
-Window::~Window()
+smpl::Window::~Window()
 {
 }
 
-bool Window::create(const unsigned int widht, const unsigned int height, const std::string& title)
+bool smpl::Window::create(const unsigned int widht, const unsigned int height, const std::string& title)
 {
+
     if (!glfwInit())
     {
         LOG_CRITICAL("GLFW init failed");
         return false;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(widht, height, title.c_str(), nullptr, nullptr);
@@ -63,7 +66,7 @@ bool Window::create(const unsigned int widht, const unsigned int height, const s
     return true;
 }
 
-bool Window::close()
+bool smpl::Window::close()
 {
     if (!window)
     {
@@ -77,19 +80,19 @@ bool Window::close()
     return true;
 }
 
-void Window::clear()
+void smpl::Window::clear()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Window::clear(const Color& color)
+void smpl::Window::clear(const Color& color)
 {
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Window::display()
+void smpl::Window::display()
 {
     if (!window)
     {
@@ -99,3 +102,5 @@ void Window::display()
  
     glfwSwapBuffers(window);
 }
+
+

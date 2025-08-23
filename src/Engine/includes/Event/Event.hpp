@@ -1,10 +1,13 @@
 #pragma once
 
-class Event
+namespace smpl
 {
-public:
+    class Event
+    {
+    public:
 
 
-private:
+    private:
 
-};
+    };
+}

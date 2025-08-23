@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
-project(Medievalution3D)
+project(Medievalution)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Medievalution3D)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Medievalution)
 
 add_compile_definitions("DEBUG=$<CONFIG:Debug>")
 
@@ -34,9 +34,9 @@ target_include_directories(imgui PRIVATE
 target_compile_definitions(imgui PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 target_link_libraries(imgui PRIVATE glfw glad)
 
-target_link_libraries(Medievalution3D PRIVATE imgui)
+target_link_libraries(Medievalution PRIVATE imgui)
 
-target_include_directories(Medievalution3D PRIVATE
+target_include_directories(Medievalution PRIVATE
     ${EXTERNAL_DIR}/glfw/include
     ${EXTERNAL_DIR}/glad/include
     ${EXTERNAL_DIR}/glm/include
@@ -47,7 +47,7 @@ target_include_directories(Medievalution3D PRIVATE
     src/Medievalution/src
 )
 
-target_link_libraries(Medievalution3D PRIVATE
+target_link_libraries(Medievalution PRIVATE
     Samopal_Engine
     glfw
     glad
@@ -55,6 +55,13 @@ target_link_libraries(Medievalution3D PRIVATE
     spdlog
 )
 
-set_target_properties(Medievalution3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+#set_target_properties(Medievalution PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+# Убедись, что это вызывается для исполняемого проекта
+set_target_properties(Medievalution PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/bin
+    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin
+)
 
-target_compile_features(Medievalution3D PUBLIC cxx_std_20)
+target_compile_features(Medievalution PUBLIC cxx_std_20)
