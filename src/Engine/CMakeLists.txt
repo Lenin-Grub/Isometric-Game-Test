@@ -4,16 +4,18 @@ project(Samopal_Engine)
 
 set (ENGINE_PUBLIC_INCLUDES
     includes/Window/Window.hpp
-    includes/Shader/Shader.hpp
+    includes/Graphics/Shader/Shader.hpp
     includes/Event/Event.hpp
     includes/Log/Log.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
     src/Window/Window.cpp
-    src/Shader/Shader.cpp
+    src/Graphics/Shader/Shader.cpp
     src/Event/Event.cpp
 )
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
 
 add_library(${PROJECT_NAME} STATIC
 	${ENGINE_PUBLIC_INCLUDES}
