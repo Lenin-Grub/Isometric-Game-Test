@@ -9,23 +9,30 @@
 #include <Window/Window.hpp>
 #include <Log/Log.hpp>
 
-#include <Shader/Shader.hpp>
+#include <Graphics/Shader/Shader.hpp>
 
-GLfloat point[] = {
-    0.0f,  0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-   -0.5f, -0.5f, 0.0f,
+GLfloat vertices[] = {
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
 };
 
 GLfloat colors [] = {
     1.0f,  0.0f, 0.0f,
     0.0f,  1.0f, 0.0f,
     0.0f,  0.0f, 1.0f,
+    0.0f,  0.0f, 1.0f,
+};
+
+GLuint indices[] = {
+    0, 1, 3,
+    1, 2, 3
 };
 
 bool initImGui(const smpl::Window& window)
 {
-    if (!window.window)
+    if (!&window.getWindow())
     {
         LOG_CRITICAL("Window is nullptr!");
         return false;
@@ -43,7 +50,7 @@ bool initImGui(const smpl::Window& window)
         return false;
     }
 
-    if(!ImGui_ImplGlfw_InitForOpenGL(window.window, true))
+    if(!ImGui_ImplGlfw_InitForOpenGL(&window.getWindow(), true))
     {
         LOG_CRITICAL("Failed init GLFW to ImGui!");
         return false;
@@ -73,6 +80,7 @@ bool initBackEndImGui()
     ImGui_ImplGlfw_NewFrame();
     return true;
 }
+
 
 int main()
 {
@@ -105,21 +113,21 @@ int main()
         return -1;
     }
 
-    GLuint shader = glCreateProgram();
+    smpl::ShaderProgram program;
+    program.create();
+    program.bind(vertex_shader);
+    program.bind(fragment_shader);
 
-    glAttachShader(shader, vertex_shader.getShaderID());
-    glAttachShader(shader, fragment_shader.getShaderID());
-
-    glLinkProgram(shader);
-
-    glDeleteShader(vertex_shader.getShaderID());
-    glDeleteShader(fragment_shader.getShaderID());
+    if (!program.link())
+    {
+        return -1;
+    }
 
     GLuint points_vbo = 0;
     glGenBuffers(1, &points_vbo);
 
     glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     GLuint colors_vbo = 0;
     glGenBuffers(1, &colors_vbo);
@@ -127,34 +135,36 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 
-    const GLint uniform_angle = glGetUniformLocation(shader, "angle");
-
     GLuint vao = 0;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    GLuint ebo = 0;
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 #pragma endregion
 
-
     smpl::Color color{ 50,50,50 };
 
-    while (!glfwWindowShouldClose(window.window))
+    while (!glfwWindowShouldClose(&window.getWindow()))
     {
         window.clear(color);
 
         initBackEndImGui();
-
-        glUseProgram(shader);
+        
+        program.use();
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         ImGui::NewFrame();
 
@@ -165,7 +175,8 @@ int main()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwPollEvents();
-        
+        window.processInput(&window.getWindow());
+
         window.display();
     }
 
