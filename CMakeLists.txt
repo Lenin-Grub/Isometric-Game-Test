@@ -26,11 +26,17 @@ list(APPEND IMGUI_SOURCES
     ${EXTERNAL_DIR}/imgui/backends/imgui_impl_opengl3.cpp
 )
 
+#stb image
+add_library(stb_image INTERFACE)
+target_include_directories(stb_image INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/ext_libs)
+target_compile_definitions(stb_image INTERFACE STB_IMAGE_IMPLEMENTATION)
+target_link_libraries(Samopal_Engine PRIVATE stb_image)
+#delete later
+target_link_libraries(Medievalution PRIVATE stb_image)
+
+#imgui
 add_library(imgui STATIC ${IMGUI_SOURCES})
-target_include_directories(imgui PRIVATE
-    ${EXTERNAL_DIR}/imgui
-    ${EXTERNAL_DIR}/imgui/backends
-)
+target_include_directories(imgui PRIVATE ${EXTERNAL_DIR}/imgui ${EXTERNAL_DIR}/imgui/backends)
 target_compile_definitions(imgui PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 target_link_libraries(imgui PRIVATE glfw glad)
 
@@ -43,7 +49,7 @@ target_include_directories(Medievalution PRIVATE
     ${EXTERNAL_DIR}/spdlog/include
     ${EXTERNAL_DIR}/imgui
     ${EXTERNAL_DIR}/imgui/backends
-    src/Engine/includes
+    src/Engine/src
     src/Medievalution/src
 )
 
@@ -55,8 +61,6 @@ target_link_libraries(Medievalution PRIVATE
     spdlog
 )
 
-#set_target_properties(Medievalution PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-# Убедись, что это вызывается для исполняемого проекта
 set_target_properties(Medievalution PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/bin

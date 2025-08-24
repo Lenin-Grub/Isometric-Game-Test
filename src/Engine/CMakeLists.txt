@@ -3,16 +3,18 @@ cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 project(Samopal_Engine)
 
 set (ENGINE_PUBLIC_INCLUDES
-    includes/Window/Window.hpp
-    includes/Graphics/Shader/Shader.hpp
-    includes/Event/Event.hpp
-    includes/Log/Log.hpp
+    src/Window/Window.hpp
+    src/Graphics/Shader/Shader.hpp
+    src/Event/Event.hpp
+    src/Log/Log.hpp
+    src/FileSystem/FileSystem.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
     src/Window/Window.cpp
     src/Graphics/Shader/Shader.cpp
     src/Event/Event.cpp
+	src/FileSystem/FileSystem.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
@@ -23,7 +25,7 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/includes
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 
     $ENV{External}/glfw/include
     $ENV{External}/glad/include
