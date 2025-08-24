@@ -86,13 +86,13 @@ int main()
 #pragma region Shader
 
     smpl::Shader vertex_shader;
-    if (!vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::ShaderType::Vertex))
+    if (!vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex))
     {
         return -1;
     }
 
     smpl::Shader fragment_shader;
-    if (!fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::ShaderType::Fragment))
+    if (!fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment))
     {
         return -1;
     }
@@ -148,10 +148,10 @@ int main()
         return -1;
     }
     
-    //if (!texture.loadFromFile("D:/Repositories/Medievalution3D/res/eng.png"))
-    //{
-    //    return -1;
-    //}
+    if (!texture.loadFromFile("D:/Repositories/Medievalution3D/res/eng.png"))
+    {
+        return -1;
+    }
 
 #pragma endregion
 

@@ -2,6 +2,23 @@
 #include <Log/Log.hpp>
 #include <fstream>
 
+namespace
+{
+    GLenum getType(smpl::Shader::Type type)
+    {
+        switch (type)
+        {
+        case smpl::Shader::Type::Vertex:
+            return  GL_VERTEX_SHADER;
+        case smpl::Shader::Type::Fragment:
+            return GL_FRAGMENT_SHADER;
+        default:
+            LOG_ERROR("Unknown shader type.");
+            return -1;
+        }
+    }
+}
+
 smpl::Shader::Shader()
     : is_loaded   { false }
     , is_compiled { false }
@@ -11,7 +28,7 @@ smpl::Shader::Shader()
     //Do nothing
 }
 
-bool smpl::Shader::loadFromFile(const std::string& filename, ShaderType type)
+bool smpl::Shader::loadFromFile(const std::string& filename, smpl::Shader::Type type)
 {
     std::vector<char> shader;
     if (!getFileContents(filename, shader))
@@ -20,20 +37,7 @@ bool smpl::Shader::loadFromFile(const std::string& filename, ShaderType type)
         return false;
     }
 
-    GLenum shader_type;
-
-    switch (type)
-    {
-    case smpl::ShaderType::Vertex:
-        shader_type =  GL_VERTEX_SHADER;
-        break;
-    case smpl::ShaderType::Fragment:
-        shader_type = GL_FRAGMENT_SHADER;
-        break;
-    default:
-        LOG_ERROR("Unknown shader type.");
-        return false;
-    }
+    shader_type = getType(type);
 
     shader_id = glCreateShader(shader_type);
 
@@ -87,12 +91,6 @@ GLuint smpl::Shader::getID() const
 {
     return shader_id;
 }
-
-GLenum smpl::Shader::getType() const
-{
-    return GLenum();
-}
-
 
 bool smpl::Shader::getFileContents(const std::string& filename, std::vector<char>& buffer)
 {

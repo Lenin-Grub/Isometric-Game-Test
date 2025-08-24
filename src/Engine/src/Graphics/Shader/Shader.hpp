@@ -5,19 +5,22 @@
 
 namespace smpl
 {
-    enum ShaderType
-    {
-        Vertex = 0,
-        Fragment
-    };
+
 
     class Shader
     {
     public:
+
+        enum Type
+        {
+            Vertex = 0,
+            Fragment
+        };
+
         Shader();
         ~Shader() = default;
 
-        bool loadFromFile(const std::string& filename, ShaderType type);
+        bool loadFromFile(const std::string& filename, smpl::Shader::Type type);
         bool isLoaded() const;
         bool isCompiled() const;
         void release();
@@ -26,7 +29,6 @@ namespace smpl
 
 
         GLuint getID()   const;
-        GLenum getType() const;
 
     private:
         bool getFileContents(const std::string& filename, std::vector<char>& buffer);
