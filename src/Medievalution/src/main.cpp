@@ -11,6 +11,8 @@
 #include <Graphics/Shader/Shader.hpp>
 #include <Graphics/Texture/Texture.hpp>
 #include <Graphics/Color/Color.hpp>
+#include <Graphics/VertexBuffer/VertexBuffer.hpp>
+#include <Graphics/VertexArray/VertexArray.hpp>
 
 #include <Window/Window.hpp>
 
@@ -65,7 +67,6 @@ bool initBackEndImGui()
     return true;
 }
 
-
 int main()
 {
     const unsigned int WIDTH  = 1280;
@@ -83,30 +84,6 @@ int main()
 
     //LogInfo::initLogger();
 
-#pragma region Shader
-
-    smpl::Shader vertex_shader;
-    if (!vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex))
-    {
-        return -1;
-    }
-
-    smpl::Shader fragment_shader;
-    if (!fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment))
-    {
-        return -1;
-    }
-
-    smpl::ShaderProgram program;
-    program.create();
-    program.bind(vertex_shader);
-    program.bind(fragment_shader);
-
-    if (!program.link())
-    {
-        return -1;
-    }
-
     float vertices[] = {
         // positions          // colors           // texture coords
          0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
@@ -114,10 +91,73 @@ int main()
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
         -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
     };
+
+    float vertices_triangle[] = {
+        // positions       
+         0.5f,  0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+    };
+
+    float vertices_color[] = {
+        // positions       
+         1.0f,  0.0f, 0.0f,
+         1.0f,  0.0f, 0.0f,
+         1.0f,  0.0f, 0.0f,
+    };
+
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
+
+#pragma region Render with Vertex Buffer
+
+    smpl::Shader vertex_shader2;
+    if (!vertex_shader2.loadFromFile("shaders/primitive_color_shader.vert", smpl::Shader::Type::Vertex))
+        return -1;
+
+    smpl::Shader fragment_shader2;
+    if (!fragment_shader2.loadFromFile("shaders/primitive_color_shader.frag", smpl::Shader::Type::Fragment))
+        return -1;
+
+    smpl::ShaderProgram program2;
+    program2.create();
+    program2.bind(vertex_shader2);
+    program2.bind(fragment_shader2);
+
+    if (!program2.link())
+        return -1;
+
+    std::unique_ptr<smpl::VertexBuffer> points_vbo;
+    std::unique_ptr<smpl::VertexBuffer> points_color;
+    std::unique_ptr<smpl::VertexArray>  vao;
+
+    points_vbo   = std::make_unique<smpl::VertexBuffer>(vertices_triangle, sizeof(vertices_triangle));
+    points_color = std::make_unique<smpl::VertexBuffer>(vertices_color,    sizeof(vertices_color));
+    vao          = std::make_unique<smpl::VertexArray>();
+
+    vao->addBuffer(*points_vbo);
+    vao->addBuffer(*points_color);
+#pragma endregion
+
+#pragma region Render clean opengl
+    smpl::Shader vertex_shader;
+    if (!vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex))
+        return -1;
+
+    smpl::Shader fragment_shader;
+    if (!fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment))
+        return -1;
+
+    smpl::ShaderProgram program;
+    program.create();
+    program.bind(vertex_shader);
+    program.bind(fragment_shader);
+
+    if (!program.link())
+        return -1;
+
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -141,17 +181,12 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-
     smpl::Texture texture;
     if (!texture.loadFromFile("D:/Repositories/Medievalution3D/res/rus.png"))
-    {
         return -1;
-    }
     
-    if (!texture.loadFromFile("D:/Repositories/Medievalution3D/res/eng.png"))
-    {
-        return -1;
-    }
+    //if (!texture.loadFromFile("D:/Repositories/Medievalution3D/res/eng.png"))
+    //    return -1;
 
 #pragma endregion
 
@@ -162,10 +197,16 @@ int main()
         window.clear(color);
 
         initBackEndImGui();
-        
+       
+        // clean opengl
         program.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // incapsulate VAO
+        program2.use();
+        vao->bind();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         ImGui::NewFrame();
 

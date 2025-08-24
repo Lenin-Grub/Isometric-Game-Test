@@ -4,7 +4,7 @@
 
 namespace
 {
-    GLenum getType(smpl::Shader::Type type)
+    constexpr GLenum getType(smpl::Shader::Type type)
     {
         switch (type)
         {

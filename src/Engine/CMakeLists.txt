@@ -14,6 +14,8 @@ set (ENGINE_PUBLIC_INCLUDES
 	src/Graphics/Sprite/Sprite.hpp
 	src/Graphics/Texture/Texture.hpp
 	src/Graphics/Color/Color.hpp
+	src/Graphics/VertexArray/VertexArray.hpp
+	src/Graphics/VertexBuffer/VertexBuffer.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
@@ -25,6 +27,8 @@ set (ENGINE_PUBLIC_SOURCES
 	src/Graphics/Shader/Shader.cpp
 	src/Graphics/Sprite/Sprite.cpp
 	src/Graphics/Texture/Texture.cpp
+	src/Graphics/VertexArray/VertexArray.cpp
+	src/Graphics/VertexBuffer/VertexBuffer.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
