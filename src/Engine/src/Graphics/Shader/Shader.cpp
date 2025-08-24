@@ -11,7 +11,7 @@ smpl::Shader::Shader()
     //Do nothing
 }
 
-bool smpl::Shader::loadFromFile(const std::string& filename, GLenum shaderType)
+bool smpl::Shader::loadFromFile(const std::string& filename, ShaderType type)
 {
     std::vector<char> shader;
     if (!getFileContents(filename, shader))
@@ -20,7 +20,22 @@ bool smpl::Shader::loadFromFile(const std::string& filename, GLenum shaderType)
         return false;
     }
 
-    shader_id = glCreateShader(shaderType);
+    GLenum shader_type;
+
+    switch (type)
+    {
+    case smpl::ShaderType::Vertex:
+        shader_type =  GL_VERTEX_SHADER;
+        break;
+    case smpl::ShaderType::Fragment:
+        shader_type = GL_FRAGMENT_SHADER;
+        break;
+    default:
+        LOG_ERROR("Unknown shader type.");
+        return false;
+    }
+
+    shader_id = glCreateShader(shader_type);
 
     const char* src = shader.data();
     glShaderSource(shader_id, 1, &src, nullptr);
@@ -134,7 +149,7 @@ bool smpl::ShaderProgram::link()
 
     if (!is_linked)
     {
-        LOG_ERROR("Error! Shader program wasn't linked!");
+        LOG_ERROR("Shader program wasn't linked!");
         
         GLint logLength;
         glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &logLength);
@@ -143,7 +158,7 @@ bool smpl::ShaderProgram::link()
         {
             GLchar* logMessage = new GLchar[logLength];
             glGetProgramInfoLog(program_id, logLength, nullptr, logMessage);
-            LOG_ERROR("The linker returned: %s", logMessage);
+            LOG_ERROR("The linker returned: {}", logMessage);
             delete[] logMessage;
         }
 
