@@ -6,11 +6,13 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <Window/Window.hpp>
 #include <Log/Log.hpp>
 
 #include <Graphics/Shader/Shader.hpp>
 #include <Graphics/Texture/Texture.hpp>
+#include <Graphics/Color/Color.hpp>
+
+#include <Window/Window.hpp>
 
 bool initImGui(const smpl::Window& window)
 {
@@ -169,6 +171,10 @@ int main()
 
         //ImGui::ShowDemoWindow();
         
+        ImGui::Begin("Color background");
+        ImGui::ColorPicker3("Color", color.data());
+        ImGui::End();
+
         ImGui::Render();
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

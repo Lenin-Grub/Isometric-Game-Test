@@ -6,16 +6,17 @@
 #include <Log/Log.hpp>
 #include <Window/Window.hpp>
 
+
 smpl::Window::Window()
-    : m_widht  (0)
+    : m_width(0)
     , m_height (0)
     , m_title  ("No Title")
     , window   (nullptr)
 {
 }
 
-smpl::Window::Window(const unsigned int widht, const unsigned int height, const std::string& title)
-    : m_widht  (widht)
+smpl::Window::Window(const unsigned int width, const unsigned int height, const std::string& title)
+    : m_width  (width)
     , m_height (height)
     , m_title  (title)
     , window   (nullptr)
@@ -26,7 +27,7 @@ smpl::Window::~Window()
 {
 }
 
-bool smpl::Window::create(const unsigned int widht, const unsigned int height, const std::string& title)
+bool smpl::Window::create(const unsigned int width, const unsigned int height, const std::string& title)
 {
 
     if (!glfwInit())
@@ -39,7 +40,7 @@ bool smpl::Window::create(const unsigned int widht, const unsigned int height, c
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(widht, height, title.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
     if (!window)
     {

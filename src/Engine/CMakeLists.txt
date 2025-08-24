@@ -13,6 +13,7 @@ set (ENGINE_PUBLIC_INCLUDES
 	src/Graphics/Shader/Shader.hpp
 	src/Graphics/Sprite/Sprite.hpp
 	src/Graphics/Texture/Texture.hpp
+	src/Graphics/Color/Color.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
