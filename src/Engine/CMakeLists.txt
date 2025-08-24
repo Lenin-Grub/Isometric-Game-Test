@@ -4,17 +4,26 @@ project(Samopal_Engine)
 
 set (ENGINE_PUBLIC_INCLUDES
     src/Window/Window.hpp
-    src/Graphics/Shader/Shader.hpp
     src/Event/Event.hpp
+	
     src/Log/Log.hpp
+	
     src/FileSystem/FileSystem.hpp
+	
+	src/Graphics/Shader/Shader.hpp
+	src/Graphics/Sprite/Sprite.hpp
+	src/Graphics/Texture/Texture.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
     src/Window/Window.cpp
-    src/Graphics/Shader/Shader.cpp
     src/Event/Event.cpp
+	
 	src/FileSystem/FileSystem.cpp
+	
+	src/Graphics/Shader/Shader.cpp
+	src/Graphics/Sprite/Sprite.cpp
+	src/Graphics/Texture/Texture.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
