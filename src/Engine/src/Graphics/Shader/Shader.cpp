@@ -1,6 +1,10 @@
 #include <Graphics/Shader/Shader.hpp>
+
 #include <Log/Log.hpp>
+
 #include <fstream>
+
+#include <glad/glad.h>
 
 namespace
 {
@@ -119,6 +123,31 @@ smpl::ShaderProgram::ShaderProgram()
     , is_linked  { false }
 {
     // Do nothing
+}
+
+smpl::ShaderProgram::~ShaderProgram()
+{
+    glDeleteProgram(program_id);
+}
+
+smpl::ShaderProgram::ShaderProgram(smpl::ShaderProgram&& other) noexcept
+    : program_id(other.program_id)
+    , is_linked(other.is_linked)
+{
+    other.program_id = 0;
+    other.is_linked = false;
+}
+
+smpl::ShaderProgram& smpl::ShaderProgram::operator=(smpl::ShaderProgram&& other) noexcept
+{
+    glDeleteProgram(program_id);
+    program_id = other.program_id;
+    is_linked = other.is_linked;
+
+    other.program_id = 0;
+    other.is_linked  = false;
+
+    return *this;
 }
 
 void smpl::ShaderProgram::create()
