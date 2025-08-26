@@ -1,5 +1,6 @@
 #pragma once
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
+#include <Graphics/IndexBuffer/IndexBuffer.hpp>
 
 namespace smpl
 {
@@ -14,12 +15,16 @@ namespace smpl
         smpl::VertexArray& operator=(smpl::VertexArray&& vertex_array) noexcept;
         VertexArray(smpl::VertexArray&& vertex_array) noexcept;
 
-        void addBuffer(const smpl::VertexBuffer& vertex_array);
+        void addVertexBuffer(const smpl::VertexBuffer& vertex_array);
+        void setIndexBuffer(const smpl::IndexBuffer& index_array);
         void bind() const;
         static void unbind();
 
+        size_t getIndexesCount() const;
+
     private:
-        unsigned int m_id = 0;
-        unsigned int m_elements_count = 0;
+        unsigned int m_id;
+        unsigned int m_elements_count;
+        size_t m_indexes;
     };
 }

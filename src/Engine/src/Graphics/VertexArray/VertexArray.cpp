@@ -1,17 +1,21 @@
+#include <stdafx.hpp>
 #include <Graphics/VertexArray/VertexArray.hpp>
 #include <Log/Log.hpp>
 
 #include <glad/glad.h>
     
 smpl::VertexArray::VertexArray()
-    {
-        glGenVertexArrays(1, &m_id);
-    }
+    : m_id(0)
+    , m_elements_count(0)
+    , m_indexes(0)
+{
+    glGenVertexArrays(1, &m_id);
+}
 
 smpl::VertexArray::~VertexArray()
-    {
-        glDeleteVertexArrays(1, &m_id);
-    }
+{
+    glDeleteVertexArrays(1, &m_id);
+}
 
 smpl::VertexArray& smpl::VertexArray::operator=(smpl::VertexArray&& vertex_array) noexcept
 {
@@ -23,31 +27,52 @@ smpl::VertexArray& smpl::VertexArray::operator=(smpl::VertexArray&& vertex_array
 }
 
 smpl::VertexArray::VertexArray(smpl::VertexArray&& vertex_array) noexcept
-        : m_id(vertex_array.m_id)
-        , m_elements_count(vertex_array.m_elements_count)
-    {
-        vertex_array.m_id = 0;
-        vertex_array.m_elements_count = 0;
-    }
+    : m_id(vertex_array.m_id)
+    , m_elements_count(vertex_array.m_elements_count)
+    , m_indexes(0)
+{
+    vertex_array.m_id = 0;
+    vertex_array.m_elements_count = 0;
+}
 
-    void smpl::VertexArray::bind() const
-    {
-        glBindVertexArray(m_id);
-    }
+void smpl::VertexArray::bind() const
+{
+    glBindVertexArray(m_id);
+}
 
-    void smpl::VertexArray::unbind()
-    {
-        glBindVertexArray(0);
-    }
+void smpl::VertexArray::unbind()
+{
+    glBindVertexArray(0);
+}
 
-    void smpl::VertexArray::addBuffer(const smpl::VertexBuffer& vertex_array)
-    {
-        bind();
-        vertex_array.bind();
+size_t smpl::VertexArray::getIndexesCount() const
+{
+    return m_indexes;
+}
 
-        //TODO - use buffer layout
+void smpl::VertexArray::addVertexBuffer(const smpl::VertexBuffer& vertex_array)
+{
+    bind();
+    vertex_array.bind();
+
+    for (const BufferElement& current_element : vertex_array.getLayout().getElements())
+    {
         glEnableVertexAttribArray(m_elements_count);
-        glVertexAttribPointer(m_elements_count, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
+        glVertexAttribPointer(
+            m_elements_count,
+            static_cast<GLint>(current_element.components_count),
+            current_element.component_type,
+            GL_FALSE,
+            static_cast<GLsizei>(vertex_array.getLayout().getStride()),
+            reinterpret_cast<const void*>(current_element.offset)
+        );
         ++m_elements_count;
     }
+}
+
+void smpl::VertexArray::setIndexBuffer(const smpl::IndexBuffer& index_array)
+{
+    bind();
+    index_array.bind();
+    m_indexes = index_array.getCount();
+}

@@ -1,3 +1,4 @@
+#include <stdafx.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -69,6 +70,7 @@ bool smpl::Texture::loadFromFile(const std::string& file_path)
         // TODO. Attach texture should be in other place?
         glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        LOG_DEBUG("Texture loaded: \"{}\".", file_path);
     }
     else
     {

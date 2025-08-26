@@ -30,7 +30,7 @@ list(APPEND IMGUI_SOURCES
 add_library(stb_image INTERFACE)
 target_include_directories(stb_image INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/ext_libs)
 target_compile_definitions(stb_image INTERFACE STB_IMAGE_IMPLEMENTATION)
-target_link_libraries(Samopal_Engine PRIVATE stb_image)
+target_link_libraries(SamopalEngine PRIVATE stb_image)
 #delete later
 target_link_libraries(Medievalution PRIVATE stb_image)
 
@@ -54,7 +54,7 @@ target_include_directories(Medievalution PRIVATE
 )
 
 target_link_libraries(Medievalution PRIVATE
-    Samopal_Engine
+    SamopalEngine
     glfw
     glad
     glm::glm
@@ -69,3 +69,4 @@ set_target_properties(Medievalution PROPERTIES
 )
 
 target_compile_features(Medievalution PUBLIC cxx_std_20)
+set_target_properties( spdlog glad imgui glm PROPERTIES FOLDER "External" )

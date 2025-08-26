@@ -1,8 +1,9 @@
+#include <stdafx.hpp>
 #include <Graphics/Shader/Shader.hpp>
 
 #include <Log/Log.hpp>
 
-#include <fstream>
+//#include <fstream>
 
 #include <glad/glad.h>
 
@@ -69,6 +70,7 @@ bool smpl::Shader::loadFromFile(const std::string& filename, smpl::Shader::Type 
 
     is_compiled = true;
     is_loaded = true;
+    LOG_DEBUG("Shader loaded: \"{}\" and compile.", filename);
     return true;
 }
 

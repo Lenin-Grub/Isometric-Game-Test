@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
-project(Samopal_Engine)
+project(SamopalEngine)
 
 set (ENGINE_PUBLIC_INCLUDES
-    src/Window/Window.hpp
+	src/stdafx.hpp
+    
+	src/Window/Window.hpp
     src/Event/Event.hpp
 	
     src/Log/Log.hpp
@@ -16,6 +18,7 @@ set (ENGINE_PUBLIC_INCLUDES
 	src/Graphics/Color/Color.hpp
 	src/Graphics/VertexArray/VertexArray.hpp
 	src/Graphics/VertexBuffer/VertexBuffer.hpp
+	src/Graphics/IndexBuffer/IndexBuffer.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
@@ -29,6 +32,7 @@ set (ENGINE_PUBLIC_SOURCES
 	src/Graphics/Texture/Texture.cpp
 	src/Graphics/VertexArray/VertexArray.cpp
 	src/Graphics/VertexBuffer/VertexBuffer.cpp
+	src/Graphics/IndexBuffer/IndexBuffer.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
@@ -57,3 +61,5 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog
 )
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/stdafx.hpp)

@@ -1,13 +1,18 @@
 ﻿#pragma once
+
+#pragma warning(push, 0)
+#pragma warning(disable: 4996)
 #include <spdlog/spdlog.h>
+#pragma warning(pop)
 
 namespace LogInfo
 {
+#ifdef DEBUG
     inline void initLogger()
     {
-        //spdlog::set_level(spdlog::level::debug);
-        spdlog::set_pattern("[%H:%M:%S] [%l] %v");
+        spdlog::set_level(spdlog::level::debug);
     }
+#endif
 
 #ifdef NDEBUG
 
