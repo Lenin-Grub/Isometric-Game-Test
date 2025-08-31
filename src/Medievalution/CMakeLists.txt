@@ -2,8 +2,21 @@ cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
 project(Medievalution)
 
-add_executable(Medievalution
+set(GAME_INCLUDES
+	src/Game/Game.hpp
+)
+
+set(GAME_SOURCES
     src/main.cpp
+	
+	src/Game/Game.cpp
+)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Medievalution" FILES ${GAME_INCLUDES} ${GAME_SOURCES})
+
+add_executable(Medievalution
+    ${GAME_INCLUDES}
+    ${GAME_SOURCES}
 )
 
 target_include_directories(Medievalution PRIVATE
