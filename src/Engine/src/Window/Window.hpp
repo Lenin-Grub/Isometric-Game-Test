@@ -26,12 +26,10 @@ namespace smpl
 
         void display();
 
-        //void processInput(GLFWwindow* window);
-
         GLFWwindow& getWindow() const;
 
     private:
-        GLFWwindow* window = nullptr;
+        GLFWwindow*        m_window = nullptr;
         const std::string  m_title;
         const unsigned int m_width;
         const unsigned int m_height;
@@ -43,6 +41,6 @@ namespace smpl
         static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         static void windowCloseCallback(GLFWwindow* window);
         static void windowSizeCallback(GLFWwindow* window, int width, int height);
-        static void scrollCallback(GLFWwindow* window, float xoffset, float yoffset);
+        static void windowScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
     };
 }

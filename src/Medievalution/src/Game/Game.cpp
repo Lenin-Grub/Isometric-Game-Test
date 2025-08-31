@@ -80,14 +80,17 @@ void Game::input()
             window.close();
         }
 
-        if (event.key.key == GLFW_KEY_ESCAPE)
+        if (event.key.code == smpl::Key::Code::Escape)
         {
             window.close();
         }
 
-        if (event.key.key == GLFW_KEY_SPACE)
+        if (event.key.action == GLFW_RELEASE)
         {
-            LOG_DEBUG("Space key pressed!");
+            if (event.key.code == smpl::Key::Code::Space)
+            {
+                LOG_DEBUG("Space key relesed!");
+            }
         }
 
         if (event.type == smpl::EventType::WindowResized)
@@ -97,7 +100,24 @@ void Game::input()
 
         if (event.type == smpl::EventType::MouseButtonPressed)
         {
-            LOG_DEBUG("Mouse ckicked!");
+            if (event.mouseButton.button == smpl::Mouse::Left)
+            {
+                LOG_DEBUG("Mouse left ckicked!");
+            }
+        }
+
+        if (event.type == smpl::EventType::MouseScrolled)
+        {
+            LOG_DEBUG("Mouse scrolled!");
+        }
+
+        //not work yet
+        if (event.type == smpl::EventType::KeyPressed)
+        {
+            if (event.key.code == smpl::Key::Code::A && event.key.code == smpl::Key::Code::LShift && event.key.code == smpl::Key::Code::LCtrl)
+            {
+                LOG_DEBUG("Ctrl+Shift+A");
+            }
         }
 
     }

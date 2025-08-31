@@ -7,17 +7,21 @@ namespace smpl
 {
     struct KeyEvent 
     {
-        int key;
+        //int key;
+        Key::Code code;
         int scancode;
         int action;
-        int mods;
+        //int mods;
     };
 
-    struct MouseClickEvent 
+    struct MouseButtonEvent 
     {
-        int button;
-        int action;
-        int mods;
+        Mouse::Button button;
+        float x;
+        float y;
+        //int button;
+        //int action;
+        //int mods;
     };
 
     struct MouseMoveEvent 
@@ -34,8 +38,8 @@ namespace smpl
 
     struct MouseScrollEvent 
     {
-        float xoffset;
-        float yoffset;
+        double xoffset;
+        double yoffset;
     };
 
     enum class EventType 
@@ -50,8 +54,13 @@ namespace smpl
         MouseMoved,
         MouseScrolled,
 
+        TextInput,
+        DragAndDrop,
+
         WindowClosed,
         WindowResized,
+        WindowFocusLost,
+        WindowFocusGained,
     };
 
     struct Event 
@@ -61,7 +70,7 @@ namespace smpl
         union
         {
             KeyEvent         key;
-            MouseClickEvent  mouseButton;
+            MouseButtonEvent mouseButton;
             MouseMoveEvent   mouseMove;
             WindowSizeEvent  windowSize;
             MouseScrollEvent mouseScroll;

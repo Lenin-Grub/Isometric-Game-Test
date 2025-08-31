@@ -11,7 +11,7 @@ smpl::Window::Window()
     : m_width(0)
     , m_height (0)
     , m_title  ("No Title")
-    , window   (nullptr)
+    , m_window   (nullptr)
 {
 }
 
@@ -19,7 +19,7 @@ smpl::Window::Window(const unsigned int width, const unsigned int height, const 
     : m_width  (width)
     , m_height (height)
     , m_title  (title)
-    , window   (nullptr)
+    , m_window   (nullptr)
 {
 }
 
@@ -40,42 +40,43 @@ bool smpl::Window::create(const unsigned int width, const unsigned int height, c
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
-    if (!window)
+    if (!m_window)
     {
         LOG_CRITICAL("Window init failed");
-        glfwDestroyWindow(window);
-        window = nullptr;
+        glfwDestroyWindow(m_window);
+        m_window = nullptr;
         glfwTerminate();
         return false;
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(m_window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         LOG_CRITICAL("GLAD init failed");
-        glfwDestroyWindow(window);
-        window = nullptr;
+        glfwDestroyWindow(m_window);
+        m_window = nullptr;
         glfwTerminate();
         return false;
     }
 
-    glfwSetWindowUserPointer(window, this);
+    glfwSetWindowUserPointer(m_window, this);
 
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
-    glfwSetCursorPosCallback(window, cursorPosCallback);
-    glfwSetWindowCloseCallback(window, windowCloseCallback);
-    glfwSetWindowSizeCallback(window, windowSizeCallback);
+    glfwSetKeyCallback(m_window, keyCallback);
+    glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
+    glfwSetCursorPosCallback(m_window, cursorPosCallback);
+    glfwSetWindowCloseCallback(m_window, windowCloseCallback);
+    glfwSetWindowSizeCallback(m_window, windowSizeCallback);
+    glfwSetScrollCallback(m_window, windowScrollCallback);
 
     return true;
 }
 
 bool smpl::Window::close()
 {
-    if (!window)
+    if (!m_window)
     {
         LOG_CRITICAL("Attempted to close window, but no window exists.");
         return false;
@@ -85,7 +86,7 @@ bool smpl::Window::close()
     //window = nullptr;
     //glfwTerminate();
 
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
+    glfwSetWindowShouldClose(m_window, GLFW_TRUE);
 
     return true;
 }
@@ -104,25 +105,20 @@ void smpl::Window::clear(const Color& color)
 
 void smpl::Window::display()
 {
-    if (!window)
+    if (!m_window)
     {
         LOG_CRITICAL("Window is nulptr. Can`t display");
         return;
     }
  
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(m_window);
 }
 
-//void smpl::Window::processInput(GLFWwindow* window)
-//{
-//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-//        glfwSetWindowShouldClose(window, true);
-//}
 
 GLFWwindow& smpl::Window::getWindow() const
 {
-    assert(window && "Window is not created!");
-    return *window;
+    assert(m_window && "Window is not created!");
+    return *m_window;
 }
 
 bool smpl::Window::pollEvent(smpl::Event& event)
@@ -139,10 +135,10 @@ bool smpl::Window::pollEvent(smpl::Event& event)
 
 bool smpl::Window::isOpen()
 {
-    if (!window)
+    if (!m_window)
         return false;
 
-    return !glfwWindowShouldClose(window);
+    return !glfwWindowShouldClose(m_window);
 }
 
 void smpl::Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
@@ -150,10 +146,10 @@ void smpl::Window::keyCallback(GLFWwindow* window, int key, int scancode, int ac
     Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
     Event event;
     event.type = (action == GLFW_PRESS) ? EventType::KeyPressed : EventType::KeyReleased;
-    event.key.key = key;
+    event.key.code = static_cast<Key::Code>(key);
     event.key.scancode = scancode;
     event.key.action = action;
-    event.key.mods = mods;
+    //event.key.mods = mods;
     win->m_event_queue.push(event);
 }
 
@@ -162,9 +158,10 @@ void smpl::Window::mouseButtonCallback(GLFWwindow* window, int button, int actio
     Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
     Event event;
     event.type = (action == GLFW_PRESS) ? EventType::MouseButtonPressed : EventType::MouseButtonReleased;
-    event.mouseButton.button = button;
-    event.mouseButton.action = action;
-    event.mouseButton.mods = mods;
+    //event.mouseButton.button = button;
+    event.mouseButton.button = static_cast<Mouse::Button>(button);
+    //event.mouseButton.action = action;
+    //event.mouseButton.mods = mods;
     win->m_event_queue.push(event);
 }
 
@@ -196,10 +193,9 @@ void smpl::Window::windowSizeCallback(GLFWwindow* window, int width, int height)
     win->m_event_queue.push(event);
 }
 
-void smpl::Window::scrollCallback(GLFWwindow* window, float xoffset, float yoffset)
+void smpl::Window::windowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    if (!win) return;
     Event event;
     event.type = EventType::MouseScrolled;
     event.mouseScroll.xoffset = xoffset;
