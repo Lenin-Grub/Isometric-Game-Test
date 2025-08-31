@@ -6,11 +6,13 @@ set (ENGINE_PUBLIC_INCLUDES
 	src/stdafx.hpp
     
 	src/Window/Window.hpp
-    src/Event/Event.hpp
+	src/Event/Event.hpp
+	src/Event/Keyboard.hpp
+	src/Event/Mouse.hpp
+
+	src/Log/Log.hpp
 	
-    src/Log/Log.hpp
-	
-    src/FileSystem/FileSystem.hpp
+	src/FileSystem/FileSystem.hpp
 	
 	src/Graphics/Shader/Shader.hpp
 	src/Graphics/Sprite/Sprite.hpp
@@ -19,12 +21,15 @@ set (ENGINE_PUBLIC_INCLUDES
 	src/Graphics/VertexArray/VertexArray.hpp
 	src/Graphics/VertexBuffer/VertexBuffer.hpp
 	src/Graphics/IndexBuffer/IndexBuffer.hpp
+
 )
 
 set (ENGINE_PUBLIC_SOURCES
-    src/Window/Window.cpp
-    src/Event/Event.cpp
-	
+	src/Window/Window.cpp
+	src/Event/Event.cpp
+	src/Event/Keyboard.cpp
+	src/Event/Mouse.cpp
+
 	src/FileSystem/FileSystem.cpp
 	
 	src/Graphics/Shader/Shader.cpp
@@ -48,17 +53,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $ENV{External}/glfw/include
     $ENV{External}/glad/include
     $ENV{External}/spdlog/include
+	$ENV{External}/glm/include
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
-target_link_libraries(${PROJECT_NAME} INTERFACE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     glad
     glm::glm
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog
 )
 

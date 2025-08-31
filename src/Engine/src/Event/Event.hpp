@@ -1,30 +1,71 @@
 #pragma once
 
+#include <Event/Keyboard.hpp>
+#include <Event/Mouse.hpp>
+
 namespace smpl
 {
-    enum class EventType
+    struct KeyEvent 
+    {
+        int key;
+        int scancode;
+        int action;
+        int mods;
+    };
+
+    struct MouseClickEvent 
+    {
+        int button;
+        int action;
+        int mods;
+    };
+
+    struct MouseMoveEvent 
+    {
+        float x;
+        float y;
+    };
+
+    struct WindowSizeEvent
+    {
+        unsigned int width;
+        unsigned int height;
+    };
+
+    struct MouseScrollEvent 
+    {
+        float xoffset;
+        float yoffset;
+    };
+
+    enum class EventType 
     {
         None = 0,
-        WindowClose,
-        WindowResize,
-        WindowFocus,
-        WindowUnFocus,
-        WindowMoved,
+
         KeyPressed,
         KeyReleased,
+
         MouseButtonPressed,
         MouseButtonReleased,
         MouseMoved,
-        MouseScrolled
+        MouseScrolled,
+
+        WindowClosed,
+        WindowResized,
     };
 
-
-    class Event
+    struct Event 
     {
-    public:
+        EventType type = EventType::None;
 
-
-    private:
-
+        union
+        {
+            KeyEvent         key;
+            MouseClickEvent  mouseButton;
+            MouseMoveEvent   mouseMove;
+            WindowSizeEvent  windowSize;
+            MouseScrollEvent mouseScroll;
+        };
     };
+
 }
