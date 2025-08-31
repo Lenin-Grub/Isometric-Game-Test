@@ -15,6 +15,7 @@ add_subdirectory(${EXTERNAL_DIR}/spdlog  External/spdlog)
 
 add_subdirectory(src/Engine)
 add_subdirectory(src/Medievalution)
+add_subdirectory(shaders)
 
 list(APPEND IMGUI_SOURCES
     ${EXTERNAL_DIR}/imgui/imgui.cpp
