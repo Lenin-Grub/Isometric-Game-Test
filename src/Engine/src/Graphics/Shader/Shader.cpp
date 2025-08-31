@@ -2,9 +2,6 @@
 #include <Graphics/Shader/Shader.hpp>
 
 #include <Log/Log.hpp>
-
-//#include <fstream>
-
 #include <glad/glad.h>
 
 namespace
@@ -205,7 +202,25 @@ void smpl::ShaderProgram::use() const
     }
 }
 
+void smpl::ShaderProgram::setUniform1i(const std::string& name, int x)
+{
+    GLint location = glGetUniformLocation(program_id, name.c_str());
+
+    if (location == -1)
+    {
+        LOG_WARN("Uniform \"{}\" not found.", name);
+        return; 
+    }
+
+    glUniform1i(location, x);
+}
+
 GLuint smpl::ShaderProgram::getID() const
+{
+    return program_id;
+}
+
+const bool smpl::ShaderProgram::isLinked() const
 {
     return program_id;
 }

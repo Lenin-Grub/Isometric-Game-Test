@@ -84,3 +84,8 @@ bool smpl::Texture::loadFromFile(const std::string& file_path)
     data = nullptr;
     return true;
 }
+
+const unsigned int& smpl::Texture::getTextureID()
+{
+    return texture_id;
+}

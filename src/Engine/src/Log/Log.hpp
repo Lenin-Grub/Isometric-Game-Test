@@ -8,9 +8,10 @@
 namespace LogInfo
 {
 #ifdef DEBUG
-    inline void initLogger()
+    inline bool initLogger()
     {
         spdlog::set_level(spdlog::level::debug);
+        return true;
     }
 #endif
 

@@ -9,7 +9,8 @@ namespace smpl
         ~Texture();
 
         bool loadFromFile(const std::string& file_path);
-        void bind(const uint32_t& texture);
+
+        const unsigned int& getTextureID();
 
     private:
 

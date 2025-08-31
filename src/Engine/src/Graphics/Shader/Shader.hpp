@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/glm.hpp>
 
 namespace smpl
 {
@@ -22,7 +23,6 @@ namespace smpl
 
         void bind();
 
-
         uint32_t getID()   const;
 
     private:
@@ -39,9 +39,7 @@ namespace smpl
     public:
         ShaderProgram();
         ~ShaderProgram();
-
         ShaderProgram(smpl::ShaderProgram&& other) noexcept;
-
         ShaderProgram(const smpl::ShaderProgram&) = delete;
         smpl::ShaderProgram& operator=(const smpl::ShaderProgram&) = delete;
         smpl::ShaderProgram& operator=(smpl::ShaderProgram&& other) noexcept;
@@ -51,7 +49,27 @@ namespace smpl
         bool link();
         void use() const;
 
+        void setUniform1i(const std::string& name, int x);
+        void setUniform1f(const std::string& name, float x);
+        void setUniform2f(const std::string& name, float x, float y);
+        void setUniform2f(const std::string& name, const glm::vec2& xy);
+        void setUniform2i(const std::string& name, const glm::ivec2& xy);
+        void setUniform3f(const std::string& name, float x, float y, float z);
+        void setUniform3f(const std::string& name, const glm::vec3& xyz);
+        void setUniform4f(const std::string& name, const glm::vec4& xyzw);
+
+        void setUniform1v(const std::string& name, int length, const int* v);
+        void setUniform1v(const std::string& name, int length, const float* v);
+        void setUniform2v(const std::string& name, int length, const float* v);
+        void setUniform3v(const std::string& name, int length, const float* v);
+        void setUniform4v(const std::string& name, int length, const float* v);
+
+        void setUniformMatrix(const std::string&, const glm::mat4& matrix);
+        void setUniformMatrix(const std::string&, const glm::mat3& matrix);
+
+
         uint32_t getID() const;
+        const bool isLinked() const;
 
     private:
         uint32_t program_id;
