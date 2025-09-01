@@ -3,6 +3,7 @@
 #include <Graphics/Color/Color.hpp>
 #include <Event/Event.hpp>
 #include <queue>
+#include "VideoMode.hpp"
 
 class GLFWwindow;
 
@@ -12,10 +13,10 @@ namespace smpl
     {
     public:
         Window();
-        Window(const unsigned int width, const unsigned int height, const std::string& title);
+        Window(smpl::VideoMode& mode, const std::string& title);
         ~Window();
 
-        bool create(const unsigned int width, const unsigned int height, const std::string& title);
+        bool create(smpl::VideoMode& mode, const std::string& title);
         bool close();
 
         bool pollEvent(smpl::Event& event);
@@ -28,11 +29,47 @@ namespace smpl
 
         GLFWwindow& getWindow() const;
 
+        bool setFullscreen(bool fullscreen)
+        {
+            if (!m_window || m_fullscreen == fullscreen)
+                return true;
+
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            if (!monitor)
+                return false;
+
+            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+            if (!mode)
+                return false;
+
+            if (fullscreen)
+            {
+                glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+                LOG_DEBUG("Fullscrean mod eanable");
+            }
+            else
+            {
+                int windowX = (mode->width - m_windowedMode.width) / 2;
+                int windowY = (mode->height - m_windowedMode.height) / 2;
+
+                glfwSetWindowMonitor(m_window, nullptr, windowX, windowY, m_windowedMode.width, m_windowedMode.height, 0);
+
+                LOG_DEBUG("Fullscrean mod disable");
+            }
+
+            m_fullscreen = fullscreen;
+            return true;
+        }
+
     private:
         GLFWwindow*        m_window = nullptr;
         const std::string  m_title;
         const unsigned int m_width;
         const unsigned int m_height;
+
+        VideoMode          m_windowedMode;     // Параметры оконного режима
+        VideoMode          m_fullscreenMode;   // Режим для полноэкранного (обычно primary monitor)
+        bool               m_fullscreen = false;
 
         std::queue<smpl::Event> m_event_queue;
 

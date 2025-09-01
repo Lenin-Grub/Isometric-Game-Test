@@ -8,18 +8,18 @@
 
 
 smpl::Window::Window()
-    : m_width(0)
+    : m_width  (0)
     , m_height (0)
     , m_title  ("No Title")
-    , m_window   (nullptr)
+    , m_window (nullptr)
 {
 }
 
-smpl::Window::Window(const unsigned int width, const unsigned int height, const std::string& title)
-    : m_width  (width)
-    , m_height (height)
+smpl::Window::Window(smpl::VideoMode& mode, const std::string& title)
+    : m_width  (mode.width)
+    , m_height (mode.height)
     , m_title  (title)
-    , m_window   (nullptr)
+    , m_window (nullptr)
 {
 }
 
@@ -27,7 +27,7 @@ smpl::Window::~Window()
 {
 }
 
-bool smpl::Window::create(const unsigned int width, const unsigned int height, const std::string& title)
+bool smpl::Window::create(smpl::VideoMode& mode, const std::string& title)
 {
 
     if (!glfwInit())
@@ -40,7 +40,7 @@ bool smpl::Window::create(const unsigned int width, const unsigned int height, c
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    m_window = glfwCreateWindow(mode.width, mode.height, title.c_str(), nullptr, nullptr);
 
     if (!m_window)
     {
@@ -62,14 +62,14 @@ bool smpl::Window::create(const unsigned int width, const unsigned int height, c
         return false;
     }
 
-    glfwSetWindowUserPointer(m_window, this);
+    glfwSetWindowUserPointer   (m_window, this);
 
-    glfwSetKeyCallback(m_window, keyCallback);
-    glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
-    glfwSetCursorPosCallback(m_window, cursorPosCallback);
-    glfwSetWindowCloseCallback(m_window, windowCloseCallback);
-    glfwSetWindowSizeCallback(m_window, windowSizeCallback);
-    glfwSetScrollCallback(m_window, windowScrollCallback);
+    glfwSetKeyCallback         (m_window, keyCallback);
+    glfwSetMouseButtonCallback (m_window, mouseButtonCallback);
+    glfwSetCursorPosCallback   (m_window, cursorPosCallback);
+    glfwSetWindowCloseCallback (m_window, windowCloseCallback);
+    glfwSetWindowSizeCallback  (m_window, windowSizeCallback);
+    glfwSetScrollCallback      (m_window, windowScrollCallback);
 
     return true;
 }

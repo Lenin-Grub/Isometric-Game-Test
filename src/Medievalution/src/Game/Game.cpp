@@ -1,6 +1,8 @@
 #include <Game/Game.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <Window/VideoMode.hpp>
+
 
 #pragma region Call Backs
 // TODO delete later. Unused
@@ -31,7 +33,9 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 bool Game::create()
 {
-    if (!window.create(WIDTH, HEIGHT, "Medievalution"))
+    smpl::VideoMode mode{ WIDTH , HEIGHT };
+
+    if (!window.create(mode, "Medievalution"))
         return false;
 
     if(!initImGui(window))
@@ -48,6 +52,15 @@ bool Game::create()
 
 void Game::run()
 {
+    smpl::VideoMode modes;
+
+    for (auto i : modes.getFullscreenModes())
+    {
+        auto res = i;
+        LOG_INFO("Video mode: {0},{1}", res.width, res.height);
+    }
+
+
     while (window.isOpen())
     {
         window.clear(color);
@@ -127,6 +140,16 @@ void Game::draw()
 {
     ImGui::NewFrame();
     ImGui::ShowDemoWindow();
+
+    static bool fullscrean;
+
+    ImGui::Begin("Settings");
+    
+    ImGui::Checkbox("Fullscrean", &fullscrean);
+    window.setFullscreen(fullscrean);
+
+    ImGui::End();
+
     ImGui::Render();
     drawImGuiGL();
 }
