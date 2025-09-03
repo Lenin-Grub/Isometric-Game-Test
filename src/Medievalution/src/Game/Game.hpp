@@ -1,9 +1,5 @@
 #pragma once
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
 #include <Log/Log.hpp>
 
 #include <Graphics/Shader/Shader.hpp>
@@ -14,6 +10,10 @@
 #include <Graphics/IndexBuffer/IndexBuffer.hpp>
 
 #include <Window/Window.hpp>
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 class Game
 {
@@ -33,6 +33,8 @@ private:
     void update();
 
     void close();
+
+    void showVideoSettings();
 
 
 private:

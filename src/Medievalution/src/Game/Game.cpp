@@ -2,33 +2,83 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <Window/VideoMode.hpp>
+#include <set>
+#include <algorithm>
 
+#pragma region Settings
 
-#pragma region Call Backs
-// TODO delete later. Unused
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+static bool s_showSettings = false;
+static bool s_fullscreen = false;
+static int s_selectedIndex = 0;
+static std::vector<smpl::VideoMode> s_availableModes;
+static std::vector<std::string> s_modeLabels;
+
+void initVideoModeList()
 {
-    if (action == GLFW_PRESS)
-        LOG_DEBUG("Key pressed: {}", std::to_string(key));
+    if (!s_availableModes.empty()) return;
+
+    auto modes = smpl::VideoMode::getFullscreenModes();
+
+    std::set<std::pair<int, int>> seen;
+    std::vector<smpl::VideoMode> unique;
+
+    for (const auto& mode : modes)
+    {
+        auto key = std::make_pair(mode.width, mode.height);
+        if (seen.insert(key).second)
+        {
+            unique.push_back(mode);
+        }
+    }
+
+    std::sort(unique.begin(), unique.end(), [](const smpl::VideoMode& a, const smpl::VideoMode& b)
+        { return (a.width * a.height) > (b.width * b.height); });
+
+    s_availableModes = std::move(unique);
+
+    s_modeLabels.clear();
+    for (const auto& mode : s_availableModes)
+    {
+        s_modeLabels.push_back(std::to_string(mode.width) + "x" + std::to_string(mode.height));
+    }
+
+    s_selectedIndex = 0;
 }
 
-void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
+void Game::showVideoSettings()
 {
-    LOG_DEBUG("Mouse position is {} {}", xpos, ypos);
-}
+    initVideoModeList();
 
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-{
-    LOG_DEBUG("Mouse button callback.");
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        LOG_DEBUG("Mouse button rights is pressed.");
-}
+    ImGui::Begin("Settings", &s_showSettings);
 
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    LOG_DEBUG("Mouse scrolling.");
-}
+    if (ImGui::BeginCombo("Resolution", s_modeLabels[s_selectedIndex].c_str()))
+    {
+        for (int i = 0; i < s_modeLabels.size(); i++)
+        {
+            bool selected = (i == s_selectedIndex);
+            if (ImGui::Selectable(s_modeLabels[i].c_str(), selected))
+            {
+                s_selectedIndex = i;
+            }
+            if (selected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
 
+    ImGui::Checkbox("Fullscreen", &s_fullscreen);
+
+    if (ImGui::Button("Applay"))
+    {
+        const smpl::VideoMode& mode = s_availableModes[s_selectedIndex];
+        window.setMode(mode, s_fullscreen);
+        LOG_INFO("Resolution: {}x{} | Fullscreen: {}", mode.width, mode.height, s_fullscreen);
+    }
+
+    ImGui::End();
+}
 #pragma endregion
 
 bool Game::create()
@@ -140,16 +190,7 @@ void Game::draw()
 {
     ImGui::NewFrame();
     ImGui::ShowDemoWindow();
-
-    static bool fullscrean;
-
-    ImGui::Begin("Settings");
-    
-    ImGui::Checkbox("Fullscrean", &fullscrean);
-    window.setFullscreen(fullscrean);
-
-    ImGui::End();
-
+    showVideoSettings();
     ImGui::Render();
     drawImGuiGL();
 }
@@ -164,3 +205,4 @@ void Game::close()
     destroyImGui();
     window.close();
 }
+

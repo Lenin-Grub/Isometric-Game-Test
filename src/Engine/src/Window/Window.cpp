@@ -121,6 +121,77 @@ GLFWwindow& smpl::Window::getWindow() const
     return *m_window;
 }
 
+bool smpl::Window::setFullscreen(bool fullscreen)
+{
+    if (!m_window || m_fullscreen == fullscreen)
+        return true;
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    if (!monitor)
+        return false;
+
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    if (!mode)
+        return false;
+
+    if (fullscreen)
+    {
+        glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        LOG_DEBUG("Fullscrean mod eanable");
+    }
+    else
+    {
+        int windowX = (mode->width - m_windowedMode.width) / 2;
+        int windowY = (mode->height - m_windowedMode.height) / 2;
+
+        glfwSetWindowMonitor(m_window, nullptr, windowX, windowY, m_windowedMode.width, m_windowedMode.height, 0);
+
+        LOG_DEBUG("Fullscrean mod disable");
+    }
+
+    m_fullscreen = fullscreen;
+    return true;
+}
+
+bool smpl::Window::setMode(const VideoMode& mode, bool fullscreen)
+{
+    if (!m_window)
+    {
+        LOG_CRITICAL("Cannot set mode: window not created.");
+        return false;
+    }
+
+    GLFWmonitor* monitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
+
+    // fulscreen
+    if (monitor)
+    {
+        const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
+        if (!vidMode)
+        {
+            LOG_CRITICAL("Failed to get video mode for monitor.");
+            return false;
+        }
+
+        glfwSetWindowMonitor(m_window, monitor, 0, 0, mode.width, mode.height, vidMode->refreshRate);
+    }
+    else
+    {
+        const GLFWvidmode* desktop = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        int x = (desktop->width - mode.width)   / 2;
+        int y = (desktop->height - mode.height) / 2;
+
+        glfwSetWindowMonitor(m_window, nullptr, x, y, mode.width, mode.height, 0);
+    }
+
+    m_windowedMode = mode;
+    m_width        = mode.width;
+    m_height       = mode.height;
+    m_fullscreen   = fullscreen;
+
+    return true;
+}
+
 bool smpl::Window::pollEvent(smpl::Event& event)
 {
     glfwPollEvents();
@@ -141,7 +212,12 @@ bool smpl::Window::isOpen()
     return !glfwWindowShouldClose(m_window);
 }
 
-void smpl::Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+bool smpl::Window::isFullscreen() const
+{
+    return m_fullscreen;
+}
+
+void smpl::Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
     Event event;

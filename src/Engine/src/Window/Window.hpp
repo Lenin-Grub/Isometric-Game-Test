@@ -29,46 +29,20 @@ namespace smpl
 
         GLFWwindow& getWindow() const;
 
-        bool setFullscreen(bool fullscreen)
-        {
-            if (!m_window || m_fullscreen == fullscreen)
-                return true;
+        bool setFullscreen(bool fullscreen);
 
-            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-            if (!monitor)
-                return false;
+        bool setMode(const VideoMode& mode, bool fullscreen = false);
 
-            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-            if (!mode)
-                return false;
-
-            if (fullscreen)
-            {
-                glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-                LOG_DEBUG("Fullscrean mod eanable");
-            }
-            else
-            {
-                int windowX = (mode->width - m_windowedMode.width) / 2;
-                int windowY = (mode->height - m_windowedMode.height) / 2;
-
-                glfwSetWindowMonitor(m_window, nullptr, windowX, windowY, m_windowedMode.width, m_windowedMode.height, 0);
-
-                LOG_DEBUG("Fullscrean mod disable");
-            }
-
-            m_fullscreen = fullscreen;
-            return true;
-        }
+        bool isFullscreen() const;
 
     private:
         GLFWwindow*        m_window = nullptr;
         const std::string  m_title;
-        const unsigned int m_width;
-        const unsigned int m_height;
+        unsigned int       m_width;
+        unsigned int       m_height;
 
-        VideoMode          m_windowedMode;     // Параметры оконного режима
-        VideoMode          m_fullscreenMode;   // Режим для полноэкранного (обычно primary monitor)
+        VideoMode          m_windowedMode;
+        VideoMode          m_fullscreenMode;
         bool               m_fullscreen = false;
 
         std::queue<smpl::Event> m_event_queue;
