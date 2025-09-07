@@ -3,6 +3,7 @@
 
 #include <Log/Log.hpp>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace
 {
@@ -213,6 +214,19 @@ void smpl::ShaderProgram::setUniform1i(const std::string& name, int x)
     }
 
     glUniform1i(location, x);
+}
+
+void smpl::ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat4& matrix)
+{
+    GLint location = glGetUniformLocation(program_id, name.c_str());
+
+    if (location == -1)
+    {
+        LOG_WARN("Uniform \"{}\" not found.", name);
+        return;
+    }
+
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 GLuint smpl::ShaderProgram::getID() const

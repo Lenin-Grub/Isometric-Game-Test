@@ -64,8 +64,8 @@ namespace smpl
         void setUniform3v(const std::string& name, int length, const float* v);
         void setUniform4v(const std::string& name, int length, const float* v);
 
-        void setUniformMatrix(const std::string&, const glm::mat4& matrix);
-        void setUniformMatrix(const std::string&, const glm::mat3& matrix);
+        void setUniformMatrix(const std::string& name, const glm::mat4& matrix);
+        void setUniformMatrix(const std::string& name, const glm::mat3& matrix);
 
 
         uint32_t getID() const;
