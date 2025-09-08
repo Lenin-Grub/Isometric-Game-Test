@@ -14,6 +14,7 @@ set (ENGINE_PUBLIC_INCLUDES
 
     src/Log/Log.hpp
 
+    src/Camera/Camera.hpp
     src/Settings/WindowSettings.hpp	
     src/FileSystem/FileSystem.hpp
     
@@ -34,6 +35,7 @@ set (ENGINE_PUBLIC_SOURCES
     src/Event/Keyboard.cpp
     src/Event/Mouse.cpp
 
+    src/Camera/Camera.cpp
     src/Settings/WindowSettings.cpp
     src/FileSystem/FileSystem.cpp
     

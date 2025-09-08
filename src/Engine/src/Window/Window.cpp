@@ -71,6 +71,8 @@ bool smpl::Window::create(smpl::VideoMode& mode, const std::string& title)
     glfwSetWindowSizeCallback  (m_window, windowSizeCallback);
     glfwSetScrollCallback      (m_window, windowScrollCallback);
 
+    glEnable(GL_DEPTH_TEST);
+
     return true;
 }
 
@@ -82,10 +84,6 @@ bool smpl::Window::close()
         return false;
     }
 
-    //glfwDestroyWindow(window);
-    //window = nullptr;
-    //glfwTerminate();
-
     glfwSetWindowShouldClose(m_window, GLFW_TRUE);
 
     return true;
@@ -94,13 +92,13 @@ bool smpl::Window::close()
 void smpl::Window::clear()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void smpl::Window::clear(const Color& color)
 {
     glClearColor(color.r, color.g, color.b, color.a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void smpl::Window::display()
