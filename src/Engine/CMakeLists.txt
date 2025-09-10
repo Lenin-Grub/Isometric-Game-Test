@@ -13,6 +13,7 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Event/Mouse.hpp
 
     src/Log/Log.hpp
+    src/ImGui/SetImGui.cpp
 
     src/Camera/Camera.hpp
     src/Settings/WindowSettings.hpp	
@@ -35,6 +36,7 @@ set (ENGINE_PUBLIC_SOURCES
     src/Event/Keyboard.cpp
     src/Event/Mouse.cpp
 
+    src/ImGui/SetImGui.hpp
     src/Camera/Camera.cpp
     src/Settings/WindowSettings.cpp
     src/FileSystem/FileSystem.cpp

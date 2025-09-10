@@ -4,6 +4,7 @@
 #include <Event/Event.hpp>
 #include <queue>
 #include "VideoMode.hpp"
+#include <glm/glm.hpp>
 
 class GLFWwindow;
 
@@ -31,9 +32,13 @@ namespace smpl
 
         bool setFullscreen(bool fullscreen);
 
-        bool setMode(const VideoMode& mode, bool fullscreen = false);
-
         bool isFullscreen() const;
+
+        bool setVideoMode(const VideoMode& mode, bool fullscreen = false);
+
+        const VideoMode& getVideoMode();
+
+        glm::vec2 getCursorPos() const;
 
     private:
         GLFWwindow*        m_window = nullptr;
@@ -41,8 +46,7 @@ namespace smpl
         unsigned int       m_width;
         unsigned int       m_height;
 
-        VideoMode          m_windowedMode;
-        VideoMode          m_fullscreenMode;
+        VideoMode          m_video_mode;
         bool               m_fullscreen = false;
 
         std::queue<smpl::Event> m_event_queue;

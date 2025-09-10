@@ -18,12 +18,11 @@
 class Game
 {
 public:
-	Game()  = default;
-	~Game() = default;
+    Game()  = default;
+    ~Game() = default;
 
-	bool create();
-
-	void run();
+    bool create();
+    void run();
 
 private:
 
@@ -34,83 +33,21 @@ private:
 
     void close();
 
+    void initVideoModeList();
     void showVideoSettings();
 
+private:
+    unsigned int m_width  = 2560;
+    unsigned int m_height = 1600;
+
+    smpl::Window m_window;
+    smpl::Event  m_event;
+    smpl::Color  m_color{ 50,50,50 };
 
 private:
-	const unsigned int WIDTH = 1280;
-	const unsigned int HEIGHT = 920;
-
-	smpl::Window window;
-    smpl::Event  event;
-    smpl::Color  color{ 50,50,50 };
-
-private:
-    bool initImGui(const smpl::Window& window)
-    {
-        if (!&window.getWindow())
-        {
-            LOG_CRITICAL("Window is nullptr!");
-            return false;
-        }
-
-        if (!IMGUI_CHECKVERSION())
-        {
-            LOG_CRITICAL("Wrong version of ImGui!");
-            return false;
-        }
-
-        if (!ImGui::CreateContext())
-        {
-            LOG_CRITICAL("Failed create context to ImGui!");
-            return false;
-        }
-
-        if (!ImGui_ImplGlfw_InitForOpenGL(&window.getWindow(), true))
-        {
-            LOG_CRITICAL("Failed init GLFW to ImGui!");
-            return false;
-        }
-
-        if (!ImGui_ImplOpenGL3_Init("#version 460"))
-        {
-            LOG_CRITICAL("Failed init opengl3 to ImGui!");
-            return false;
-        }
-
-        LOG_DEBUG("ImGui inited");
-
-        return true;
-    }
-
-    bool destroyImGui()
-    {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-
-        return true;
-    }
-
-    bool initBackEndImGui()
-    {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        return true;
-    }
-
-    bool drawImGuiGL()
-    {
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        return true;
-    }
-
-    bool initImGuiFont()
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        ImFontConfig config;
-        config.SizePixels = 25.0f;
-        io.Fonts->AddFontDefault(&config);
-        return true;
-    }
+    bool m_show_settings  = false;
+    bool m_fullscreen     = false;
+    int  m_selected_index = 0;
+    std::vector<smpl::VideoMode> m_available_modes;
+    std::vector<std::string> m_mode_labels;
 };

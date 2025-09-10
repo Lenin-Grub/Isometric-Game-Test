@@ -1,21 +1,137 @@
 #include <Game/Game.hpp>
 #include <GLFW/glfw3.h>
-#include <iostream>
+
 #include <Window/VideoMode.hpp>
+#include <ImGui/SetImGui.hpp>
+
+#include <iostream>
 #include <set>
 #include <algorithm>
 
+bool Game::create()
+{
+    smpl::VideoMode mode{ m_width , m_height };
+
+    if (!m_window.create(mode, "Medievalution"))
+        return false;
+
+    if(!smpl::Gui::initImGui(m_window))
+        return false;
+
+    if(!smpl::Gui::initImGuiFont())
+        return false;
+
+    if(!LogInfo::initLogger())
+        return false;
+
+    return true;
+}
+
+void Game::run()
+{
+    smpl::VideoMode modes;
+
+    while (m_window.isOpen())
+    {
+        m_window.clear(m_color);
+
+        init();
+        input();
+        update();
+        draw();
+
+        m_window.display();
+    }
+
+    close();
+}
+
+bool Game::init()
+{
+    if(!smpl::Gui::initBackEndImGui())
+        return false;
+
+    return true;
+}
+
+void Game::input()
+{
+    while (m_window.pollEvent(m_event))
+    {
+        if (m_event.type == smpl::EventType::WindowClosed)
+        {
+            m_window.close();
+        }
+
+        if (m_event.key.code == smpl::Key::Code::Escape)
+        {
+            m_window.close();
+        }
+
+        if (m_event.key.action == GLFW_RELEASE)
+        {
+            if (m_event.key.code == smpl::Key::Code::Space)
+            {
+                LOG_DEBUG("Space key relesed!");
+            }
+        }
+
+        if (m_event.type == smpl::EventType::WindowResized)
+        {
+            LOG_DEBUG("Resized to : {0} {1}", m_event.windowSize.width, m_event.windowSize.height);
+        }
+
+        if (m_event.type == smpl::EventType::MouseButtonPressed)
+        {
+            if (m_event.mouseButton.button == smpl::Mouse::Left)
+            {
+                LOG_DEBUG("Mouse left ckicked!");
+            }
+        }
+
+        if (m_event.type == smpl::EventType::MouseScrolled)
+        {
+            LOG_DEBUG("Mouse scrolled!");
+        }
+
+        //not work yet
+        //if (m_event.type == smpl::EventType::KeyPressed)
+        //{
+        //    if (m_event.key.code == smpl::Key::Code::A && m_event.key.code == smpl::Key::Code::LShift && m_event.key.code == smpl::Key::Code::LCtrl)
+        //    {
+        //        LOG_DEBUG("Ctrl+Shift+A");
+        //    }
+        //}
+
+    }
+}
+
+void Game::draw()
+{
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
+    showVideoSettings();
+
+    smpl::Gui::drawImGuiGL();
+}
+
+void Game::update()
+{
+
+}
+
+void Game::close()
+{
+    smpl::Gui::destroyImGui();
+    m_window.close();
+}
+
 #pragma region Settings
 
-static bool s_showSettings = false;
-static bool s_fullscreen = false;
-static int s_selectedIndex = 0;
-static std::vector<smpl::VideoMode> s_availableModes;
-static std::vector<std::string> s_modeLabels;
-
-void initVideoModeList()
+void Game::initVideoModeList()
 {
-    if (!s_availableModes.empty()) return;
+    if (!m_available_modes.empty())
+        return;
 
     auto modes = smpl::VideoMode::getFullscreenModes();
 
@@ -34,31 +150,32 @@ void initVideoModeList()
     std::sort(unique.begin(), unique.end(), [](const smpl::VideoMode& a, const smpl::VideoMode& b)
         { return (a.width * a.height) > (b.width * b.height); });
 
-    s_availableModes = std::move(unique);
+    m_available_modes = std::move(unique);
 
-    s_modeLabels.clear();
-    for (const auto& mode : s_availableModes)
+    m_mode_labels.clear();
+
+    for (const auto& mode : m_available_modes)
     {
-        s_modeLabels.push_back(std::to_string(mode.width) + "x" + std::to_string(mode.height));
+        m_mode_labels.push_back(std::to_string(mode.width) + "x" + std::to_string(mode.height));
     }
 
-    s_selectedIndex = 0;
+    m_selected_index = 0;
 }
 
 void Game::showVideoSettings()
 {
     initVideoModeList();
 
-    ImGui::Begin("Settings", &s_showSettings);
+    ImGui::Begin("Settings", &m_show_settings);
 
-    if (ImGui::BeginCombo("Resolution", s_modeLabels[s_selectedIndex].c_str()))
+    if (ImGui::BeginCombo("Resolution", m_mode_labels[m_selected_index].c_str()))
     {
-        for (int i = 0; i < s_modeLabels.size(); i++)
+        for (int i = 0; i < m_mode_labels.size(); i++)
         {
-            bool selected = (i == s_selectedIndex);
-            if (ImGui::Selectable(s_modeLabels[i].c_str(), selected))
+            bool selected = (i == m_selected_index);
+            if (ImGui::Selectable(m_mode_labels[i].c_str(), selected))
             {
-                s_selectedIndex = i;
+                m_selected_index = i;
             }
             if (selected)
             {
@@ -68,141 +185,16 @@ void Game::showVideoSettings()
         ImGui::EndCombo();
     }
 
-    ImGui::Checkbox("Fullscreen", &s_fullscreen);
+    ImGui::Checkbox("Fullscreen", &m_fullscreen);
 
     if (ImGui::Button("Applay"))
     {
-        const smpl::VideoMode& mode = s_availableModes[s_selectedIndex];
-        window.setMode(mode, s_fullscreen);
-        LOG_INFO("Resolution: {}x{} | Fullscreen: {}", mode.width, mode.height, s_fullscreen);
+        const smpl::VideoMode& mode = m_available_modes[m_selected_index];
+        m_window.setVideoMode(mode, m_fullscreen);
+        LOG_INFO("Resolution: {}x{} | Fullscreen: {}", mode.width, mode.height, m_fullscreen);
     }
 
     ImGui::End();
 }
+
 #pragma endregion
-
-bool Game::create()
-{
-    smpl::VideoMode mode{ WIDTH , HEIGHT };
-
-    if (!window.create(mode, "Medievalution"))
-        return false;
-
-    if(!initImGui(window))
-        return false;
-
-    if(!initImGuiFont())
-        return false;
-
-    if(!LogInfo::initLogger())
-        return false;
-
-    return true;
-}
-
-void Game::run()
-{
-    smpl::VideoMode modes;
-
-    for (auto i : modes.getFullscreenModes())
-    {
-        auto res = i;
-        LOG_INFO("Video mode: {0},{1}", res.width, res.height);
-    }
-
-
-    while (window.isOpen())
-    {
-        window.clear(color);
-
-        init();
-        input();
-        update();
-        draw();
-
-        window.display();
-    }
-
-    close();
-}
-
-bool Game::init()
-{
-    if(!initBackEndImGui())
-        return false;
-
-    return true;
-}
-
-void Game::input()
-{
-    while (window.pollEvent(event))
-    {
-        if (event.type == smpl::EventType::WindowClosed)
-        {
-            window.close();
-        }
-
-        if (event.key.code == smpl::Key::Code::Escape)
-        {
-            window.close();
-        }
-
-        if (event.key.action == GLFW_RELEASE)
-        {
-            if (event.key.code == smpl::Key::Code::Space)
-            {
-                LOG_DEBUG("Space key relesed!");
-            }
-        }
-
-        if (event.type == smpl::EventType::WindowResized)
-        {
-            LOG_DEBUG("Resized to : {0} {1}", event.windowSize.width, event.windowSize.height);
-        }
-
-        if (event.type == smpl::EventType::MouseButtonPressed)
-        {
-            if (event.mouseButton.button == smpl::Mouse::Left)
-            {
-                LOG_DEBUG("Mouse left ckicked!");
-            }
-        }
-
-        if (event.type == smpl::EventType::MouseScrolled)
-        {
-            LOG_DEBUG("Mouse scrolled!");
-        }
-
-        //not work yet
-        if (event.type == smpl::EventType::KeyPressed)
-        {
-            if (event.key.code == smpl::Key::Code::A && event.key.code == smpl::Key::Code::LShift && event.key.code == smpl::Key::Code::LCtrl)
-            {
-                LOG_DEBUG("Ctrl+Shift+A");
-            }
-        }
-
-    }
-}
-
-void Game::draw()
-{
-    ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
-    showVideoSettings();
-    ImGui::Render();
-    drawImGuiGL();
-}
-
-void Game::update()
-{
-
-}
-
-void Game::close()
-{
-    destroyImGui();
-    window.close();
-}
-

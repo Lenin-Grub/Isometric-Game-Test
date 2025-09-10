@@ -129,6 +129,11 @@ smpl::VertexBuffer::VertexBuffer(VertexBuffer&& vertex_buffer) noexcept
 
 void smpl::VertexBuffer::bind() const
 {
+    if (m_id == 0)
+    {
+        LOG_ERROR("Attempt to bind uninitialized VertexBuffer!");
+        return;
+    }
     glBindBuffer(GL_ARRAY_BUFFER, m_id);
 }
 

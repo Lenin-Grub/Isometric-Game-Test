@@ -37,6 +37,11 @@ smpl::VertexArray::VertexArray(smpl::VertexArray&& vertex_array) noexcept
 
 void smpl::VertexArray::bind() const
 {
+    if (m_id == 0)
+    {
+        LOG_ERROR("Attempt to bind uninitialized VertexArray!");
+        return;
+    }
     glBindVertexArray(m_id);
 }
 
