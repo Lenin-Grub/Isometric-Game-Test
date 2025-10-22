@@ -195,6 +195,17 @@ namespace smpl
         return true;
     }
 
+    void Window::setVerticalSync(bool enable)
+    {
+        glfwSwapInterval(enable ? 1 : 0);
+        m_vertical_synch = enable;
+    }
+
+    bool Window::isVerticalSync() const
+    {
+        return m_vertical_synch;
+    }
+
     const VideoMode& Window::getVideoMode()
     {
         return m_video_mode;

@@ -13,29 +13,25 @@ void main()
 
     float dx = fwidth(v_world_pos.x);
     float dz = fwidth(v_world_pos.z);
-    float line_width_x = 1.5 * dx;
-    float line_width_z = 1.5 * dz;
+    float line_width_x = 1.0f * dx;
+    float line_width_z = 1.0f * dz;
 
     if (x_dist < line_width_x || z_dist < line_width_z)
     {
         float dy = fwidth(v_world_pos.y);
-        float line_width_y = 1.5 * dy;
+        float line_width_y = 1.0f * dy;
 
-        // I made mistake somewhere in axes
-        // Axe X but it green like Y
         if (abs(v_world_pos.x) < line_width_x)
+        {
+            frag_color = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+        else if (abs(v_world_pos.y) < line_width_y)
         {
             frag_color = vec4(0.0, 1.0, 0.0, 1.0);
         }
-        // Axe Y — blue like Z but it should be green
-        else if (abs(v_world_pos.y) < line_width_y)
-        {
-            frag_color = vec4(0.0, 0.0, 1.0, 1.0);
-        }
-        // Axe Z — red but it should be blue
         else if (abs(v_world_pos.z) < line_width_z)
         {
-            frag_color = vec4(1.0, 0.0, 0.0, 1.0);
+            frag_color = vec4(0.0, 0.0, 1.0, 1.0);
         }
         else
         {

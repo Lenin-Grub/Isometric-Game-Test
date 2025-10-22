@@ -25,8 +25,8 @@
 #include <set>
 
 
-float camera_pos[3] = { -15.f, 0.f, 5.f };
-float camera_rot[3] = { 0.f, 0.f, 0.f };
+float camera_pos[3] = { -30.f, 15.f, 0.f };
+float camera_rot[3] = { 90.f, 0.f, -45.f };
 bool  perspective_camera = true;
 
 float deltaTime = 0.0f;
@@ -51,6 +51,7 @@ int main()
     smpl::VideoMode mode{ 2560 , 1600 };
 
     window.create(mode, "Medievalution");
+    window.setVerticalSync(true);
 
     smpl::Gui::initImGui(window);
     smpl::Gui::initImGuiFont();
@@ -187,7 +188,7 @@ int main()
         
         input(window);
 
-        window.clear(smpl::Color(30,30,30));
+        window.clear(smpl::Color(50,50,50));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1.getTextureID());
@@ -216,7 +217,7 @@ int main()
         //_______GRID_______
         glm::mat4 gridTransform = glm::mat4(1.0f);
         //gridTransform = glm::translate(gridTransform, glm::vec3(translate[0], 0.0f, translate[2])); // ← Y = 0, если сетка на полу
-        gridTransform = glm::rotate(gridTransform, glm::radians(90.0f), glm::vec3(1, 0, 0));
+        gridTransform = glm::rotate(gridTransform, glm::radians(0.0f), glm::vec3(1, 0, 0));
         gridTransform = glm::scale(gridTransform, glm::vec3(50.0f, 1.0f, 50.0f)); // ← Y масштаб = 1.0!
 
         glm::mat4 gridMVP = camera.getProjectionMatrix() * camera.getViewMatrix() * gridTransform;
@@ -301,28 +302,32 @@ void input(smpl::Window& window)
 
     was_pressed = is_pressed;
 
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q) == GLFW_PRESS || glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera_rot[2] += cameraSpeed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E) == GLFW_PRESS || glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera_rot[2] -= cameraSpeed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q) == GLFW_PRESS)
+        camera_rot[0] -= cameraSpeed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E) == GLFW_PRESS)
+        camera_rot[0] += cameraSpeed * 15;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
-        camera_rot[1] -= cameraSpeed * 15;
+        camera_rot[2] += cameraSpeed * 15;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
+        camera_rot[2] -= cameraSpeed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS)
         camera_rot[1] += cameraSpeed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS)
+        camera_rot[1] -= cameraSpeed * 15;
 
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
         camera_pos[0] += cameraSpeed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
         camera_pos[0] -= cameraSpeed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-        camera_pos[1] += cameraSpeed;
+        camera_pos[2] -= cameraSpeed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-        camera_pos[1] -= cameraSpeed;
+        camera_pos[2] += cameraSpeed;
 
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera_pos[2] += cameraSpeed;
+        camera_pos[1] += cameraSpeed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera_pos[2] -= cameraSpeed;
+        camera_pos[1] -= cameraSpeed;
 }
 
 void initGUi(smpl::Window& window)
@@ -332,6 +337,7 @@ void initGUi(smpl::Window& window)
 
     static bool show_settings_window;
     static bool show_navigation_window;
+    static bool show_demo;
     static bool fullscreen;
 
     ImGui::BeginMainMenuBar();
@@ -373,8 +379,8 @@ void initGUi(smpl::Window& window)
     {
        ImGui::MenuItem("Settings", nullptr, &show_settings_window);
        ImGui::MenuItem("Navigation", nullptr, &show_navigation_window);
-
-        ImGui::EndMenu();
+       ImGui::MenuItem("Demo", nullptr, &show_demo);
+       ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Help"))
@@ -383,6 +389,11 @@ void initGUi(smpl::Window& window)
     }
 
     ImGui::EndMainMenuBar();
+
+    if (show_demo)
+    {
+        ImGui::ShowDemoWindow();
+    }
 
     if (show_navigation_window)
     {

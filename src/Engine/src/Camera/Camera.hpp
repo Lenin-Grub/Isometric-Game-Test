@@ -41,8 +41,6 @@ namespace smpl
         const glm::vec3& getPosition() const;
         const glm::vec3& getRotation() const;
 
-        // movement_delta.x - forward, movement_delta.y - right, movement_delta.z - up
-        // rotation_delta.x - roll, rotation_delta.y - pitch, rotation_delta.z - yaw
         void addMovementAndRotation(const glm::vec3& movement_delta,
                                     const glm::vec3& rotation_delta);
 
@@ -51,7 +49,7 @@ namespace smpl
         void updateProjectionMatrix();
 
         glm::vec3 m_position;
-        glm::vec3 m_rotation; // X - Roll, Y - Pitch, Z - Yaw
+        glm::vec3 m_rotation;
         Projection m_projection_mode;
 
         glm::vec3 m_direction;
@@ -65,7 +63,7 @@ namespace smpl
         float m_field_of_view  { 60.f };
 
         static constexpr glm::vec3 s_world_up     { 0.f,  0.f, 1.f };
-        static constexpr glm::vec3 s_world_right  { 0.f, -1.f, 0.f };
+        static constexpr glm::vec3 s_world_right  { 0.f,  1.f, 0.f };
         static constexpr glm::vec3 s_world_forward{ 1.f,  0.f, 0.f };
 
         glm::mat4 m_view_matrix;
