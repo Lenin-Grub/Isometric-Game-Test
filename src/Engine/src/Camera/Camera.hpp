@@ -48,8 +48,8 @@ namespace smpl
         void updateViewMatrix();
         void updateProjectionMatrix();
 
-        glm::vec3 m_position;
-        glm::vec3 m_rotation;
+        glm::vec3  m_position;
+        glm::vec3  m_rotation;
         Projection m_projection_mode;
 
         glm::vec3 m_direction;
@@ -62,9 +62,9 @@ namespace smpl
         float m_viewport_height{ 600.f };
         float m_field_of_view  { 60.f };
 
-        static constexpr glm::vec3 s_world_up     { 0.f,  0.f, 1.f };
-        static constexpr glm::vec3 s_world_right  { 0.f,  1.f, 0.f };
-        static constexpr glm::vec3 s_world_forward{ 1.f,  0.f, 0.f };
+        static constexpr glm::vec3 m_world_forward { 1.f,  0.f, 0.f };
+        static constexpr glm::vec3 m_world_up      { 0.f,  0.f, 1.f };
+        static constexpr glm::vec3 m_world_right   { 0.f,  1.f, 0.f };
 
         glm::mat4 m_view_matrix;
         glm::mat4 m_projection_matrix;

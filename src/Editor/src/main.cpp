@@ -25,24 +25,22 @@
 #include <set>
 
 
-float camera_pos[3] = { -30.f, 15.f, 0.f };
-float camera_rot[3] = { 90.f, 0.f, -45.f };
+glm::vec3 camera_pos = { -30.f, 15.f,   0.f };
+glm::vec3 camera_rot = {  90.f,  0.f, -45.f };
+
+glm::vec3 scale      = { 1.f, 1.f, 1.f };
+glm::vec3 translate  = { 0.f, 0.f, 0.f };
+glm::vec3 rotate     = { 0.f, 0.f, 0.f };
+
 bool  perspective_camera = true;
 
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+float delta_time = 0.0f;
+float last_frame = 0.0f;
+float angle      = 0.f;
 
-float scale[3] = { 1.f, 1.f, 1.f };
-float rotate = 0.f;
-float translate[3] = { 0.f, 0.f, 0.f };
 
 void input(smpl::Window& window);
 void initGUi(smpl::Window& window);
-
-bool mouse_captured = false;
-double last_mouse_x = 0.0, last_mouse_y = 0.0;
-float yaw = 0.0f;
-float pitch = 0.0f;
 
 int main()
 {
@@ -73,7 +71,7 @@ int main()
     smpl::Shader fragment_shader2;
     smpl::Shader vertex_shader2;
 
-    vertex_shader2.loadFromFile("shaders/grid_shader.vert", smpl::Shader::Type::Vertex);
+    vertex_shader2.  loadFromFile("shaders/grid_shader.vert", smpl::Shader::Type::Vertex);
     fragment_shader2.loadFromFile("shaders/grid_shader.frag", smpl::Shader::Type::Fragment);
 
     smpl::ShaderProgram program2;
@@ -142,8 +140,8 @@ int main()
 
     smpl::BufferLayout layout
     {
-        smpl::ShaderDataType::Float3,       // position
-        smpl::ShaderDataType::Float2        // texture2D
+        smpl::ShaderDataType::Float3, // position
+        smpl::ShaderDataType::Float2  // texture2D
     };
 
     std::unique_ptr<smpl::VertexBuffer> vbo;
@@ -163,10 +161,6 @@ int main()
     smpl::Texture texture2;
     texture2.loadFromFile("res/horde.png");
 
-    //program.use();
-    //program.setUniform1i("texture1", 0);
-    //program.setUniform1i("texture2", 1);
-
     smpl::Event  event;
     smpl::Camera camera;
 
@@ -175,15 +169,13 @@ int main()
     while (window.isOpen())
     {
         float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        delta_time = currentFrame - last_frame;
+        last_frame = currentFrame;
 
         while (window.pollEvent(event))
         {
             if (event.type == smpl::EventType::WindowClosed || event.key.code == smpl::Key::Code::Escape)
-            {
                 window.close();
-            }
         }
         
         input(window);
@@ -202,31 +194,35 @@ int main()
         program.setUniformMatrix("view", camera.getViewMatrix());
         program.setUniformMatrix("projection", camera.getProjectionMatrix());
 
-        glm::mat4 baseTransform = glm::mat4(1.0f);
-        baseTransform = glm::translate(baseTransform, glm::vec3(translate[0], translate[1], translate[2]));
-        baseTransform = glm::scale(baseTransform, glm::vec3(scale[0], scale[1], scale[2]));
-        baseTransform = glm::rotate(baseTransform, glm::radians(rotate), glm::vec3(0, 0, 1));
+        glm::mat4 base_transform = glm::mat4(1.0f);
+        glm::mat4 rotation = glm::mat4(1.0f);
+        rotation = glm::rotate(rotation, glm::radians(rotate.x), glm::vec3(1, 0, 0)); // Roll
+        rotation = glm::rotate(rotation, glm::radians(rotate.y), glm::vec3(0, 1, 0)); // Yaw
+        rotation = glm::rotate(rotation, glm::radians(rotate.z), glm::vec3(0, 0, 1)); // Pitch
+
+        base_transform = glm::translate(glm::mat4(1.0f), translate);
+        base_transform = base_transform * rotation;
+        base_transform = glm::scale(base_transform, scale);
 
         for (const glm::vec3& pos : positions)
         {
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), pos) * baseTransform;
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), pos) * base_transform;
             program.setUniformMatrix("model", model);
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(vao->getIndexesCount()), GL_UNSIGNED_INT, nullptr);
         }
 
         //_______GRID_______
-        glm::mat4 gridTransform = glm::mat4(1.0f);
-        //gridTransform = glm::translate(gridTransform, glm::vec3(translate[0], 0.0f, translate[2])); // ← Y = 0, если сетка на полу
-        gridTransform = glm::rotate(gridTransform, glm::radians(0.0f), glm::vec3(1, 0, 0));
-        gridTransform = glm::scale(gridTransform, glm::vec3(50.0f, 1.0f, 50.0f)); // ← Y масштаб = 1.0!
+        glm::mat4 grid_transform = glm::mat4(1.0f);
+        grid_transform = glm::rotate(grid_transform, glm::radians(0.0f), glm::vec3(1, 0, 0));
+        grid_transform = glm::scale(grid_transform, glm::vec3(50.0f, 1.0f, 50.0f));
 
-        glm::mat4 gridMVP = camera.getProjectionMatrix() * camera.getViewMatrix() * gridTransform;
+        glm::mat4 gridMVP = camera.getProjectionMatrix() * camera.getViewMatrix() * grid_transform;
 
         program2.use();
         program2.setUniformMatrix("grid_mvp", gridMVP);
         program2.setUniform1f("grid_step", 0.025f);
         program2.setUniform3f("grid_color", 0.6f, 0.6f, 0.6f);
-        //program2.setUniform3f("axis_color", 1.0f, 1.0f, 0.0f);
+
         glDepthMask(GL_FALSE);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glDepthMask(GL_TRUE);
@@ -237,7 +233,7 @@ int main()
             0, 0, scale[2], 0,
             0, 0, 0, 1);
 
-        float rotate_in_radians = glm::radians(rotate);
+        float rotate_in_radians = glm::radians(angle);
         glm::mat4 rotate_matrix(cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
             -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
             0, 0, 1, 0,
@@ -268,66 +264,34 @@ int main()
 
 void input(smpl::Window& window)
 {
-    float cameraSpeed = static_cast<float>(10.0f * deltaTime);
+    float camera_speed = static_cast<float>(10.0f * delta_time);
     
-    static bool was_pressed = false;
-    bool is_pressed = glfwGetMouseButton(&window.getWindow(), GLFW_MOUSE_BUTTON_2) == GLFW_PRESS;
-
-    if (is_pressed)
-    {
-        double x, y;
-        glfwGetCursorPos(&window.getWindow(), &x, &y);
-
-        if (!was_pressed)
-        {
-            last_mouse_x = x;
-            last_mouse_y = y;
-        }
-        else
-        {
-            float dx = static_cast<float>(x - last_mouse_x);
-            float dy = static_cast<float>(y - last_mouse_y);
-            last_mouse_x = x;
-            last_mouse_y = y;
-
-            const float sens = 0.1f;
-            yaw -= dx * sens;
-            pitch -= dy * sens;
-            pitch = glm::clamp(pitch, -89.0f, 89.0f);
-
-            camera_rot[2] = yaw;
-            camera_rot[1] = pitch;
-        }
-    }
-
-    was_pressed = is_pressed;
-
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q) == GLFW_PRESS)
-        camera_rot[0] -= cameraSpeed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E) == GLFW_PRESS)
-        camera_rot[0] += cameraSpeed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
-        camera_rot[2] += cameraSpeed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera_rot[2] -= cameraSpeed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera_rot[1] += cameraSpeed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q)     == GLFW_PRESS)
+        camera_rot[0] -= camera_speed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E)     == GLFW_PRESS)
+        camera_rot[0] += camera_speed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP)    == GLFW_PRESS)
+        camera_rot[2] += camera_speed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN)  == GLFW_PRESS)
+        camera_rot[2] -= camera_speed * 15;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT)  == GLFW_PRESS)
+        camera_rot[1] += camera_speed * 15;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera_rot[1] -= cameraSpeed * 15;
+        camera_rot[1] -= camera_speed * 15;
 
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-        camera_pos[0] += cameraSpeed;
+        camera_pos[0] += camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-        camera_pos[0] -= cameraSpeed;
+        camera_pos[0] -= camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-        camera_pos[2] -= cameraSpeed;
+        camera_pos[2] -= camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-        camera_pos[2] += cameraSpeed;
+        camera_pos[2] += camera_speed;
 
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera_pos[1] += cameraSpeed;
+        camera_pos[1] += camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera_pos[1] -= cameraSpeed;
+        camera_pos[1] -= camera_speed;
 }
 
 void initGUi(smpl::Window& window)
@@ -344,7 +308,7 @@ void initGUi(smpl::Window& window)
 
     if (ImGui::BeginMenu("File"))
     {
-        ImGui::MenuItem("New", "Ctrl+N");
+        ImGui::MenuItem("New",  "Ctrl+N");
         ImGui::MenuItem("Open", "Ctrl+O");
         ImGui::MenuItem("Save", "Ctrl+S");
         ImGui::MenuItem("Save As..", "Ctrl+Shift+S");
@@ -371,47 +335,42 @@ void initGUi(smpl::Window& window)
     }
 
     if (ImGui::BeginMenu("View"))
-    {
         ImGui::EndMenu();
-    }
 
     if (ImGui::BeginMenu("Settings"))
     {
-       ImGui::MenuItem("Settings", nullptr, &show_settings_window);
+       ImGui::MenuItem("Settings",   nullptr, &show_settings_window);
        ImGui::MenuItem("Navigation", nullptr, &show_navigation_window);
-       ImGui::MenuItem("Demo", nullptr, &show_demo);
+       ImGui::MenuItem("Demo",       nullptr, &show_demo);
        ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Help"))
-    {
         ImGui::EndMenu();
-    }
 
     ImGui::EndMainMenuBar();
 
     if (show_demo)
-    {
         ImGui::ShowDemoWindow();
-    }
 
     if (show_navigation_window)
     {
         // Settings Window
         ImGui::Begin("Navigation", &show_navigation_window, ImGuiChildFlags_AlwaysAutoResize);
 
-        ImGui::SliderFloat3("Scale", scale, 0.f, 2.f);
-        ImGui::SliderFloat("Rotate", &rotate, 0.f, 360.f);
-        ImGui::SliderFloat3("Translate", translate, -100.f, 100.f);
-
-        ImGui::Dummy(ImVec2(0, 30));
-
-        ImGui::SliderFloat3("Camera position", camera_pos, -10.f, 10.f);
-        ImGui::SliderFloat3("Camera rotation", camera_rot, 0, 360.f);
-
-        ImGui::Dummy(ImVec2(0, 30));
-
+        ImGui::SeparatorText("Navigation");
+        ImGui::SliderFloat3("Camera position", glm::value_ptr(camera_pos), -10.f, 10.f);
+        ImGui::SliderFloat3("Camera rotation", glm::value_ptr(camera_rot), 0.0f, 360.f);
         ImGui::Checkbox("Perspective camera", &perspective_camera);
+
+        ImGui::Dummy(ImVec2(0, 30));
+        ImGui::SeparatorText("Object");
+
+        ImGui::SliderFloat3("Scale",     glm::value_ptr(scale),        0.f,   2.f);
+        ImGui::SliderFloat3("Translate", glm::value_ptr(translate), -100.f, 100.f);
+        ImGui::SliderFloat3("Rotate",    glm::value_ptr(rotate),       0.f, 360.f);
+
+        ImGui::Dummy(ImVec2(0, 30));
 
         ImGui::End();
     }
@@ -419,7 +378,7 @@ void initGUi(smpl::Window& window)
     if (show_settings_window)
     {
         std::vector<smpl::VideoMode> m_available_modes;
-        std::vector<std::string> m_mode_labels;
+        std::vector<std::string>     m_mode_labels;
 
         if (!m_available_modes.empty())
             return;
@@ -433,9 +392,7 @@ void initGUi(smpl::Window& window)
         {
             auto key = std::make_pair(mode.width, mode.height);
             if (seen.insert(key).second)
-            {
                 unique.push_back(mode);
-            }
         }
 
         std::sort(unique.begin(), unique.end(), [](const smpl::VideoMode& a, const smpl::VideoMode& b)
@@ -460,13 +417,10 @@ void initGUi(smpl::Window& window)
             {
                 bool selected = (i == m_selected_index);
                 if (ImGui::Selectable(m_mode_labels[i].c_str(), selected))
-                {
                     m_selected_index = i;
-                }
+
                 if (selected)
-                {
                     ImGui::SetItemDefaultFocus();
-                }
             }
             ImGui::EndCombo();
         }

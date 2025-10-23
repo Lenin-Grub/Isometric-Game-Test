@@ -65,8 +65,8 @@ namespace smpl
                                        0,                   0                   , 1);
 
         const glm::mat3 euler_rotate_matrix = rotate_matrix_z * rotate_matrix_y * rotate_matrix_x;
-        m_direction                         = glm::normalize(euler_rotate_matrix * s_world_forward);
-        m_right                             = glm::normalize(euler_rotate_matrix * s_world_right);
+        m_direction                         = glm::normalize(euler_rotate_matrix * m_world_forward);
+        m_right                             = glm::normalize(euler_rotate_matrix * m_world_right);
         m_up                                = glm::cross(m_right, m_direction);
         m_view_matrix                       = glm::lookAt(m_position, m_position + m_direction, m_up);
     }
@@ -154,7 +154,7 @@ namespace smpl
 
     void Camera::moveUp(const float delta)
     {
-        m_position += s_world_up * delta;
+        m_position += m_world_up * delta;
         m_update_view_matrix = true;
     }
 
