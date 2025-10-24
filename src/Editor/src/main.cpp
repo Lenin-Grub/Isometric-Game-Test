@@ -24,9 +24,10 @@
 #include <Log/Log.hpp>
 #include <set>
 
+#pragma region Variables
 
 glm::vec3 camera_pos = { 0.f, -30.f, 15.f };
-glm::vec3 camera_rot = { 0.f, -45.f, 0.f };
+glm::vec3 camera_rot = { 0.f, -45.f,  0.f };
 
 glm::vec3 scale      = { 1.f, 1.f, 1.f };
 glm::vec3 translate  = { 0.f, 0.f, 0.f };
@@ -37,7 +38,12 @@ bool  perspective_camera = true;
 float delta_time = 0.0f;
 float last_frame = 0.0f;
 float angle      = 0.f;
+float fov        = 0.f;
 
+smpl::Camera camera (camera_pos, camera_rot);
+smpl::Event  event;
+
+#pragma endregion
 
 void input(smpl::Window& window);
 void initGUi(smpl::Window& window);
@@ -54,6 +60,7 @@ int main()
     smpl::Gui::initImGui(window);
     smpl::Gui::initImGuiFont();
 
+#pragma region Variables
     smpl::Shader fragment_shader;
     smpl::Shader vertex_shader;
 
@@ -160,17 +167,15 @@ int main()
 
     smpl::Texture texture2;
     texture2.loadFromFile("res/horde.png");
-
-    smpl::Event  event;
-    smpl::Camera camera;
+#pragma endregion
 
     camera.setViewportSize(1480, 1200);
 
     while (window.isOpen())
     {
-        float currentFrame = static_cast<float>(glfwGetTime());
-        delta_time = currentFrame - last_frame;
-        last_frame = currentFrame;
+        float current_frame = static_cast<float>(glfwGetTime());
+        delta_time = current_frame - last_frame;
+        last_frame = current_frame;
 
         while (window.pollEvent(event))
         {
@@ -182,6 +187,7 @@ int main()
 
         window.clear(smpl::Color(50,50,50));
 
+#pragma region Cube
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1.getTextureID());
         glActiveTexture(GL_TEXTURE1);
@@ -196,6 +202,7 @@ int main()
 
         glm::mat4 base_transform = glm::mat4(1.0f);
         glm::mat4 rotation = glm::mat4(1.0f);
+
         rotation = glm::rotate(rotation, glm::radians(rotate.x), glm::vec3(1, 0, 0)); // Roll
         rotation = glm::rotate(rotation, glm::radians(rotate.y), glm::vec3(0, 1, 0)); // Pitch
         rotation = glm::rotate(rotation, glm::radians(rotate.z), glm::vec3(0, 0, 1)); // Yaw
@@ -210,8 +217,9 @@ int main()
             program.setUniformMatrix("model", model);
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(vao->getIndexesCount()), GL_UNSIGNED_INT, nullptr);
         }
+#pragma endregion
 
-        //_______GRID_______
+#pragma region Grid
         glm::mat4 grid_transform = glm::mat4(1.0f);
         grid_transform = glm::rotate(grid_transform, glm::radians(0.0f), glm::vec3(1, 0, 0));
         grid_transform = glm::scale(grid_transform, glm::vec3(50.0f, 50.0f, 1.0f));
@@ -226,29 +234,7 @@ int main()
         glDepthMask(GL_FALSE);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glDepthMask(GL_TRUE);
-        //_______GRID_______
-
-        glm::mat4 scale_matrix(scale[0], 0, 0, 0,
-                                0, scale[1], 0, 0,
-                                0, 0, scale[2], 0,
-                                0, 0, 0, 1);
-
-        float rotate_in_radians = glm::radians(angle);
-        glm::mat4 rotate_matrix(cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
-                               -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
-                               0, 0, 1, 0,
-                               0, 0, 0, 1);
-
-        glm::mat4 translate_matrix(1, 0, 0, 0,
-                                   0, 1, 0, 0,
-                                   0, 0, 1, 0,
-                                   translate[0], translate[1], translate[2], 1);
-
-        glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
-
-        camera.setPositionAndRotation(glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]),
-                                      glm::vec3(camera_rot[0], camera_rot[1], camera_rot[2]));
-        camera.setProjection(perspective_camera ? smpl::Camera::Projection::Perspective : smpl::Camera::Projection::Orthographic);
+#pragma endregion
 
         initGUi(window);
 
@@ -264,34 +250,44 @@ int main()
 
 void input(smpl::Window& window)
 {
-    float camera_speed = static_cast<float>(10.0f * delta_time);
-    float modify = 50.0f;
+    float camera_speed = 10.0f * delta_time;
 
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q) == GLFW_PRESS)
-        camera_rot.x -= camera_speed * modify;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E) == GLFW_PRESS)
-        camera_rot.x += camera_speed * modify;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
-        camera_rot.y -= camera_speed * modify;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera_rot.y += camera_speed * modify;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera_rot.z += camera_speed * modify;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera_rot.z -= camera_speed * modify;
-
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-        camera_pos.x -= camera_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-        camera_pos.x += camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-        camera_pos.y += camera_speed;
+        camera.moveForward(camera_speed);
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-        camera_pos.y -= camera_speed;
+        camera.moveForward(-camera_speed);
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+        camera.moveRight(-camera_speed);
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+        camera.moveRight(camera_speed);
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera_pos.z += camera_speed;
+        camera.moveUp(camera_speed);
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera_pos.z -= camera_speed;
+        camera.moveUp(-camera_speed);
+
+    float rot_speed = 50.0f * delta_time;
+    glm::vec3 rot_delta(0);
+
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q)     == GLFW_PRESS) rot_delta.x -= rot_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E)     == GLFW_PRESS) rot_delta.x += rot_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP)    == GLFW_PRESS) rot_delta.y += rot_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN)  == GLFW_PRESS) rot_delta.y -= rot_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT)  == GLFW_PRESS) rot_delta.z += rot_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) rot_delta.z -= rot_speed;
+
+    if (rot_delta != glm::vec3(0))
+        camera.setRotation(camera.getRotation() + rot_delta);
+
+    // Field of view
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_EQUAL) == GLFW_PRESS)
+        camera.setFieldOfView(camera.getFieldOfView() - 20.0f * delta_time);
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_MINUS) == GLFW_PRESS)
+        camera.setFieldOfView(camera.getFieldOfView() + 20.0f * delta_time);
+
+    fov = camera.getFieldOfView();
+    if (fov < 1.0f)  fov = 1.0f;
+    if (fov > 90.0f) fov = 90.0f;
+    camera.setFieldOfView(fov);
 }
 
 void initGUi(smpl::Window& window)
@@ -353,14 +349,25 @@ void initGUi(smpl::Window& window)
     if (show_demo)
         ImGui::ShowDemoWindow();
 
+    // Settings Window
     if (show_navigation_window)
     {
-        // Settings Window
+        glm::vec3 cam_pos = camera.getPosition();
+        glm::vec3 cam_rot = camera.getRotation();
+        
         ImGui::Begin("Navigation", &show_navigation_window, ImGuiChildFlags_AlwaysAutoResize);
 
         ImGui::SeparatorText("Navigation");
-        ImGui::SliderFloat3("Camera position", glm::value_ptr(camera_pos), -100.0f, 100.0f);
-        ImGui::SliderFloat3("Camera rotation", glm::value_ptr(camera_rot),    0.0f, 360.0f);
+
+        if (ImGui::SliderFloat3("Camera position", glm::value_ptr(cam_pos), -100.0f, 100.0f))
+            camera.setPosition(cam_pos);
+
+        if (ImGui::SliderFloat3("Camera rotation", glm::value_ptr(cam_rot), 0.0f, 360.0f))
+            camera.setRotation(cam_rot);
+
+        if (ImGui::SliderFloat("Field of view", &fov, 1.0f, 90.0f))
+            camera.setFieldOfView(fov);
+
         ImGui::Checkbox("Perspective camera", &perspective_camera);
 
         ImGui::Dummy(ImVec2(0, 30));

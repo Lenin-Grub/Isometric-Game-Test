@@ -58,7 +58,6 @@ namespace smpl
 
         glm::mat3 euler_rotate_matrix = roll_mat * pitch_mat * yaw_mat;
 
-        //const glm::mat3 euler_rotate_matrix = rotate_matrix_z * rotate_matrix_y * rotate_matrix_x;
         m_direction                         = glm::normalize(euler_rotate_matrix * m_world_forward);
         m_right                             = glm::normalize(euler_rotate_matrix * m_world_right);
         m_up                                = glm::cross(m_right, m_direction);
