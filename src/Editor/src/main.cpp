@@ -25,8 +25,8 @@
 #include <set>
 
 
-glm::vec3 camera_pos = { -30.f, 15.f,   0.f };
-glm::vec3 camera_rot = {  90.f,  0.f, -45.f };
+glm::vec3 camera_pos = { 0.f, -30.f, 15.f };
+glm::vec3 camera_rot = { 0.f, -45.f, 0.f };
 
 glm::vec3 scale      = { 1.f, 1.f, 1.f };
 glm::vec3 translate  = { 0.f, 0.f, 0.f };
@@ -84,40 +84,40 @@ int main()
 
     float vertices[] = {
         // Front face
-        -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  // bottom-left
-         1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  // bottom-right
-         1.0f,  1.0f,  1.0f,  1.0f, 1.0f,  // top-right
-        -1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  // top-left
+        -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
 
         // Back face
-        -1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  // bottom-right (mirrored)
-         1.0f, -1.0f, -1.0f,  0.0f, 0.0f,  // bottom-left
-         1.0f,  1.0f, -1.0f,  0.0f, 1.0f,  // top-left
-        -1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  // top-right
+        -1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
+         1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
+         1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
 
         // Right face
-         1.0f, -1.0f, -1.0f,  0.0f, 0.0f,  // bottom-left
-         1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  // bottom-right
-         1.0f,  1.0f,  1.0f,  1.0f, 1.0f,  // top-right
-         1.0f,  1.0f, -1.0f,  0.0f, 1.0f,  // top-left
+         1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
+         1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
 
          // Left face
-         -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,  // bottom-left
-         -1.0f, -1.0f, -1.0f,  1.0f, 0.0f,  // bottom-right
-         -1.0f,  1.0f, -1.0f,  1.0f, 1.0f,  // top-right
-         -1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  // top-left
+         -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
+         -1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
+         -1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
+         -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
 
          // Top face
-         -1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  // top-left
-          1.0f,  1.0f,  1.0f,  1.0f, 1.0f,  // top-right
-          1.0f,  1.0f, -1.0f,  1.0f, 0.0f,  // bottom-right
-         -1.0f,  1.0f, -1.0f,  0.0f, 0.0f,  // bottom-left
+         -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
+          1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
+          1.0f,  1.0f,  1.0f,  1.0f, 0.0f,
+         -1.0f,  1.0f,  1.0f,  0.0f, 0.0f,
 
          // Bottom face
-         -1.0f, -1.0f, -1.0f,  0.0f, 1.0f,  // top-left
-          1.0f, -1.0f, -1.0f,  1.0f, 1.0f,  // top-right
-          1.0f, -1.0f,  1.0f,  1.0f, 0.0f,  // bottom-right
-         -1.0f, -1.0f,  1.0f,  0.0f, 0.0f   // bottom-left
+         -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
+          1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
+          1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
+         -1.0f, -1.0f, -1.0f,  0.0f, 0.0f
     };
 
     unsigned int indices[] = {
@@ -197,8 +197,8 @@ int main()
         glm::mat4 base_transform = glm::mat4(1.0f);
         glm::mat4 rotation = glm::mat4(1.0f);
         rotation = glm::rotate(rotation, glm::radians(rotate.x), glm::vec3(1, 0, 0)); // Roll
-        rotation = glm::rotate(rotation, glm::radians(rotate.y), glm::vec3(0, 1, 0)); // Yaw
-        rotation = glm::rotate(rotation, glm::radians(rotate.z), glm::vec3(0, 0, 1)); // Pitch
+        rotation = glm::rotate(rotation, glm::radians(rotate.y), glm::vec3(0, 1, 0)); // Pitch
+        rotation = glm::rotate(rotation, glm::radians(rotate.z), glm::vec3(0, 0, 1)); // Yaw
 
         base_transform = glm::translate(glm::mat4(1.0f), translate);
         base_transform = base_transform * rotation;
@@ -214,7 +214,7 @@ int main()
         //_______GRID_______
         glm::mat4 grid_transform = glm::mat4(1.0f);
         grid_transform = glm::rotate(grid_transform, glm::radians(0.0f), glm::vec3(1, 0, 0));
-        grid_transform = glm::scale(grid_transform, glm::vec3(50.0f, 1.0f, 50.0f));
+        grid_transform = glm::scale(grid_transform, glm::vec3(50.0f, 50.0f, 1.0f));
 
         glm::mat4 gridMVP = camera.getProjectionMatrix() * camera.getViewMatrix() * grid_transform;
 
@@ -229,25 +229,25 @@ int main()
         //_______GRID_______
 
         glm::mat4 scale_matrix(scale[0], 0, 0, 0,
-            0, scale[1], 0, 0,
-            0, 0, scale[2], 0,
-            0, 0, 0, 1);
+                                0, scale[1], 0, 0,
+                                0, 0, scale[2], 0,
+                                0, 0, 0, 1);
 
         float rotate_in_radians = glm::radians(angle);
         glm::mat4 rotate_matrix(cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
-            -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1);
+                               -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
+                               0, 0, 1, 0,
+                               0, 0, 0, 1);
 
         glm::mat4 translate_matrix(1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            translate[0], translate[1], translate[2], 1);
+                                   0, 1, 0, 0,
+                                   0, 0, 1, 0,
+                                   translate[0], translate[1], translate[2], 1);
 
         glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
 
         camera.setPositionAndRotation(glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]),
-            glm::vec3(camera_rot[0], camera_rot[1], camera_rot[2]));
+                                      glm::vec3(camera_rot[0], camera_rot[1], camera_rot[2]));
         camera.setProjection(perspective_camera ? smpl::Camera::Projection::Perspective : smpl::Camera::Projection::Orthographic);
 
         initGUi(window);
@@ -265,33 +265,33 @@ int main()
 void input(smpl::Window& window)
 {
     float camera_speed = static_cast<float>(10.0f * delta_time);
-    
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q)     == GLFW_PRESS)
-        camera_rot[0] -= camera_speed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E)     == GLFW_PRESS)
-        camera_rot[0] += camera_speed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP)    == GLFW_PRESS)
-        camera_rot[2] += camera_speed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN)  == GLFW_PRESS)
-        camera_rot[2] -= camera_speed * 15;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT)  == GLFW_PRESS)
-        camera_rot[1] += camera_speed * 15;
+    float modify = 50.0f;
+
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q) == GLFW_PRESS)
+        camera_rot.x -= camera_speed * modify;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E) == GLFW_PRESS)
+        camera_rot.x += camera_speed * modify;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
+        camera_rot.y -= camera_speed * modify;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
+        camera_rot.y += camera_speed * modify;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS)
+        camera_rot.z += camera_speed * modify;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera_rot[1] -= camera_speed * 15;
+        camera_rot.z -= camera_speed * modify;
 
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-        camera_pos[0] += camera_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-        camera_pos[0] -= camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-        camera_pos[2] -= camera_speed;
+        camera_pos.x -= camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-        camera_pos[2] += camera_speed;
-
+        camera_pos.x += camera_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+        camera_pos.y += camera_speed;
+    if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+        camera_pos.y -= camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera_pos[1] += camera_speed;
+        camera_pos.z += camera_speed;
     if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera_pos[1] -= camera_speed;
+        camera_pos.z -= camera_speed;
 }
 
 void initGUi(smpl::Window& window)
@@ -359,16 +359,16 @@ void initGUi(smpl::Window& window)
         ImGui::Begin("Navigation", &show_navigation_window, ImGuiChildFlags_AlwaysAutoResize);
 
         ImGui::SeparatorText("Navigation");
-        ImGui::SliderFloat3("Camera position", glm::value_ptr(camera_pos), -10.f, 10.f);
-        ImGui::SliderFloat3("Camera rotation", glm::value_ptr(camera_rot), 0.0f, 360.f);
+        ImGui::SliderFloat3("Camera position", glm::value_ptr(camera_pos), -100.0f, 100.0f);
+        ImGui::SliderFloat3("Camera rotation", glm::value_ptr(camera_rot),    0.0f, 360.0f);
         ImGui::Checkbox("Perspective camera", &perspective_camera);
 
         ImGui::Dummy(ImVec2(0, 30));
         ImGui::SeparatorText("Object");
 
-        ImGui::SliderFloat3("Scale",     glm::value_ptr(scale),        0.f,   2.f);
-        ImGui::SliderFloat3("Translate", glm::value_ptr(translate), -100.f, 100.f);
-        ImGui::SliderFloat3("Rotate",    glm::value_ptr(rotate),       0.f, 360.f);
+        ImGui::SliderFloat3("Scale",     glm::value_ptr(scale),        0.5f,  2.0f);
+        ImGui::SliderFloat3("Translate", glm::value_ptr(translate), -100.0f, 100.0f);
+        ImGui::SliderFloat3("Rotate",    glm::value_ptr(rotate),       0.0f, 360.0f);
 
         ImGui::Dummy(ImVec2(0, 30));
 

@@ -52,19 +52,13 @@ namespace smpl
         const float pitch_in_radians = glm::radians(m_rotation.y);
         const float yaw_in_radians   = glm::radians(m_rotation.z);
 
-        const glm::mat3 rotate_matrix_x(1, 0, 0,
-                                        0, cos(roll_in_radians), sin(roll_in_radians),
-                                        0, -sin(roll_in_radians), cos(roll_in_radians));
+        glm::mat3 yaw_mat   = glm::rotate(glm::mat4(1), yaw_in_radians,   m_world_up);      // вокруг Z
+        glm::mat3 pitch_mat = glm::rotate(glm::mat4(1), pitch_in_radians, m_world_right);   // вокруг X
+        glm::mat3 roll_mat  = glm::rotate(glm::mat4(1), roll_in_radians,  m_world_forward); // вокруг Y
 
-        const glm::mat3 rotate_matrix_y(cos(pitch_in_radians), 0, -sin(pitch_in_radians),
-                                        0,                     1, 0,
-                                        sin(pitch_in_radians), 0, cos(pitch_in_radians));
+        glm::mat3 euler_rotate_matrix = roll_mat * pitch_mat * yaw_mat;
 
-        const glm::mat3 rotate_matrix_z(cos(yaw_in_radians), sin(yaw_in_radians), 0,
-                                       -sin(yaw_in_radians), cos(yaw_in_radians), 0,
-                                       0,                   0                   , 1);
-
-        const glm::mat3 euler_rotate_matrix = rotate_matrix_z * rotate_matrix_y * rotate_matrix_x;
+        //const glm::mat3 euler_rotate_matrix = rotate_matrix_z * rotate_matrix_y * rotate_matrix_x;
         m_direction                         = glm::normalize(euler_rotate_matrix * m_world_forward);
         m_right                             = glm::normalize(euler_rotate_matrix * m_world_right);
         m_up                                = glm::cross(m_right, m_direction);

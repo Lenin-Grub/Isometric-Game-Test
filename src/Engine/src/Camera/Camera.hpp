@@ -62,9 +62,9 @@ namespace smpl
         float m_viewport_height{ 600.f };
         float m_field_of_view  { 60.f };
 
-        static constexpr glm::vec3 m_world_forward { 1.f,  0.f, 0.f };
-        static constexpr glm::vec3 m_world_up      { 0.f,  0.f, 1.f };
-        static constexpr glm::vec3 m_world_right   { 0.f,  1.f, 0.f };
+        static constexpr glm::vec3 m_world_right    { 1.f, 0.f, 0.f }; // X = right
+        static constexpr glm::vec3 m_world_forward  { 0.f, 1.f, 0.f }; // Y = forward
+        static constexpr glm::vec3 m_world_up       { 0.f, 0.f, 1.f }; // Z = up
 
         glm::mat4 m_view_matrix;
         glm::mat4 m_projection_matrix;
