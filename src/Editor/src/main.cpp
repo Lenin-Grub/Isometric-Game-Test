@@ -33,6 +33,9 @@ glm::vec3 scale      = { 1.f, 1.f, 1.f };
 glm::vec3 translate  = { 0.f, 0.f, 0.f };
 glm::vec3 rotate     = { 0.f, 0.f, 0.f };
 
+glm::vec3 saved_perspective_pos = camera_pos;
+glm::vec3 saved_perspective_rot = camera_rot;
+
 bool  isometric_mode = false;
 
 float delta_time = 0.0f;
@@ -379,6 +382,7 @@ void initGUi(smpl::Window& window)
     // Settings Window
     if (show_navigation_window)
     {
+
         glm::vec3 cam_pos = camera.getPosition();
         glm::vec3 cam_rot = camera.getRotation();
         
@@ -409,11 +413,19 @@ void initGUi(smpl::Window& window)
         {
             if (isometric_mode)
             {
-                camera.setRotation(glm::vec3(-45.0f, -45, 0.0f));
+                saved_perspective_pos = camera.getPosition();
+                saved_perspective_rot = camera.getRotation();
+
+                camera.setRotation(glm::vec3(-45.0f, -45.0f, 0.0f));
                 camera.setProjection(smpl::Camera::Projection::Isometric);
             }
             else
+            {
+                camera.setPosition(saved_perspective_pos);
+                camera.setRotation(saved_perspective_rot);
                 camera.setProjection(smpl::Camera::Projection::Perspective);
+            }
+
         }
 
         ImGui::Dummy(ImVec2(0, 30));
