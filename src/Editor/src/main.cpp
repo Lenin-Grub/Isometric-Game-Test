@@ -33,7 +33,7 @@ glm::vec3 scale      = { 1.f, 1.f, 1.f };
 glm::vec3 translate  = { 0.f, 0.f, 0.f };
 glm::vec3 rotate     = { 0.f, 0.f, 0.f };
 
-bool  perspective_camera = true;
+bool  isometric_mode = false;
 
 float delta_time = 0.0f;
 float last_frame = 0.0f;
@@ -250,44 +250,71 @@ int main()
 
 void input(smpl::Window& window)
 {
-    float camera_speed = 10.0f * delta_time;
+    if (camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
+    {
+        float camera_speed = 30.0f * delta_time;
 
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-        camera.moveForward(camera_speed);
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-        camera.moveForward(-camera_speed);
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-        camera.moveRight(-camera_speed);
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-        camera.moveRight(camera_speed);
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.moveUp(camera_speed);
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera.moveUp(-camera_speed);
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W)            == GLFW_PRESS)
+            camera.moveForward(camera_speed);                      
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S)            == GLFW_PRESS)
+            camera.moveForward(-camera_speed);                     
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A)            == GLFW_PRESS)
+            camera.moveRight(-camera_speed);                       
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D)            == GLFW_PRESS)
+            camera.moveRight(camera_speed);                        
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE)        == GLFW_PRESS)
+            camera.moveUp(camera_speed);
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+            camera.moveUp(-camera_speed);
 
-    float rot_speed = 50.0f * delta_time;
-    glm::vec3 rot_delta(0);
+        float rot_speed = 50.0f * delta_time;
+        glm::vec3 rot_delta(0);
 
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q)     == GLFW_PRESS) rot_delta.x -= rot_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_E)     == GLFW_PRESS) rot_delta.x += rot_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP)    == GLFW_PRESS) rot_delta.y += rot_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN)  == GLFW_PRESS) rot_delta.y -= rot_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT)  == GLFW_PRESS) rot_delta.z += rot_speed;
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) rot_delta.z -= rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q)     == GLFW_PRESS) rot_delta.x -= rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_E)     == GLFW_PRESS) rot_delta.x += rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP)    == GLFW_PRESS) rot_delta.y += rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN)  == GLFW_PRESS) rot_delta.y -= rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT)  == GLFW_PRESS) rot_delta.z += rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) rot_delta.z -= rot_speed;
 
-    if (rot_delta != glm::vec3(0))
-        camera.setRotation(camera.getRotation() + rot_delta);
+        if (rot_delta != glm::vec3(0))
+            camera.setRotation(camera.getRotation() + rot_delta);
 
-    // Field of view
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_EQUAL) == GLFW_PRESS)
-        camera.setFieldOfView(camera.getFieldOfView() - 20.0f * delta_time);
-    if (glfwGetKey(&window.getWindow(), GLFW_KEY_MINUS) == GLFW_PRESS)
-        camera.setFieldOfView(camera.getFieldOfView() + 20.0f * delta_time);
+        // Field of view
+        {
+            if (glfwGetKey(&window.getWindow(), GLFW_KEY_EQUAL) == GLFW_PRESS)
+                camera.setFieldOfView(camera.getFieldOfView() - camera_speed * delta_time);
+            if (glfwGetKey(&window.getWindow(), GLFW_KEY_MINUS) == GLFW_PRESS)
+                camera.setFieldOfView(camera.getFieldOfView() + camera_speed * delta_time);
 
-    fov = camera.getFieldOfView();
-    if (fov < 1.0f)  fov = 1.0f;
-    if (fov > 90.0f) fov = 90.0f;
-    camera.setFieldOfView(fov);
+            fov = camera.getFieldOfView();
+            if (fov < 1.0f)  fov = 1.0f;
+            if (fov > 90.0f) fov = 90.0f;
+            camera.setFieldOfView(fov);
+        }
+    }
+
+    if (camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+    {
+        float camera_speed = 30.0f * delta_time;
+
+        glm::vec3 pos = camera.getPosition();
+
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A)            == GLFW_PRESS)
+            pos.x -= camera_speed;                                 
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D)            == GLFW_PRESS)
+            pos.x += camera_speed;                                 
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W)            == GLFW_PRESS)
+            pos.y += camera_speed;                                 
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S)            == GLFW_PRESS)
+            pos.y -= camera_speed;                                 
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE)        == GLFW_PRESS)
+            pos.z += camera_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+            pos.z -= camera_speed;
+
+        camera.setPosition(pos);
+    }
 }
 
 void initGUi(smpl::Window& window)
@@ -362,13 +389,32 @@ void initGUi(smpl::Window& window)
         if (ImGui::SliderFloat3("Camera position", glm::value_ptr(cam_pos), -100.0f, 100.0f))
             camera.setPosition(cam_pos);
 
-        if (ImGui::SliderFloat3("Camera rotation", glm::value_ptr(cam_rot), 0.0f, 360.0f))
-            camera.setRotation(cam_rot);
+        if (!isometric_mode)
+        {
+            if (ImGui::SliderFloat3("Camera rotation", glm::value_ptr(cam_rot), 0.0f, 360.0f))
+                camera.setRotation(cam_rot);
 
-        if (ImGui::SliderFloat("Field of view", &fov, 1.0f, 90.0f))
-            camera.setFieldOfView(fov);
+            if (ImGui::SliderFloat("Field of view", &fov, 1.0f, 90.0f))
+                camera.setFieldOfView(fov);
+        }
+        else
+        {
+            auto zoom = camera.getZoom();
 
-        ImGui::Checkbox("Perspective camera", &perspective_camera);
+            if (ImGui::SliderFloat("Zoom", &zoom, 1.0f, 90.0f))
+                camera.setZoom(zoom);
+        }
+
+        if (ImGui::Checkbox("Isometric", &isometric_mode))
+        {
+            if (isometric_mode)
+            {
+                camera.setRotation(glm::vec3(-45.0f, -45, 0.0f));
+                camera.setProjection(smpl::Camera::Projection::Isometric);
+            }
+            else
+                camera.setProjection(smpl::Camera::Projection::Perspective);
+        }
 
         ImGui::Dummy(ImVec2(0, 30));
         ImGui::SeparatorText("Object");

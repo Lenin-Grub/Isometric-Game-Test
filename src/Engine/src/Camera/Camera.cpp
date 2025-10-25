@@ -8,9 +8,16 @@ namespace smpl
     Camera::Camera(const glm::vec3& position,
         const glm::vec3& rotation,
         const Projection projection_mode)
-        : m_position(position)
-        , m_rotation(rotation)
-        , m_projection_mode(projection_mode)
+        : m_projection_mode( projection_mode )
+        , m_position       ( position )
+        , m_rotation       ( rotation )
+        , m_far_clip_plane ( 100.f )
+        , m_near_clip_plane(  0.1f )
+        , m_viewport_width ( 800.f )
+        , m_viewport_height( 600.f )
+        , m_field_of_view  (  60.f )
+        , m_zoom           (  30.f )
+        , m_update_view_matrix (false)
     {
         updateViewMatrix();
         updateProjectionMatrix();
@@ -31,6 +38,11 @@ namespace smpl
         return m_projection_matrix;
     }
 
+    const Camera::Projection& Camera::getProjectionMode() const
+    {
+        return m_projection_mode;
+    }
+
     const float Camera::getFarClipPlane() const
     {
         return m_far_clip_plane;
@@ -46,22 +58,43 @@ namespace smpl
         return m_field_of_view;
     }
 
+    const float Camera::getZoom() const
+    {
+        return m_zoom;
+    }
+
     void Camera::updateViewMatrix()
     {
-        const float roll_in_radians  = glm::radians(m_rotation.x);
-        const float pitch_in_radians = glm::radians(m_rotation.y);
-        const float yaw_in_radians   = glm::radians(m_rotation.z);
+        if (m_projection_mode == Projection::Isometric)
+        {
+            const float pitch_in_radians = glm::radians(m_rotation.x);
+            const float yaw_in_radians   = glm::radians(m_rotation.y);
 
-        glm::mat3 yaw_mat   = glm::rotate(glm::mat4(1), yaw_in_radians,   m_world_up);      // вокруг Z
-        glm::mat3 pitch_mat = glm::rotate(glm::mat4(1), pitch_in_radians, m_world_right);   // вокруг X
-        glm::mat3 roll_mat  = glm::rotate(glm::mat4(1), roll_in_radians,  m_world_forward); // вокруг Y
+            glm::mat4 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw_in_radians, m_world_up);
+            glm::mat3 pitch_mat = glm::rotate(yaw_mat, pitch_in_radians, m_world_right);
 
-        glm::mat3 euler_rotate_matrix = roll_mat * pitch_mat * yaw_mat;
+            m_direction        = glm::normalize(glm::vec3(pitch_mat * glm::vec4(m_world_forward, 0.0f)));
+            m_right            = glm::normalize(glm::vec3(yaw_mat   * glm::vec4(m_world_right,   0.0f)));
+            m_up               = glm::cross(m_right, m_direction);
+            m_view_matrix      = glm::lookAt(m_position, m_position + m_direction, m_up);
+        }
+        else
+        {
+            const float roll_in_radians = glm::radians(m_rotation.x);
+            const float pitch_in_radians = glm::radians(m_rotation.y);
+            const float yaw_in_radians = glm::radians(m_rotation.z);
 
-        m_direction                         = glm::normalize(euler_rotate_matrix * m_world_forward);
-        m_right                             = glm::normalize(euler_rotate_matrix * m_world_right);
-        m_up                                = glm::cross(m_right, m_direction);
-        m_view_matrix                       = glm::lookAt(m_position, m_position + m_direction, m_up);
+            glm::mat3 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw_in_radians,   m_world_up);
+            glm::mat3 pitch_mat = glm::rotate(glm::mat4(1.0f), pitch_in_radians, m_world_right);
+            glm::mat3 roll_mat  = glm::rotate(glm::mat4(1.0f), roll_in_radians,  m_world_forward);
+
+            glm::mat3 euler_rotate_matrix = roll_mat * pitch_mat * yaw_mat;
+
+            m_direction   = glm::normalize(euler_rotate_matrix * m_world_forward);
+            m_right       = glm::normalize(euler_rotate_matrix * m_world_right);
+            m_up          = glm::cross(m_right, m_direction);
+            m_view_matrix = glm::lookAt(m_position, m_position + m_direction, m_up);
+        }
     }
 
     void Camera::updateProjectionMatrix()
@@ -69,6 +102,11 @@ namespace smpl
         if (m_projection_mode == Projection::Perspective)
         {
             m_projection_matrix = glm::perspective(glm::radians(m_field_of_view), m_viewport_width / m_viewport_height, m_near_clip_plane, m_far_clip_plane);
+        }
+        else if (m_projection_mode == Projection::Isometric)
+        {
+            float aspect = m_viewport_width / m_viewport_height;
+            m_projection_matrix = glm::ortho(-m_zoom * aspect, m_zoom * aspect,-m_zoom, m_zoom,m_near_clip_plane,m_far_clip_plane );
         }
         else
         {
@@ -133,6 +171,12 @@ namespace smpl
         updateProjectionMatrix();
     }
 
+    void Camera::setZoom(float zoom)
+    {
+        m_zoom = zoom;
+        updateProjectionMatrix();
+    }
+
     void Camera::moveForward(const float delta)
     {
         m_position += m_direction * delta;
@@ -170,5 +214,4 @@ namespace smpl
         m_rotation += rotation_delta;
         m_update_view_matrix = true;
     }
-
 }

@@ -15,6 +15,8 @@ namespace smpl
             Isometric
         };
 
+        // TODO Make Frustrum & View class
+
         Camera(const glm::vec3& position = { 0, 0, 0 },
                const glm::vec3& rotation = { 0, 0, 0 },
                const Projection projection_mode = Projection::Perspective);
@@ -27,12 +29,15 @@ namespace smpl
         void setNearClipPlane(const float near);
         void setViewportSize(const float width, const float height);
         void setFieldOfView(const float fov);
+        void setZoom(float zoom);
 
         const glm::mat4& getViewMatrix();
         const glm::mat4& getProjectionMatrix() const;
+        const Camera::Projection& getProjectionMode() const;
         const float getFarClipPlane() const;
         const float getNearClipPlane() const;
         const float getFieldOfView() const;
+        const float getZoom() const;
 
         void moveForward(const float delta);
         void moveRight(const float delta);
@@ -48,26 +53,27 @@ namespace smpl
         void updateViewMatrix();
         void updateProjectionMatrix();
 
+    private:
+        Projection m_projection_mode;
         glm::vec3  m_position;
         glm::vec3  m_rotation;
-        Projection m_projection_mode;
+        glm::vec3  m_direction;
+        glm::vec3  m_right;
+        glm::vec3  m_up;
 
-        glm::vec3 m_direction;
-        glm::vec3 m_right;
-        glm::vec3 m_up;
+        float m_far_clip_plane;
+        float m_near_clip_plane;
+        float m_viewport_width;
+        float m_viewport_height;
+        float m_field_of_view;
+        float m_zoom;
 
-        float m_far_clip_plane { 100.f };
-        float m_near_clip_plane{ 0.1f };
-        float m_viewport_width { 800.f };
-        float m_viewport_height{ 600.f };
-        float m_field_of_view  { 60.f };
-
-        static constexpr glm::vec3 m_world_right    { 1.f, 0.f, 0.f }; // X = right
-        static constexpr glm::vec3 m_world_forward  { 0.f, 1.f, 0.f }; // Y = forward
-        static constexpr glm::vec3 m_world_up       { 0.f, 0.f, 1.f }; // Z = up
+        static constexpr glm::vec3 m_world_right    { 1.f, 0.f, 0.f };
+        static constexpr glm::vec3 m_world_forward  { 0.f, 1.f, 0.f };
+        static constexpr glm::vec3 m_world_up       { 0.f, 0.f, 1.f };
 
         glm::mat4 m_view_matrix;
         glm::mat4 m_projection_matrix;
-        bool m_update_view_matrix = false;
+        bool      m_update_view_matrix;
     };
 }
