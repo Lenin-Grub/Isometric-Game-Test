@@ -18,6 +18,8 @@
 #include <Graphics/VertexArray/VertexArray.hpp>
 #include <Graphics/Texture/Texture.hpp>
 
+#include <Graphics/Primitives/Cube/Cube.hpp>
+
 #include <Window/Window.hpp>
 #include <Camera/Camera.hpp>
 #include <ImGui/SetImGui.hpp>
@@ -27,7 +29,7 @@
 #pragma region Variables
 
 glm::vec3 camera_pos = { 0.f, -30.f, 15.f };
-glm::vec3 camera_rot = { 0.f, -45.f,  0.f };
+glm::vec3 camera_rot = {-45.f, 90.f,  0.f };
 
 glm::vec3 scale      = { 1.f, 1.f, 1.f };
 glm::vec3 translate  = { 0.f, 0.f, 0.f };
@@ -42,9 +44,11 @@ float delta_time = 0.0f;
 float last_frame = 0.0f;
 float angle      = 0.f;
 float fov        = 0.f;
+float zoom       = 0.f;
 
 smpl::Camera camera (camera_pos, camera_rot);
 smpl::Event  event;
+
 
 #pragma endregion
 
@@ -92,61 +96,16 @@ int main()
     if (!program2.link())
         return -1;
 
-    float vertices[] = {
-        // Front face
-        -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
-        -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
+    smpl::Cube   cube;
 
-        // Back face
-        -1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
-         1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-         1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
-
-        // Right face
-         1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
-         1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
-
-         // Left face
-         -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
-         -1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
-         -1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
-         -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
-
-         // Top face
-         -1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
-          1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
-          1.0f,  1.0f,  1.0f,  1.0f, 0.0f,
-         -1.0f,  1.0f,  1.0f,  0.0f, 0.0f,
-
-         // Bottom face
-         -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
-          1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
-          1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
-         -1.0f, -1.0f, -1.0f,  0.0f, 0.0f
-    };
-
-    unsigned int indices[] = {
-        0,  1,  2,  0,  2,  3,  // front
-        4,  5,  6,  4,  6,  7,  // back
-        8,  9, 10,  8, 10, 11,  // right
-        12, 13, 14, 12, 14, 15, // left
-        16, 17, 18, 16, 18, 19, // top
-        20, 21, 22, 20, 22, 23  // bottom
-    };
-
-    std::array<glm::vec3, 5> positions = {
+    std::array<glm::vec3, 6> positions = {
                glm::vec3(-2.f, -2.f, -4.f),
                glm::vec3(-5.f,  0.f,  3.f),
                glm::vec3( 2.f,  1.f, -2.f),
                glm::vec3( 4.f, -3.f,  3.f),
-               glm::vec3( 1.f, -7.f,  1.f)
+               glm::vec3( 1.f, -7.f,  1.f),
+               glm::vec3( 1.f,  1.f,  1.f)
     };
-
 
     smpl::BufferLayout layout
     {
@@ -159,8 +118,8 @@ int main()
     std::unique_ptr<smpl::IndexBuffer>  index_buffer;
 
     vao          = std::make_unique<smpl::VertexArray>();
-    vbo          = std::make_unique<smpl::VertexBuffer>(vertices, sizeof(vertices), layout);
-    index_buffer = std::make_unique<smpl::IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
+    vbo          = std::make_unique<smpl::VertexBuffer>(cube.getVertices().data(),sizeof(cube.getVertices()),layout);
+    index_buffer = std::make_unique<smpl::IndexBuffer> (cube.getIndices().data(), static_cast<uint32_t>(cube.getIndices().size()));
 
     vao->addVertexBuffer(*vbo);
     vao->setIndexBuffer(*index_buffer);
@@ -172,7 +131,8 @@ int main()
     texture2.loadFromFile("res/horde.png");
 #pragma endregion
 
-    camera.setViewportSize(1480, 1200);
+    camera.setViewportSize(mode.width, mode.height);
+
 
     while (window.isOpen())
     {
@@ -184,6 +144,17 @@ int main()
         {
             if (event.type == smpl::EventType::WindowClosed || event.key.code == smpl::Key::Code::Escape)
                 window.close();
+
+            if (event.type == smpl::EventType::MouseScrolled)
+            {
+                if (camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+                {
+                    float scroll_sensitivity = 1.0f;
+                    float new_zoom = camera.getZoom() - static_cast<float>(event.mouseScroll.yoffset) * scroll_sensitivity;
+                    zoom = glm::clamp(new_zoom, 1.0f, 100.0f);
+                    camera.setZoom(zoom);
+                }
+            }
         }
         
         input(window);
@@ -257,15 +228,15 @@ void input(smpl::Window& window)
     {
         float camera_speed = 30.0f * delta_time;
 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W)            == GLFW_PRESS)
-            camera.moveForward(camera_speed);                      
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S)            == GLFW_PRESS)
-            camera.moveForward(-camera_speed);                     
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A)            == GLFW_PRESS)
-            camera.moveRight(-camera_speed);                       
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D)            == GLFW_PRESS)
-            camera.moveRight(camera_speed);                        
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE)        == GLFW_PRESS)
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+            camera.moveForward(camera_speed);
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+            camera.moveForward(-camera_speed);
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+            camera.moveRight(-camera_speed);
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+            camera.moveRight(camera_speed);
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
             camera.moveUp(camera_speed);
         if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
             camera.moveUp(-camera_speed);
@@ -273,12 +244,10 @@ void input(smpl::Window& window)
         float rot_speed = 50.0f * delta_time;
         glm::vec3 rot_delta(0);
 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_Q)     == GLFW_PRESS) rot_delta.x -= rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_E)     == GLFW_PRESS) rot_delta.x += rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP)    == GLFW_PRESS) rot_delta.y += rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN)  == GLFW_PRESS) rot_delta.y -= rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT)  == GLFW_PRESS) rot_delta.z += rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) rot_delta.z -= rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP) == GLFW_PRESS) rot_delta.x += rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS) rot_delta.x -= rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS) rot_delta.y += rot_speed;
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) rot_delta.y -= rot_speed;
 
         if (rot_delta != glm::vec3(0))
             camera.setRotation(camera.getRotation() + rot_delta);
@@ -295,6 +264,54 @@ void input(smpl::Window& window)
             if (fov > 90.0f) fov = 90.0f;
             camera.setFieldOfView(fov);
         }
+
+        // Mouse navigation
+        {
+            static bool   first_mouse = true;
+            static double last_mouse_x = 0.0;
+            static double last_mouse_y = 0.0;
+
+            if (glfwGetMouseButton(&window.getWindow(), GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+            {
+                if (glfwGetInputMode(&window.getWindow(), GLFW_CURSOR) != GLFW_CURSOR_DISABLED)
+                {
+                    glfwSetInputMode(&window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    first_mouse = true;
+                }
+
+                glm::vec2 current_mouse_pos = window.getCursorPos();
+                double current_mouse_x = current_mouse_pos.x;
+                double current_mouse_y = current_mouse_pos.y;
+
+                if (first_mouse)
+                {
+                    last_mouse_x = current_mouse_x;
+                    last_mouse_y = current_mouse_y;
+                    first_mouse = false;
+                }
+
+                float mouse_sensitivity = 0.1f;
+                float delta_x = (current_mouse_x - last_mouse_x) * mouse_sensitivity;
+                float delta_y = (last_mouse_y - current_mouse_y) * mouse_sensitivity;
+
+                last_mouse_x = current_mouse_x;
+                last_mouse_y = current_mouse_y;
+
+                glm::vec3 current_rot = camera.getRotation();
+                current_rot.y -= delta_x;
+                current_rot.x += delta_y;
+
+                current_rot.x = glm::clamp(current_rot.x, -89.0f, 89.0f);
+
+                camera.setRotation(current_rot);
+            }
+            else
+            {
+                if (glfwGetInputMode(&window.getWindow(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+                    glfwSetInputMode(&window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                first_mouse = true;
+            }
+        }
     }
 
     if (camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
@@ -303,20 +320,33 @@ void input(smpl::Window& window)
 
         glm::vec3 pos = camera.getPosition();
 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A)            == GLFW_PRESS)
-            pos.x -= camera_speed;                                 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D)            == GLFW_PRESS)
-            pos.x += camera_speed;                                 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W)            == GLFW_PRESS)
-            pos.y += camera_speed;                                 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S)            == GLFW_PRESS)
-            pos.y -= camera_speed;                                 
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+        {
+            pos.x -= camera_speed;
+            pos.y += camera_speed;
+        }
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+        {
+            pos.x += camera_speed;
+            pos.y -= camera_speed;
+        }
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+        {
+            pos.x += camera_speed;
+            pos.y += camera_speed;
+        }
+        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+        {
+            pos.x -= camera_speed;
+            pos.y -= camera_speed;
+        }
         if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE)        == GLFW_PRESS)
             pos.z += camera_speed;
         if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
             pos.z -= camera_speed;
 
         camera.setPosition(pos);
+
     }
 }
 
@@ -403,7 +433,7 @@ void initGUi(smpl::Window& window)
         }
         else
         {
-            auto zoom = camera.getZoom();
+            zoom = camera.getZoom();
 
             if (ImGui::SliderFloat("Zoom", &zoom, 1.0f, 90.0f))
                 camera.setZoom(zoom);

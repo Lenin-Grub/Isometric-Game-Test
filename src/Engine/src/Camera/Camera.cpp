@@ -13,8 +13,8 @@ namespace smpl
         , m_rotation       ( rotation )
         , m_far_clip_plane ( 100.f )
         , m_near_clip_plane(  0.1f )
-        , m_viewport_width ( 800.f )
-        , m_viewport_height( 600.f )
+        , m_viewport_width (2560.f )
+        , m_viewport_height(1600.f )
         , m_field_of_view  (  60.f )
         , m_zoom           (  30.f )
         , m_update_view_matrix (false)
@@ -67,11 +67,11 @@ namespace smpl
     {
         if (m_projection_mode == Projection::Isometric)
         {
-            const float pitch_in_radians = glm::radians(m_rotation.x);
-            const float yaw_in_radians   = glm::radians(m_rotation.y);
+            const float pitch = glm::radians(m_rotation.x);
+            const float yaw   = glm::radians(m_rotation.y);
 
-            glm::mat4 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw_in_radians, m_world_up);
-            glm::mat3 pitch_mat = glm::rotate(yaw_mat, pitch_in_radians, m_world_right);
+            glm::mat4 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw, m_world_up);
+            glm::mat3 pitch_mat = glm::rotate(yaw_mat, pitch, m_world_right);
 
             m_direction        = glm::normalize(glm::vec3(pitch_mat * glm::vec4(m_world_forward, 0.0f)));
             m_right            = glm::normalize(glm::vec3(yaw_mat   * glm::vec4(m_world_right,   0.0f)));
@@ -80,19 +80,17 @@ namespace smpl
         }
         else
         {
-            const float roll_in_radians = glm::radians(m_rotation.x);
-            const float pitch_in_radians = glm::radians(m_rotation.y);
-            const float yaw_in_radians = glm::radians(m_rotation.z);
+            const float pitch = glm::radians(m_rotation.x);
+            const float yaw   = glm::radians(m_rotation.y);
 
-            glm::mat3 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw_in_radians,   m_world_up);
-            glm::mat3 pitch_mat = glm::rotate(glm::mat4(1.0f), pitch_in_radians, m_world_right);
-            glm::mat3 roll_mat  = glm::rotate(glm::mat4(1.0f), roll_in_radians,  m_world_forward);
+            glm::vec3 direction;
+            direction.x = cos(yaw) * cos(pitch);
+            direction.y = sin(yaw) * cos(pitch);
+            direction.z = sin(pitch);
 
-            glm::mat3 euler_rotate_matrix = roll_mat * pitch_mat * yaw_mat;
-
-            m_direction   = glm::normalize(euler_rotate_matrix * m_world_forward);
-            m_right       = glm::normalize(euler_rotate_matrix * m_world_right);
-            m_up          = glm::cross(m_right, m_direction);
+            m_direction   = glm::normalize(direction);
+            m_right       = glm::normalize(glm::cross(m_direction, m_world_up));
+            m_up          = glm::normalize(glm::cross(m_right, m_direction));
             m_view_matrix = glm::lookAt(m_position, m_position + m_direction, m_up);
         }
     }
@@ -110,14 +108,8 @@ namespace smpl
         }
         else
         {
-            float r = 2;
-            float t = 2;
-            float f = 100;
-            float n = 0.1f;
-            m_projection_matrix = glm::mat4(1 / r, 0, 0, 0,
-                                            0, 1 / t, 0, 0,
-                                            0, 0, -2 / (f - n), 0,
-                                            0, 0, (-f - n) / (f - n), 1);
+            float aspect = m_viewport_width / m_viewport_height;
+            m_projection_matrix = glm::ortho(-m_zoom * aspect, m_zoom * aspect, -m_zoom, m_zoom, m_near_clip_plane, m_far_clip_plane);
         }
     }
 
