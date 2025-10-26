@@ -26,6 +26,8 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Graphics/VertexArray/VertexArray.hpp
     src/Graphics/VertexBuffer/VertexBuffer.hpp
     src/Graphics/IndexBuffer/IndexBuffer.hpp
+	
+    src/Graphics/Primitives/Cube/Cube.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
@@ -47,6 +49,8 @@ set (ENGINE_PUBLIC_SOURCES
     src/Graphics/VertexArray/VertexArray.cpp
     src/Graphics/VertexBuffer/VertexBuffer.cpp
     src/Graphics/IndexBuffer/IndexBuffer.cpp
+	
+	src/Graphics/Primitives/Cube/Cube.cpp
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
