@@ -93,6 +93,8 @@ namespace smpl
             RAlt        = GLFW_KEY_RIGHT_ALT,
             LWin        = GLFW_KEY_LEFT_SUPER,
             RWin        = GLFW_KEY_RIGHT_SUPER,
+            Equal       = GLFW_KEY_EQUAL,
+            Minus       = GLFW_KEY_MINUS,
         };
 
         inline bool operator==(int glfwKey, Code key) 

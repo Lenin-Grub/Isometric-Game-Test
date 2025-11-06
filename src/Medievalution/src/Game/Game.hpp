@@ -41,7 +41,6 @@ private:
     unsigned int m_height = 1600;
 
     smpl::Window m_window;
-    smpl::Event  m_event;
     smpl::Color  m_color{ 50,50,50 };
 
 private:

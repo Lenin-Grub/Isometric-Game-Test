@@ -4,13 +4,21 @@ namespace smpl
 {
     namespace Mouse
     {
-        enum Button
+        enum class Button
         {
             Left,
             Right,
             Middle,
             XButton1,
             XButton2,
+        };
+
+        enum class Scroll
+        {
+            Up,
+            Down,
+            Left,
+            Right
         };
     }
 }

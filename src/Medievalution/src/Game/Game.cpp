@@ -3,6 +3,7 @@
 
 #include <Window/VideoMode.hpp>
 #include <ImGui/SetImGui.hpp>
+#include <Event/Input.hpp>
 
 #include <iostream>
 #include <set>
@@ -22,6 +23,9 @@ bool Game::create()
         return false;
 
     if(!LogInfo::initLogger())
+        return false;
+
+    if (!smpl::Input::init(m_window))
         return false;
 
     return true;
@@ -56,53 +60,40 @@ bool Game::init()
 
 void Game::input()
 {
-    while (m_window.pollEvent(m_event))
+    glfwPollEvents();
+
+    if (smpl::Input::isKeyPressed(smpl::Key::Code::Escape))
     {
-        if (m_event.type == smpl::EventType::WindowClosed)
-        {
-            m_window.close();
-        }
+        m_window.close();
+    }
 
-        if (m_event.key.code == smpl::Key::Code::Escape)
-        {
-            m_window.close();
-        }
+    if (smpl::Input::isKeyPressed(smpl::Key::Code::Space))
+    {
+        LOG_DEBUG("Space key pressed!");
+    }
 
-        if (m_event.key.action == GLFW_RELEASE)
-        {
-            if (m_event.key.code == smpl::Key::Code::Space)
-            {
-                LOG_DEBUG("Space key relesed!");
-            }
-        }
+    if (smpl::Input::isKeyReleased(smpl::Key::Code::Space))
+    {
+        LOG_INFO("Space key relesed!");
+    }
 
-        if (m_event.type == smpl::EventType::WindowResized)
-        {
-            LOG_DEBUG("Resized to : {0} {1}", m_event.windowSize.width, m_event.windowSize.height);
-        }
+    if (smpl::Input::isMousePressed(smpl::Mouse::Button::Left))
+    {
+        LOG_DEBUG("Mouse left ckicked!");
+    }
 
-        if (m_event.type == smpl::EventType::MouseButtonPressed)
-        {
-            if (m_event.mouseButton.button == smpl::Mouse::Left)
-            {
-                LOG_DEBUG("Mouse left ckicked!");
-            }
-        }
+    if (smpl::Input::isMouseReleased(smpl::Mouse::Button::Left))
+    {
+        LOG_INFO("Mouse left relesed!");
+    }
 
-        if (m_event.type == smpl::EventType::MouseScrolled)
-        {
-            LOG_DEBUG("Mouse scrolled!");
-        }
-
-        //not work yet
-        //if (m_event.type == smpl::EventType::KeyPressed)
-        //{
-        //    if (m_event.key.code == smpl::Key::Code::A && m_event.key.code == smpl::Key::Code::LShift && m_event.key.code == smpl::Key::Code::LCtrl)
-        //    {
-        //        LOG_DEBUG("Ctrl+Shift+A");
-        //    }
-        //}
-
+    if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Up))
+    {
+        LOG_DEBUG("Mouse scrolled up!");
+    }
+    if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Down))
+    {
+        LOG_DEBUG("Mouse scrolled down!");
     }
 }
 

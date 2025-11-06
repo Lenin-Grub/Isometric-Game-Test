@@ -8,9 +8,9 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Window/Window.hpp
     src/Window/VideoMode.hpp
 
-    src/Event/Event.hpp
     src/Event/Keyboard.hpp
     src/Event/Mouse.hpp
+    src/Event/Input.hpp
 
     src/Log/Log.hpp
     src/ImGui/SetImGui.cpp
@@ -34,9 +34,9 @@ set (ENGINE_PUBLIC_SOURCES
     src/Window/Window.cpp
     src/Window/VideoMode.cpp
 
-    src/Event/Event.cpp
     src/Event/Keyboard.cpp
     src/Event/Mouse.cpp
+    src/Event/Input.cpp
 
     src/ImGui/SetImGui.hpp
     src/Camera/Camera.cpp

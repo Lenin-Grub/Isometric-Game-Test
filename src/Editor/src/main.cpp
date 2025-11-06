@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <array>
+#include <set>
 
 #include <Graphics/Shader/Shader.hpp>
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
@@ -21,10 +22,11 @@
 #include <Graphics/Primitives/Cube/Cube.hpp>
 
 #include <Window/Window.hpp>
+#include <Event/Input.hpp>
 #include <Camera/Camera.hpp>
 #include <ImGui/SetImGui.hpp>
 #include <Log/Log.hpp>
-#include <set>
+
 
 #pragma region Variables
 
@@ -47,8 +49,6 @@ float fov        = 0.f;
 float zoom       = 0.f;
 
 smpl::Camera camera (camera_pos, camera_rot);
-smpl::Event  event;
-
 
 #pragma endregion
 
@@ -132,7 +132,7 @@ int main()
 #pragma endregion
 
     camera.setViewportSize(mode.width, mode.height);
-
+    smpl::Input::init(window);
 
     while (window.isOpen())
     {
@@ -140,23 +140,7 @@ int main()
         delta_time = current_frame - last_frame;
         last_frame = current_frame;
 
-        while (window.pollEvent(event))
-        {
-            if (event.type == smpl::EventType::WindowClosed || event.key.code == smpl::Key::Code::Escape)
-                window.close();
-
-            if (event.type == smpl::EventType::MouseScrolled)
-            {
-                if (camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
-                {
-                    float scroll_sensitivity = 1.0f;
-                    float new_zoom = camera.getZoom() - static_cast<float>(event.mouseScroll.yoffset) * scroll_sensitivity;
-                    zoom = glm::clamp(new_zoom, 1.0f, 100.0f);
-                    camera.setZoom(zoom);
-                }
-            }
-        }
-        
+        glfwPollEvents();
         input(window);
 
         window.clear(smpl::Color(50,50,50));
@@ -213,7 +197,6 @@ int main()
         initGUi(window);
 
         window.display();
-        glfwPollEvents();
     }
 
     smpl::Gui::destroyImGui();
@@ -224,40 +207,54 @@ int main()
 
 void input(smpl::Window& window)
 {
+    if (smpl::Input::isKeyReleased(smpl::Key::Code::Escape))
+    {
+        window.close();
+    }
+
     if (camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
     {
         float camera_speed = 30.0f * delta_time;
 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::W))
             camera.moveForward(camera_speed);
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::S))
             camera.moveForward(-camera_speed);
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::A))
             camera.moveRight(-camera_speed);
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::D))
             camera.moveRight(camera_speed);
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::Space))
             camera.moveUp(camera_speed);
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::LCtrl))
             camera.moveUp(-camera_speed);
 
         float rot_speed = 50.0f * delta_time;
         glm::vec3 rot_delta(0);
 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_UP) == GLFW_PRESS) rot_delta.x += rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS) rot_delta.x -= rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT) == GLFW_PRESS) rot_delta.y += rot_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_RIGHT) == GLFW_PRESS) rot_delta.y -= rot_speed;
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::Up))
+            rot_delta.x += rot_speed;
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::Down))
+            rot_delta.x -= rot_speed;
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::Left))
+            rot_delta.y += rot_speed;
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::Right))
+            rot_delta.y -= rot_speed;
 
         if (rot_delta != glm::vec3(0))
             camera.setRotation(camera.getRotation() + rot_delta);
 
+        if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Up))
+            camera.moveUp(rot_speed);
+        if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Down))
+            camera.moveUp(-rot_speed);
+
         // Field of view
         {
-            if (glfwGetKey(&window.getWindow(), GLFW_KEY_EQUAL) == GLFW_PRESS)
-                camera.setFieldOfView(camera.getFieldOfView() - camera_speed * delta_time);
-            if (glfwGetKey(&window.getWindow(), GLFW_KEY_MINUS) == GLFW_PRESS)
-                camera.setFieldOfView(camera.getFieldOfView() + camera_speed * delta_time);
+            if (smpl::Input::isKeyPressed(smpl::Key::Code::Equal))
+                camera.setFieldOfView(camera.getFieldOfView() - camera_speed);
+            if (smpl::Input::isKeyPressed(smpl::Key::Code::Minus))
+                camera.setFieldOfView(camera.getFieldOfView() + camera_speed);
 
             fov = camera.getFieldOfView();
             if (fov < 1.0f)  fov = 1.0f;
@@ -271,7 +268,7 @@ void input(smpl::Window& window)
             static double last_mouse_x = 0.0;
             static double last_mouse_y = 0.0;
 
-            if (glfwGetMouseButton(&window.getWindow(), GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+            if (smpl::Input::isMousePressed(smpl::Mouse::Button::Right))
             {
                 if (glfwGetInputMode(&window.getWindow(), GLFW_CURSOR) != GLFW_CURSOR_DISABLED)
                 {
@@ -320,33 +317,41 @@ void input(smpl::Window& window)
 
         glm::vec3 pos = camera.getPosition();
 
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::A))
         {
             pos.x -= camera_speed;
             pos.y += camera_speed;
         }
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::D))
         {
             pos.x += camera_speed;
             pos.y -= camera_speed;
         }
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::W))
         {
             pos.x += camera_speed;
             pos.y += camera_speed;
         }
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::S))
         {
             pos.x -= camera_speed;
             pos.y -= camera_speed;
         }
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_SPACE)        == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::Space))
             pos.z += camera_speed;
-        if (glfwGetKey(&window.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        if (smpl::Input::isKeyPressed(smpl::Key::Code::LCtrl))
             pos.z -= camera_speed;
 
         camera.setPosition(pos);
 
+        float scroll_y = smpl::Input::getScrollOffsetY();
+        if (scroll_y != 0.0f)
+        {
+            float scroll_sensitivity = 1.0f;
+            float new_zoom = zoom - scroll_y * scroll_sensitivity;
+            zoom = glm::clamp(new_zoom, 1.0f, 100.0f);
+            camera.setZoom(zoom);
+        }
     }
 }
 

@@ -69,13 +69,6 @@ namespace smpl
 
         glfwSetWindowUserPointer   (m_window, this);
 
-        glfwSetKeyCallback         (m_window, keyCallback);
-        glfwSetMouseButtonCallback (m_window, mouseButtonCallback);
-        glfwSetCursorPosCallback   (m_window, cursorPosCallback);
-        glfwSetWindowCloseCallback (m_window, windowCloseCallback);
-        glfwSetWindowSizeCallback  (m_window, windowSizeCallback);
-        glfwSetScrollCallback      (m_window, windowScrollCallback);
-
         glEnable(GL_DEPTH_TEST);
 
         return true;
@@ -211,19 +204,6 @@ namespace smpl
         return m_video_mode;
     }
 
-
-    bool Window::pollEvent(smpl::Event& event)
-    {
-        glfwPollEvents();
-
-        if (m_event_queue.empty())
-            return false;
-
-        event = m_event_queue.front();
-        m_event_queue.pop();
-        return true;
-    }
-
     bool Window::isOpen()
     {
         if (!m_window)
@@ -243,67 +223,5 @@ namespace smpl
         double y_pos;
         glfwGetCursorPos(m_window, &x_pos, &y_pos);
         return { x_pos, y_pos };
-    }
-
-    void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-    {
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        Event event;
-        event.type = (action == GLFW_PRESS) ? EventType::KeyPressed : EventType::KeyReleased;
-        event.key.code = static_cast<Key::Code>(key);
-        event.key.scancode = scancode;
-        event.key.action = action;
-        //event.key.mods = mods;
-        win->m_event_queue.push(event);
-    }
-
-    void Window::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-    {
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        Event event;
-        event.type = (action == GLFW_PRESS) ? EventType::MouseButtonPressed : EventType::MouseButtonReleased;
-        //event.mouseButton.button = button;
-        event.mouseButton.button = static_cast<Mouse::Button>(button);
-        //event.mouseButton.action = action;
-        //event.mouseButton.mods = mods;
-        win->m_event_queue.push(event);
-    }
-
-    void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
-    {
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        Event event;
-        event.type = EventType::MouseMoved;
-        event.mouseMove.x = xpos;
-        event.mouseMove.y = ypos;
-        win->m_event_queue.push(event);
-    }
-
-    void Window::windowCloseCallback(GLFWwindow* window)
-    {
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        Event event;
-        event.type = EventType::WindowClosed;
-        win->m_event_queue.push(event);
-    }
-
-    void Window::windowSizeCallback(GLFWwindow* window, int width, int height)
-    {
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        Event event;
-        event.type = EventType::WindowResized;
-        event.windowSize.width = width;
-        event.windowSize.height = height;
-        win->m_event_queue.push(event);
-    }
-
-    void Window::windowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-    {
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        Event event;
-        event.type = EventType::MouseScrolled;
-        event.mouseScroll.xoffset = xoffset;
-        event.mouseScroll.yoffset = yoffset;
-        win->m_event_queue.push(event);
     }
 }
