@@ -1,0 +1,18 @@
+[submodule "ext_libs/imgui"]
+	path = ext_libs/imgui
+	url = git@github.com:ocornut/imgui.git
+[submodule "ext_libs/spdlog"]
+	path = ext_libs/spdlog
+	url = git@github.com:gabime/spdlog.git
+[submodule "ext_libs/glm"]
+	path = ext_libs/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "ext_libs/glad"]
+	path = ext_libs/glad
+	url = git@github.com:Dav1dde/glad.git
+[submodule "ext_libs/glfw"]
+	path = ext_libs/glfw
+	url = git@github.com:glfw/glfw.git
+[submodule "ext_libs/entt"]
+	path = ext_libs/entt
+	url = git@github.com:skypjack/entt.git
