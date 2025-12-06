@@ -45,7 +45,6 @@ namespace smpl
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         m_window = glfwCreateWindow(mode.width, mode.height, title.c_str(), nullptr, nullptr);
-        setVideoMode(mode);
 
         if (!m_window)
         {
@@ -68,7 +67,6 @@ namespace smpl
         }
 
         glfwSetWindowUserPointer   (m_window, this);
-
         glEnable(GL_DEPTH_TEST);
 
         return true;
