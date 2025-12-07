@@ -9,9 +9,7 @@ namespace smpl
     {
     public:
         VideoMode();
-        VideoMode(std::uint32_t width, std::uint32_t height)
-            : width(width), height(height)
-        {}
+        VideoMode(std::uint32_t width, std::uint32_t height);
 
         static VideoMode getDesktopMode();
         static std::vector<VideoMode> getFullscreenModes();
