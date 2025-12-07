@@ -63,14 +63,7 @@ void smpl::VertexArray::addVertexBuffer(const smpl::VertexBuffer& vertex_array)
     for (const BufferElement& current_element : vertex_array.getLayout().getElements())
     {
         glEnableVertexAttribArray(m_elements_count);
-        glVertexAttribPointer(
-            m_elements_count,
-            static_cast<GLint>(current_element.components_count),
-            current_element.component_type,
-            GL_FALSE,
-            static_cast<GLsizei>(vertex_array.getLayout().getStride()),
-            reinterpret_cast<const void*>(current_element.offset)
-        );
+        glVertexAttribPointer(m_elements_count, static_cast<GLint>(current_element.components_count), current_element.component_type, GL_FALSE, static_cast<GLsizei>(vertex_array.getLayout().getStride()), reinterpret_cast<const void*>(current_element.offset)        );
         ++m_elements_count;
     }
 }
