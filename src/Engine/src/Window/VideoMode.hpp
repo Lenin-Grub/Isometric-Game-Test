@@ -1,29 +1,33 @@
 #pragma once
 
+#include <vector>
+#include <cstdint> 
+
 namespace smpl
 {
-	class VideoMode
-	{
+    class VideoMode
+    {
     public:
-
         VideoMode();
-        VideoMode(unsigned int width, unsigned int height);
+        VideoMode(std::uint32_t width, std::uint32_t height)
+            : width(width), height(height)
+        {}
 
         static VideoMode getDesktopMode();
         static std::vector<VideoMode> getFullscreenModes();
 
     public:
-        unsigned int width  = 0;
-        unsigned int height = 0;
+        std::uint32_t width;
+        std::uint32_t height;
 
-        bool operator == (const VideoMode& other) const
+        constexpr bool operator==(const VideoMode& other) const
         {
-            return *this == other;
+            return width == other.width && height == other.height;
         }
 
-        bool operator != (const VideoMode& other) const
+        constexpr bool operator!=(const VideoMode& other) const
         {
-            return *this != other;
+            return !(*this == other);
         }
-	};
+    };
 }
