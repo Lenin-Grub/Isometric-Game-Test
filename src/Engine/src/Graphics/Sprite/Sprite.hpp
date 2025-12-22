@@ -4,7 +4,9 @@
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
 #include <Graphics/Shader/Shader.hpp>
 #include <Graphics/Texture/Texture.hpp>
+
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace smpl
 {
@@ -31,9 +33,9 @@ namespace smpl
         glm::vec3 getScale()    const { return m_scale;    }
 
     private:
-        std::unique_ptr<VertexArray>  m_vao;
-        std::unique_ptr<VertexBuffer> m_vbo;
-        std::unique_ptr<IndexBuffer>  m_ebo;
+        std::unique_ptr<smpl::VertexArray>  m_vao;
+        std::unique_ptr<smpl::VertexBuffer> m_vbo;
+        std::unique_ptr<smpl::IndexBuffer>  m_ebo;
 
         glm::vec3 m_position;
         glm::vec3 m_rotation;
