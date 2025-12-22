@@ -1,6 +1,6 @@
 set (ENGINE_PUBLIC_INCLUDES
-    src/stdafx.hpp
-    
+
+	src/Utils/NonCopyable.hpp
     src/Application/Application.hpp
     src/Window/Window.hpp
     src/Window/VideoMode.hpp

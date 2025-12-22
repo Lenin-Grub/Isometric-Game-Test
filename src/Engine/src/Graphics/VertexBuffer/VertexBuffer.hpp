@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <Utils/NonCopyable.hpp>
 
 namespace smpl
 {
@@ -51,6 +52,7 @@ namespace smpl
     };
 
     class VertexBuffer
+        : public smpl::NonCopyable
     {
     public:
 
@@ -63,11 +65,6 @@ namespace smpl
 
         VertexBuffer(const void* data, const size_t size, smpl::BufferLayout buffer_layout,const smpl::VertexBuffer::Usage usage = smpl::VertexBuffer::Usage::Static);
         ~VertexBuffer();
-
-        VertexBuffer(const smpl::VertexBuffer&) = delete;
-        smpl::VertexBuffer& operator=(const smpl::VertexBuffer&) = delete;
-        smpl::VertexBuffer& operator=(smpl::VertexBuffer&& vertex_buffer) noexcept;
-        VertexBuffer(smpl::VertexBuffer&& vertex_buffer) noexcept;
 
         void bind() const;
         static void unbind();

@@ -1,19 +1,16 @@
 #pragma once
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
 #include <Graphics/IndexBuffer/IndexBuffer.hpp>
+#include <Utils/NonCopyable.hpp>
 
 namespace smpl
 {
     class VertexArray 
+        : public smpl::NonCopyable
     {
     public:
         VertexArray();
         ~VertexArray();
-
-        VertexArray(const smpl::VertexArray&) = delete;
-        smpl::VertexArray& operator=(const smpl::VertexArray&) = delete;
-        smpl::VertexArray& operator=(smpl::VertexArray&& vertex_array) noexcept;
-        VertexArray(smpl::VertexArray&& vertex_array) noexcept;
 
         void addVertexBuffer(const smpl::VertexBuffer& vertex_array);
         void setIndexBuffer(const smpl::IndexBuffer& index_array);
