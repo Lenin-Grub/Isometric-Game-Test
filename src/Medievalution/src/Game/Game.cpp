@@ -9,37 +9,40 @@
 #include <set>
 #include <algorithm>
 
-bool Game::create()
+Game::Game(smpl::Settings& settings)
+    : m_settings{ settings }
+    , m_window  { settings }
 {
-    smpl::VideoMode mode{ m_width , m_height };
+    // Do nothing
+};
 
-    if (!m_window.create(mode, "Medievalution"))
-        return false;
+void Game::create()
+{
+    if (!m_window.create())
+        return;
 
     if(!smpl::Gui::initImGui(m_window))
-        return false;
+        return;
 
     if(!smpl::Gui::initImGuiFont())
-        return false;
+        return;
 
     if(!LogInfo::initLogger())
-        return false;
+        return;
 
     if (!smpl::Input::init(m_window))
-        return false;
+        return;
 
-    return true;
+    if(!init())
+        return;
 }
 
 void Game::run()
 {
-    smpl::VideoMode modes;
-
     while (m_window.isOpen())
     {
         m_window.clear(m_color);
 
-        init();
         input();
         update();
         draw();
@@ -176,16 +179,25 @@ void Game::showVideoSettings()
         ImGui::EndCombo();
     }
 
-    ImGui::Checkbox("Fullscreen", &m_fullscreen);
+    ImGui::Checkbox("Fullscreen", &m_settings.window.fullscreen);
 
     if (ImGui::Button("Applay"))
     {
         const smpl::VideoMode& mode = m_available_modes[m_selected_index];
-        m_window.setVideoMode(mode, m_fullscreen);
-        LOG_INFO("Resolution: {}x{} | Fullscreen: {}", mode.width, mode.height, m_fullscreen);
+        m_window.setVideoMode(mode, m_settings.window.fullscreen);
+        LOG_INFO("Resolution: {}x{} | Fullscreen: {}", (int)mode.width, (int)mode.height, m_settings.window.fullscreen);
+        updateImGuiDisplaySize();
     }
 
     ImGui::End();
+}
+
+void Game::updateImGuiDisplaySize()
+{
+    int display_w  = m_window.getVideoMode().width;
+    int display_h  = m_window.getVideoMode().height;
+    ImGuiIO& io    = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)display_w, (float)display_h);
 }
 
 #pragma endregion

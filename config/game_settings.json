@@ -1,0 +1,17 @@
+{
+    "window": {
+        "title": "Editor",
+        "width": 1920,
+        "height": 1080,
+        "fullscreen": false,
+        "vertical_sync": false,
+        "fps_limit": 60
+    },
+    "audio": {
+        "music_volume": 0,
+        "sound_volume": 0,
+        "is_sound_play": false,
+        "is_music_play": false
+    },
+    "language": "eng"
+}

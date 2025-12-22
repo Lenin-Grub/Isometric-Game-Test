@@ -14,14 +14,14 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <Settings/Settings.hpp>
 
 class Game
 {
 public:
-    Game()  = default;
-    ~Game() = default;
+    Game(smpl::Settings& settings);
 
-    bool create();
+    void create();
     void run();
 
 private:
@@ -35,18 +35,17 @@ private:
 
     void initVideoModeList();
     void showVideoSettings();
+    void updateImGuiDisplaySize();
 
 private:
-    unsigned int m_width  = 2560;
-    unsigned int m_height = 1600;
-
     smpl::Window m_window;
     smpl::Color  m_color{ 50,50,50 };
 
 private:
     bool m_show_settings  = false;
-    bool m_fullscreen     = false;
     int  m_selected_index = 0;
+
+    smpl::Settings&              m_settings;
     std::vector<smpl::VideoMode> m_available_modes;
-    std::vector<std::string> m_mode_labels;
+    std::vector<std::string>     m_mode_labels;
 };

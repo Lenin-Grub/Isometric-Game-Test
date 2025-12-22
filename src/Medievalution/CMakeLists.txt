@@ -31,6 +31,7 @@ add_dependencies(${PROJECT_NAME} SamopalEngine)
 add_custom_command(TARGET Medievalution POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/shaders" "$<TARGET_FILE_DIR:Medievalution>/shaders"
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/res"     "$<TARGET_FILE_DIR:Medievalution>/res"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/config"  "$<TARGET_FILE_DIR:Medievalution>/config"
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -5,12 +5,12 @@
 namespace smpl
 {
     VideoMode::VideoMode()
-        : width(640)
+        : width (640)
         , height(480)
     {
     }
 
-    VideoMode::VideoMode(unsigned int width, unsigned int height)
+    VideoMode::VideoMode(uint32_t width, uint32_t height)
         : width(width)
         , height(height)
     {
@@ -21,7 +21,7 @@ namespace smpl
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
         if (mode)
-            return VideoMode(mode->width, mode->height);
+            return VideoMode((uint32_t)mode->width, (uint32_t)mode->height);
 
         return VideoMode(640, 480);
     }
@@ -30,14 +30,14 @@ namespace smpl
     {
         std::vector<smpl::VideoMode> modes;
 
-        int count;
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode* vidModes = glfwGetVideoModes(monitor, &count);
+        int count = 0;
+        GLFWmonitor* monitor           = glfwGetPrimaryMonitor();
+        const GLFWvidmode* video_modes = glfwGetVideoModes(monitor, &count);
 
         for (int i = 0; i < count; ++i)
         {
-            const auto& vm = vidModes[i];
-            modes.emplace_back(vm.width, vm.height);
+            const auto& mode = video_modes[i];
+            modes.emplace_back(mode.width, mode.height);
         }
 
         return modes;

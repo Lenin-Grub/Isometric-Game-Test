@@ -2,6 +2,7 @@
 
 #include <Graphics/Color/Color.hpp>
 #include <Window/VideoMode.hpp>
+#include <Settings/Settings.hpp>
 
 #include <glm/glm.hpp>
 #include <queue>
@@ -13,44 +14,45 @@ namespace smpl
     class Window
     {
     public:
-        Window();
-        Window(smpl::VideoMode& mode, const std::string& title);
+        Window(smpl::Settings& settings);
         ~Window();
 
-        bool create(smpl::VideoMode& mode, const std::string& title);
+        bool create();
+
         bool close();
 
         bool isOpen();
 
         void clear();
+
         void clear(const Color& color);
 
         void display();
 
         GLFWwindow& getWindow() const;
 
-        bool setFullscreen(bool fullscreen);
+        void setFullscreen(bool fullscreen);
 
         bool isFullscreen() const;
 
-        bool setVideoMode(const VideoMode& mode, bool fullscreen = false);
+        void setVideoMode(const VideoMode& mode, bool fullscreen = false);
 
         void setVerticalSync(bool enable);
 
         bool isVerticalSync() const;
 
+        void setResizable(bool enable);
+
+        bool isResizable() const;
+
         const VideoMode& getVideoMode();
+
+        static VideoMode getDesktopResolution();
 
         glm::vec2 getCursorPos() const;
 
     private:
-        GLFWwindow*        m_window = nullptr;
-        const std::string  m_title;
-        unsigned int       m_width;
-        unsigned int       m_height;
-
-        VideoMode          m_video_mode;
-        bool               m_fullscreen     = false;
-        bool               m_vertical_synch = false;
+        GLFWwindow* m_window = nullptr;
+        smpl::WindowSettings& m_window_settings;
     };
 }

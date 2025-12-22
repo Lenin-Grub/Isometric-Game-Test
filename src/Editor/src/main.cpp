@@ -26,6 +26,7 @@
 #include <Camera/Camera.hpp>
 #include <ImGui/SetImGui.hpp>
 #include <Log/Log.hpp>
+#include <Settings/Settings.hpp>
 
 
 #pragma region Variables
@@ -57,12 +58,13 @@ void initGUi(smpl::Window& window);
 
 int main()
 {
-    smpl::Window window;
+    smpl::Settings settings;
+    if (!settings.loadFromFile("config/editor_settings.json"))
+        return 1;
 
-    smpl::VideoMode mode{ 2560 , 1600 };
+    smpl::Window window( settings );
 
-    window.create(mode, "Medievalution");
-    window.setVerticalSync(true);
+    window.create();
 
     smpl::Gui::initImGui(window);
     smpl::Gui::initImGuiFont();
@@ -131,7 +133,7 @@ int main()
     texture2.loadFromFile("res/horde.png");
 #pragma endregion
 
-    camera.setViewportSize(mode.width, mode.height);
+    camera.setViewportSize(settings.window.mode.width, settings.window.mode.height);
     smpl::Input::init(window);
 
     while (window.isOpen())

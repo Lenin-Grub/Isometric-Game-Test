@@ -2,56 +2,7 @@ cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
 project(SamopalEngine)
 
-set (ENGINE_PUBLIC_INCLUDES
-    src/stdafx.hpp
-    
-    src/Window/Window.hpp
-    src/Window/VideoMode.hpp
-
-    src/Event/Keyboard.hpp
-    src/Event/Mouse.hpp
-    src/Event/Input.hpp
-
-    src/Log/Log.hpp
-    src/ImGui/SetImGui.cpp
-
-    src/Camera/Camera.hpp
-    src/Settings/WindowSettings.hpp	
-    src/FileSystem/FileSystem.hpp
-    
-    src/Graphics/Shader/Shader.hpp
-    src/Graphics/Sprite/Sprite.hpp
-    src/Graphics/Texture/Texture.hpp
-    src/Graphics/Color/Color.hpp
-    src/Graphics/VertexArray/VertexArray.hpp
-    src/Graphics/VertexBuffer/VertexBuffer.hpp
-    src/Graphics/IndexBuffer/IndexBuffer.hpp
-	
-    src/Graphics/Primitives/Cube/Cube.hpp
-)
-
-set (ENGINE_PUBLIC_SOURCES
-    src/Window/Window.cpp
-    src/Window/VideoMode.cpp
-
-    src/Event/Keyboard.cpp
-    src/Event/Mouse.cpp
-    src/Event/Input.cpp
-
-    src/ImGui/SetImGui.hpp
-    src/Camera/Camera.cpp
-    src/Settings/WindowSettings.cpp
-    src/FileSystem/FileSystem.cpp
-    
-    src/Graphics/Shader/Shader.cpp
-    src/Graphics/Sprite/Sprite.cpp
-    src/Graphics/Texture/Texture.cpp
-    src/Graphics/VertexArray/VertexArray.cpp
-    src/Graphics/VertexBuffer/VertexBuffer.cpp
-    src/Graphics/IndexBuffer/IndexBuffer.cpp
-	
-	src/Graphics/Primitives/Cube/Cube.cpp
-)
+include(${CMAKE_CURRENT_SOURCE_DIR}/engine.cmake)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Engine" FILES ${ENGINE_PUBLIC_INCLUDES} ${ENGINE_PUBLIC_SOURCES})
 

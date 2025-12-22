@@ -1,6 +1,7 @@
 set (ENGINE_PUBLIC_INCLUDES
     src/stdafx.hpp
-
+    
+    src/Application/Application.hpp
     src/Window/Window.hpp
     src/Window/VideoMode.hpp
 
@@ -12,7 +13,7 @@ set (ENGINE_PUBLIC_INCLUDES
     src/ImGui/SetImGui.cpp
 
     src/Camera/Camera.hpp
-    src/Settings/WindowSettings.hpp	
+    src/Settings/Settings.hpp	
     src/FileSystem/FileSystem.hpp
     
     src/Graphics/Shader/Shader.hpp
@@ -22,7 +23,7 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Graphics/VertexArray/VertexArray.hpp
     src/Graphics/VertexBuffer/VertexBuffer.hpp
     src/Graphics/IndexBuffer/IndexBuffer.hpp
-
+    
     src/Graphics/Primitives/Cube/Cube.hpp
 )
 
@@ -36,7 +37,7 @@ set (ENGINE_PUBLIC_SOURCES
 
     src/ImGui/SetImGui.hpp
     src/Camera/Camera.cpp
-    src/Settings/WindowSettings.cpp
+    src/Settings/Settings.cpp
     src/FileSystem/FileSystem.cpp
     
     src/Graphics/Shader/Shader.cpp
@@ -45,6 +46,6 @@ set (ENGINE_PUBLIC_SOURCES
     src/Graphics/VertexArray/VertexArray.cpp
     src/Graphics/VertexBuffer/VertexBuffer.cpp
     src/Graphics/IndexBuffer/IndexBuffer.cpp
-
+    
     src/Graphics/Primitives/Cube/Cube.cpp
 )
