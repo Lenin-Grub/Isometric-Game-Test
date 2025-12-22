@@ -10,13 +10,17 @@ namespace smpl
 
         bool loadFromFile(const std::string& file_path);
 
-        const unsigned int& getTextureID();
+        unsigned int getTextureID() const;
+
+        int getHeight() const;
+        int getWidth() const;
+        int getChannels() const;
 
     private:
 
-        unsigned int texture_id;
-        int width;
-        int height;
-        int channels;
+        unsigned int m_texture_id;
+        int m_width;
+        int m_height;
+        int m_channels;
     };
 }

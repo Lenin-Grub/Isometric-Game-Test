@@ -18,6 +18,7 @@
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
 #include <Graphics/VertexArray/VertexArray.hpp>
 #include <Graphics/Texture/Texture.hpp>
+#include <Graphics/Sprite/Sprite.hpp>
 
 #include <Graphics/Primitives/Cube/Cube.hpp>
 
@@ -29,7 +30,7 @@
 #include <Settings/Settings.hpp>
 
 
-#pragma region Variables
+#pragma region GlobalVariables
 
 glm::vec3 camera_pos = { 0.f, -30.f, 15.f };
 glm::vec3 camera_rot = {-45.f, 90.f,  0.f };
@@ -51,7 +52,13 @@ float zoom       = 0.f;
 
 smpl::Camera camera (camera_pos, camera_rot);
 
+smpl::Texture full_texture;
+smpl::Sprite sprite;
+smpl::Sprite sprite2;
+smpl::Sprite::Rect rect{ 0.0f, 0.0f, 64.0f, 64.0f };
+
 #pragma endregion
+
 
 void input(smpl::Window& window);
 void initGUi(smpl::Window& window);
@@ -131,10 +138,13 @@ int main()
 
     smpl::Texture texture2;
     texture2.loadFromFile("res/horde.png");
-#pragma endregion
+
+    full_texture.loadFromFile("res/Spearman.png");
 
     camera.setViewportSize(settings.window.mode.width, settings.window.mode.height);
     smpl::Input::init(window);
+
+#pragma endregion
 
     while (window.isOpen())
     {
@@ -145,13 +155,17 @@ int main()
         glfwPollEvents();
         input(window);
 
-        window.clear(smpl::Color(50,50,50));
+        window.clear(smpl::Color(50, 50, 50));
 
 #pragma region Cube
+        vao->bind();
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1.getTextureID());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2.getTextureID());
+
+        program.use();
 
         program.use();
 
@@ -177,9 +191,12 @@ int main()
             program.setUniformMatrix("model", model);
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(vao->getIndexesCount()), GL_UNSIGNED_INT, nullptr);
         }
+        vao->unbind();
 #pragma endregion
 
 #pragma region Grid
+        vao->bind();
+
         glm::mat4 grid_transform = glm::mat4(1.0f);
         grid_transform = glm::rotate(grid_transform, glm::radians(0.0f), glm::vec3(1, 0, 0));
         grid_transform = glm::scale(grid_transform, glm::vec3(50.0f, 50.0f, 1.0f));
@@ -194,6 +211,35 @@ int main()
         glDepthMask(GL_FALSE);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glDepthMask(GL_TRUE);
+        vao->unbind();
+#pragma endregion
+
+#pragma region Sprite
+
+        program.use();
+        program.setUniformMatrix("view", camera.getViewMatrix());
+        program.setUniformMatrix("projection", camera.getProjectionMatrix());
+
+        sprite.create(full_texture, rect);
+        sprite.setPosition(glm::vec3(10.0f, 15.0f, 6.0f));
+        sprite.setScale(glm::vec3(6.0f, 6.0f, 1.0f));
+        sprite.setRotation(glm::vec3(90.0f, 0.0f, -45.0f));
+
+        sprite.render(full_texture, program);
+#pragma endregion
+
+#pragma region Sprite2
+
+        program.use();
+        program.setUniformMatrix("view", camera.getViewMatrix());
+        program.setUniformMatrix("projection", camera.getProjectionMatrix());
+
+        sprite2.create(full_texture, rect);
+        sprite2.setPosition(glm::vec3(-10.0f, -15.0f, 6.0f));
+        sprite2.setScale(glm::vec3(6.0f, 6.0f, 1.0f));
+        sprite2.setRotation(glm::vec3(90.0f, 0.0f, -45.0f));
+
+        sprite2.render(full_texture, program);
 #pragma endregion
 
         initGUi(window);

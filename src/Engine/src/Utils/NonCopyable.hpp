@@ -5,7 +5,7 @@ namespace smpl
     class NonCopyable
     {
     protected:
-        NonCopyable() = default;
+        NonCopyable()  = default;
         ~NonCopyable() = default;
 
         NonCopyable(const NonCopyable&)            = delete;
@@ -18,7 +18,7 @@ namespace smpl
         NonMovable()  = default;
         ~NonMovable() = default;
 
-        NonMovable(NonMovable&&)            = delete;
-        NonMovable& operator=(NonMovable&&) = delete;
+        NonMovable(NonMovable&&)                   = delete;
+        NonMovable& operator=(NonMovable&&)        = delete;
     };
 }

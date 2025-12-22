@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include <Graphics/Shader/Shader.hpp>
 
 #include <Log/Log.hpp>
@@ -213,7 +212,7 @@ namespace smpl
         glUseProgram(program_id);
     }
 
-    void ShaderProgram::setUniform1i(const std::string& name, int x)
+    void ShaderProgram::setUniform1i(const std::string& name, int x) const
     {
         GLint location = glGetUniformLocation(program_id, name.c_str());
 
@@ -226,7 +225,7 @@ namespace smpl
         glUniform1i(location, x);
     }
 
-    void ShaderProgram::setUniform1f(const std::string& name, float x)
+    void ShaderProgram::setUniform1f(const std::string& name, float x) const
     {
         GLint location = glGetUniformLocation(program_id, name.c_str());
 
@@ -239,7 +238,7 @@ namespace smpl
         glUniform1f(location, x);
     }
 
-    void ShaderProgram::setUniform3f(const std::string& name, float x, float y, float z)
+    void ShaderProgram::setUniform3f(const std::string& name, float x, float y, float z) const
     {
         GLint location = glGetUniformLocation(program_id, name.c_str());
 
@@ -252,7 +251,20 @@ namespace smpl
         glUniform3f (location, x,y,z);
     }
 
-    void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat4& matrix)
+    void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat4& matrix) const
+    {
+        GLint location = glGetUniformLocation(program_id, name.c_str());
+
+        if (location == -1)
+        {
+            LOG_WARN("Uniform \"{}\" not found.", name);
+            return;
+        }
+
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+    }
+
+    void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat3& matrix) const
     {
         GLint location = glGetUniformLocation(program_id, name.c_str());
 

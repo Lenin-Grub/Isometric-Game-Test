@@ -1,4 +1,5 @@
 #include <Game/Game.hpp>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <Window/VideoMode.hpp>
@@ -8,6 +9,8 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
+
 
 Game::Game(smpl::Settings& settings)
     : m_settings{ settings }
@@ -58,6 +61,19 @@ bool Game::init()
     if(!smpl::Gui::initBackEndImGui())
         return false;
 
+    vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
+    fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
+    program.create();
+    program.bind(vertex_shader);
+    program.bind(fragment_shader);
+
+    if (!program.link())
+        return false;
+
+    texture.loadFromFile("res/Spearman.png");
+
+    sprite.create(texture, rect);
+
     return true;
 }
 
@@ -107,11 +123,19 @@ void Game::draw()
     showVideoSettings();
 
     smpl::Gui::drawImGuiGL();
+
+    program.use();
+    program.setUniformMatrix("view", camera.getViewMatrix());
+    program.setUniformMatrix("projection", camera.getProjectionMatrix());
+    
+    sprite.render(texture, program);
 }
 
 void Game::update()
 {
-
+    sprite.setPosition(pos);
+    sprite.setRotation(rot);
+    sprite.setScale(size);
 }
 
 void Game::close()
@@ -188,6 +212,10 @@ void Game::showVideoSettings()
         LOG_INFO("Resolution: {}x{} | Fullscreen: {}", (int)mode.width, (int)mode.height, m_settings.window.fullscreen);
         updateImGuiDisplaySize();
     }
+
+    ImGui::SliderFloat3("Scale", glm::value_ptr(size), 0.5f, 10.0f);
+    ImGui::SliderFloat3("Translate", glm::value_ptr(pos), -100.0f, 100.0f);
+    ImGui::SliderFloat3("Rotate", glm::value_ptr(rot), 0.0f, 360.0f);
 
     ImGui::End();
 }

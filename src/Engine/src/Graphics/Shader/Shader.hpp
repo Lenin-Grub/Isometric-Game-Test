@@ -49,23 +49,23 @@ namespace smpl
         bool link();
         void use() const;
 
-        void setUniform1i(const std::string& name, int x);
-        void setUniform1f(const std::string& name, float x);
-        void setUniform2f(const std::string& name, float x, float y);
-        void setUniform2f(const std::string& name, const glm::vec2& xy);
-        void setUniform2i(const std::string& name, const glm::ivec2& xy);
-        void setUniform3f(const std::string& name, float x, float y, float z);
-        void setUniform3f(const std::string& name, const glm::vec3& xyz);
-        void setUniform4f(const std::string& name, const glm::vec4& xyzw);
+        void setUniform1i(const std::string& name, int x) const;
+        void setUniform1f(const std::string& name, float x) const;
+        void setUniform2f(const std::string& name, float x, float y) const;
+        void setUniform2f(const std::string& name, const glm::vec2& xy) const;
+        void setUniform2i(const std::string& name, const glm::ivec2& xy) const;
+        void setUniform3f(const std::string& name, float x, float y, float z) const;
+        void setUniform3f(const std::string& name, const glm::vec3& xyz) const;
+        void setUniform4f(const std::string& name, const glm::vec4& xyzw) const;
 
-        void setUniform1v(const std::string& name, int length, const int* v);
-        void setUniform1v(const std::string& name, int length, const float* v);
-        void setUniform2v(const std::string& name, int length, const float* v);
-        void setUniform3v(const std::string& name, int length, const float* v);
-        void setUniform4v(const std::string& name, int length, const float* v);
+        void setUniform1v(const std::string& name, int length, const int* v) const;
+        void setUniform1v(const std::string& name, int length, const float* v) const;
+        void setUniform2v(const std::string& name, int length, const float* v) const;
+        void setUniform3v(const std::string& name, int length, const float* v) const;
+        void setUniform4v(const std::string& name, int length, const float* v) const;
 
-        void setUniformMatrix(const std::string& name, const glm::mat4& matrix);
-        void setUniformMatrix(const std::string& name, const glm::mat3& matrix);
+        void setUniformMatrix(const std::string& name, const glm::mat4& matrix) const;
+        void setUniformMatrix(const std::string& name, const glm::mat3& matrix) const;
 
 
         uint32_t getID() const;
