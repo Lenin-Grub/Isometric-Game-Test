@@ -66,6 +66,9 @@ namespace smpl
         VertexBuffer(const void* data, const size_t size, smpl::BufferLayout buffer_layout,const smpl::VertexBuffer::Usage usage = smpl::VertexBuffer::Usage::Static);
         ~VertexBuffer();
 
+        smpl::VertexBuffer& operator=(smpl::VertexBuffer&& vertex_buffer) noexcept;
+        VertexBuffer(VertexBuffer&& vertex_buffer) noexcept;
+
         void bind() const;
         static void unbind();
 

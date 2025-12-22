@@ -5,12 +5,15 @@
 
 namespace smpl
 {
-    class VertexArray 
+    class VertexArray
         : public smpl::NonCopyable
     {
     public:
         VertexArray();
         ~VertexArray();
+
+        smpl::VertexArray& operator=(smpl::VertexArray&& vertex_array) noexcept;
+        VertexArray(smpl::VertexArray&& vertex_array) noexcept;
 
         void addVertexBuffer(const smpl::VertexBuffer& vertex_array);
         void setIndexBuffer(const smpl::IndexBuffer& index_array);
