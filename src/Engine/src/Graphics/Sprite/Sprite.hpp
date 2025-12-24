@@ -5,6 +5,7 @@
 
 #include <Graphics/Texture/Texture.hpp>
 #include <Graphics/Shader/Shader.hpp>
+#include <Camera/Camera.hpp>
 
 namespace smpl 
 {

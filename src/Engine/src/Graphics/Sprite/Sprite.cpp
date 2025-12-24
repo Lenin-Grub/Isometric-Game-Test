@@ -1,5 +1,5 @@
 #include "Sprite.hpp"
-
+#include <Camera/Camera.hpp>
 
 namespace smpl 
 {
