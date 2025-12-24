@@ -70,9 +70,8 @@ bool Game::init()
     if (!program.link())
         return false;
 
-    texture.loadFromFile("res/Spearman.png");
-
-    sprite.create(texture, rect);
+    vertex_shader.release();
+    fragment_shader.release();
 
     return true;
 }
@@ -122,20 +121,14 @@ void Game::draw()
     ImGui::ShowDemoWindow();
     showVideoSettings();
 
+    //sprite.draw(texture, glm::vec2(10, 10), camera);
+
     smpl::Gui::drawImGuiGL();
 
-    program.use();
-    program.setUniformMatrix("view", camera.getViewMatrix());
-    program.setUniformMatrix("projection", camera.getProjectionMatrix());
-    
-    sprite.render(texture, program);
 }
 
 void Game::update()
 {
-    sprite.setPosition(pos);
-    sprite.setRotation(rot);
-    sprite.setScale(size);
 }
 
 void Game::close()

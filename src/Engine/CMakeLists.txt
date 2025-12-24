@@ -61,4 +61,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     imgui
 )
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE src/stdafx.hpp)
+#target_precompile_headers(${PROJECT_NAME} PRIVATE src/stdafx.hpp)

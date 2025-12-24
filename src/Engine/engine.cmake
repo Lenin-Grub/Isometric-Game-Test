@@ -25,6 +25,7 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Graphics/IndexBuffer/IndexBuffer.hpp
     
     src/Graphics/Primitives/Cube/Cube.hpp
+    src/Graphics/Primitives/Grid/Grid.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
@@ -48,4 +49,5 @@ set (ENGINE_PUBLIC_SOURCES
     src/Graphics/IndexBuffer/IndexBuffer.cpp
     
     src/Graphics/Primitives/Cube/Cube.cpp
+    src/Graphics/Primitives/Grid/Grid.cpp
 )

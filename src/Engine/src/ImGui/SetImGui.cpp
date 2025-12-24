@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include <ImGui/SetImGui.hpp>
 #include <Log/Log.hpp>
 #include <imgui_impl_glfw.h>

@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include "Input.hpp"
 
 namespace smpl

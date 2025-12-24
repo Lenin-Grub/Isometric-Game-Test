@@ -11,7 +11,7 @@ namespace smpl
         : m_projection_mode( projection_mode )
         , m_position       ( position )
         , m_rotation       ( rotation )
-        , m_far_clip_plane ( 100.f )
+        , m_far_clip_plane ( 1000.f )
         , m_near_clip_plane(  0.1f )
         , m_viewport_width (2560.f )
         , m_viewport_height(1600.f )

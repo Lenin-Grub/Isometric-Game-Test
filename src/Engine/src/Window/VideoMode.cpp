@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include <Window/VideoMode.hpp>
 #include <GLFW/glfw3.h>
 

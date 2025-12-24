@@ -2,20 +2,20 @@
 
 #include <Log/Log.hpp>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <Graphics/Shader/Shader.hpp>
 #include <Graphics/Texture/Texture.hpp>
 #include <Graphics/Color/Color.hpp>
+#include <Graphics/Sprite/Sprite.hpp>
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
 #include <Graphics/VertexArray/VertexArray.hpp>
 #include <Graphics/IndexBuffer/IndexBuffer.hpp>
 
 #include <Window/Window.hpp>
-
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #include <Settings/Settings.hpp>
-#include <Graphics/Sprite/Sprite.hpp>
 #include <Camera/Camera.hpp>
 
 class Game
@@ -56,13 +56,15 @@ private:
     smpl::Shader fragment_shader;
     smpl::Shader vertex_shader;
 
-    smpl::Texture texture;
-    smpl::Sprite sprite;
-    smpl::Sprite::Rect rect{ 0.0f, 0.0f, 64.0f, 64.0f };
-
     smpl::Camera camera;
 
     glm::vec3 pos{25,2.5,2.5};
     glm::vec3 rot{90,0,270};
     glm::vec3 size{10,10,10};
+
+    float m_animation_timer    = 0.0f;
+    float m_animation_interval = 0.1f;
+    int m_current_frame        = 0;
+    int m_max_frames           = 11;
+    int m_frame_width          = 64;
 };
