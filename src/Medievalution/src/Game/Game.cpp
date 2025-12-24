@@ -125,7 +125,7 @@ void Game::draw()
     ImGui::ShowDemoWindow();
     showVideoSettings();
 
-    sprite.draw(texture, glm::vec2(10, 10), camera);
+    sprite.draw(texture, camera);
     sprite.setPosition(pos);
     sprite.setRotation(rot);
     sprite.setScale(size);
@@ -214,7 +214,7 @@ void Game::showVideoSettings()
 
     ImGui::SliderFloat3("Scale", glm::value_ptr(size), 0.5f, 10.0f);
     ImGui::SliderFloat3("Translate", glm::value_ptr(pos), -100.0f, 100.0f);
-    //ImGui::SliderFloat3("Rotate", glm::value_ptr(rot), 0.0f, 360.0f);
+    ImGui::SliderFloat3("Rotate", glm::value_ptr(rot), 0.0f, 360.0f);
 
     ImGui::End();
 }

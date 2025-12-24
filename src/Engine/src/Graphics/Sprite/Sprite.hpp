@@ -20,7 +20,7 @@ namespace smpl
 
     public:
 
-        void draw(const Texture2D& texture, glm::vec2 size, smpl::Camera camera);
+        void draw(const Texture2D& texture, smpl::Camera camera);
 
         void setPosition(const glm::vec3& pos)
         {

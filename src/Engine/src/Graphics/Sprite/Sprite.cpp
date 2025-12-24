@@ -9,6 +9,7 @@ namespace smpl
         , m_rotation(0.0f)
         , m_scale(1.0f)
         , m_color(1.0f)
+        , m_indices{0}
     {
         //initRenderData();
     }
@@ -26,13 +27,16 @@ namespace smpl
         initRenderData();
     }
 
-    void Sprite::draw(const Texture2D& texture, glm::vec2 size, smpl::Camera camera)
+    void Sprite::draw(const Texture2D& texture, smpl::Camera camera)
     {
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, m_position);
-        model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
-        model = glm::scale    (model, glm::vec3(m_scale));
-        model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f));
+        model           = glm::translate(model, m_position);
+        model           = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
+        model           = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
+        model           = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0, 0, 1));
+        model           = glm::scale(model, glm::vec3(m_scale));
+        model           = glm::translate(model, glm::vec3(-0.5f * m_scale.x, -0.5f * m_scale.y, 0.0f));
+        model           = glm::translate(model, glm::vec3(0.5f * m_scale.x, 0.5f * m_scale.y, 0.0f));
 
         m_shader->use();
         m_shader->setUniformMatrix("model", model);
@@ -40,7 +44,6 @@ namespace smpl
         m_shader->setUniformMatrix("projection", camera.getProjectionMatrix());
         m_shader->setUniformMatrix("view", camera.getViewMatrix());
 
-        // 1st texture
         glActiveTexture(GL_TEXTURE0);
         texture.bind();
 

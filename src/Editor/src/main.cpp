@@ -160,7 +160,7 @@ int main()
     smpl::Texture2D second_texture2d;
 
     first_texture2d.loadTextureFromFile("res/ussr.png");
-    second_texture2d.loadTextureFromFile("res/Spearman.png");
+    second_texture2d.loadTextureFromFile("res/rus.png");
 
     smpl::Input::init(window);
 
@@ -178,7 +178,7 @@ int main()
         window.clear(smpl::Color(50, 50, 50));
 
         // Cubes
-        //renderCubes(*vao, shader_cube, positions, state.camera, state);
+        renderCubes(*vao, shader_cube, positions, state.camera, state);
 
         // Gird
         grid.draw(state.camera);
@@ -186,15 +186,15 @@ int main()
         // Sprites
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        sprite1.setPosition(glm::vec3(5, 5, 7));
-        sprite1.setScale(glm::vec3(10, 10, 1));
-        sprite1.draw(first_texture2d, glm::vec2(10, 10), state.camera);
+        sprite1.setPosition(glm::vec3(0, 0, 7));
+        sprite1.setScale(glm::vec3(7, 4, 1));
+        sprite1.draw(second_texture2d, state.camera);
 
-        sprite2.draw(second_texture2d, glm::vec2(10, 10), state.camera);
+        sprite2.draw(second_texture2d, state.camera);
 
         sprite3.setPosition(glm::vec3(-15, -15, 7));
         sprite3.setScale(glm::vec3(10, 10, 1));
-        sprite3.draw(first_texture2d, glm::vec2(10, 10), state.camera);
+        sprite3.draw(first_texture2d, state.camera);
 
         initGui(window, state);
 
@@ -558,7 +558,7 @@ namespace
 
             ImGui::Checkbox("Fullscreen", &fullscreen);
 
-            if (ImGui::Button("Applay"))
+            if (ImGui::Button("Apply"))
             {
                 const smpl::VideoMode& mode = m_available_modes[m_selected_index];
                 window.setVideoMode(mode, fullscreen);
