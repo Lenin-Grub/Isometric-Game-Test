@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include <Graphics/VertexBuffer/VertexBuffer.hpp>
 #include <Log/Log.hpp>
 

@@ -1,105 +1,78 @@
-#include <Graphics/Sprite/Sprite.hpp>
+#include "Sprite.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glad/glad.h>
-
-namespace smpl
+namespace smpl 
 {
-
-    Sprite::Sprite()
-        : m_position(0.0f, 0.0f, 0.0f)
-        , m_rotation(0.0f, 0.0f, 0.0f)
-        , m_scale(1.0f, 1.0f, 1.0f)
+    Sprite::Sprite(smpl::ShaderProgram& shader)
+        : m_shader(shader)
+        , m_position(0.0f)
+        , m_rotation(0.0f)
+        , m_scale(1.0f)
+        , m_color(1.0f)
     {
+        initRenderData();
     }
 
-    Sprite::~Sprite() = default;
-
-    void Sprite::create(const Texture& texture, const Rect& rect)
+    Sprite::~Sprite()
     {
-        float tex_width = static_cast<float>(texture.getWidth());
-        float tex_height = static_cast<float>(texture.getHeight());
-
-        float u1 = rect.left / tex_width;
-        float v1 = rect.top / tex_height;
-        float u2 = (rect.left + rect.width) / tex_width;
-        float v2 = (rect.top + rect.height) / tex_height;
-
-        // Pos + UV
-        float vertices[] = {
-            // x    y      z      u   v
-             0.0f,  0.0f,  0.0f,  u1, v2,
-             1.0f,  0.0f,  0.0f,  u2, v2,
-             1.0f, -1.0f,  0.0f,  u2, v1,
-             0.0f, -1.0f,  0.0f,  u1, v1
-        };
-
-        uint32_t indices[] = {
-            0, 1, 2,
-            2, 3, 0
-        };
-
-        BufferLayout layout{
-            ShaderDataType::Float3, // Position
-            ShaderDataType::Float2  // UV
-        };
-
-        m_vao = std::make_unique<VertexArray>();
-        m_vbo = std::make_unique<VertexBuffer>(vertices, sizeof(vertices), layout);
-        m_ebo = std::make_unique<IndexBuffer>(indices, 6);
-
-        m_vao->addVertexBuffer(*m_vbo);
-        m_vao->setIndexBuffer(*m_ebo);
-
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D, texture.getTextureID());
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ibo);
     }
 
-    void Sprite::render(const Texture& texture, const ShaderProgram& shader) const
+    void Sprite::draw(const Texture2D& texture, glm::vec2 size, smpl::Camera camera)
     {
-        if (!m_vao || !texture.getTextureID()) return;
-
-        m_vao->bind();
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture.getTextureID());
-
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, m_position);
-        model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale (model, m_scale);
+        model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
+        model = glm::scale    (model, glm::vec3(m_scale));
+        model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f));
 
-        shader.setUniformMatrix("model", model);
-        shader.setUniform1i("texture1", 0);
+        m_shader.use();
+        m_shader.setUniformMatrix("model", model);
+        m_shader.setUniform1i("texture1", 0);
+        m_shader.setUniformMatrix("projection", camera.getProjectionMatrix());
+        m_shader.setUniformMatrix("view", camera.getViewMatrix());
 
-        glDrawElements(GL_TRIANGLES, m_ebo->getCount(), GL_UNSIGNED_INT, 0);
+        // 1st texture
+        glActiveTexture(GL_TEXTURE0);
+        texture.bind();
 
-        m_vao->unbind();
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
     }
 
-    void Sprite::setPosition(const glm::vec3& position)
+    void Sprite::initRenderData()
     {
-        m_position = position;
-    }
+        float vertices[] = {
+            //   X     Y     Z     U     V
+            -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+             1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+            -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+             1.0f,  1.0f, 0.0f,  1.0f, 1.0f };
 
-    void Sprite::setRotation(const glm::vec3& rotation)
-    {
-        m_rotation = rotation;
-    }
+        m_indices = { 0, 2, 1, 1, 2, 3 };
 
-    void Sprite::setScale(const glm::vec3& scale)
-    {
-        m_scale = scale;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        // XYZ
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        // UV
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        glGenBuffers(1, &ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices.data(), GL_STATIC_DRAW);
+
+        glBindVertexArray(0);
     }
 }

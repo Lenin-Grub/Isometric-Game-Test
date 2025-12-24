@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <string>
 
 namespace smpl
 {
@@ -20,8 +21,6 @@ namespace smpl
         bool isLoaded() const;
         bool isCompiled() const;
         void release();
-
-        void bind();
 
         uint32_t getID()   const;
 

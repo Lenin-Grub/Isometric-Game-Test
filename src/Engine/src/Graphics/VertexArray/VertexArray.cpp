@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include <Graphics/VertexArray/VertexArray.hpp>
 #include <Log/Log.hpp>
 

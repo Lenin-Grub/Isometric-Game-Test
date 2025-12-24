@@ -1,4 +1,3 @@
-#include <stdafx.hpp>
 #include "IndexBuffer.hpp"
 #include <Log/Log.hpp>
 

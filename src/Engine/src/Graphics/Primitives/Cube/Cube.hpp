@@ -1,6 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <glm/ext/vector_float3.hpp>
+#include <array>
 
 namespace smpl
 {

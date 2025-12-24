@@ -4,6 +4,9 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <fstream>
+#include <string>
+
 namespace
 {
     constexpr GLenum getType(smpl::Shader::Type type)
@@ -87,11 +90,6 @@ namespace smpl
     void Shader::release()
     {
         glDeleteShader(shader_id);
-    }
-
-    void Shader::bind()
-    {
-        LOG_WARN("Do this implementation! It`s do nothing!");
     }
 
     GLuint Shader::getID() const
@@ -249,6 +247,19 @@ namespace smpl
         }
 
         glUniform3f (location, x,y,z);
+    }
+
+    void ShaderProgram::setUniform3f(const std::string& name, const glm::vec3& xyz) const
+    {
+        GLint location = glGetUniformLocation(program_id, name.c_str());
+
+        if (location == -1)
+        {
+            LOG_WARN("Uniform \"{}\" not found.", name);
+            return;
+        }
+
+        glUniform3f(location, xyz.x, xyz.y, xyz.z);
     }
 
     void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat4& matrix) const
