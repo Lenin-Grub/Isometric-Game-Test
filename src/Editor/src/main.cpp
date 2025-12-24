@@ -153,8 +153,8 @@ int main()
     vao->addVertexBuffer(*vbo);
     vao->setIndexBuffer(*index_buffer);
 
-    //state.texture1.loadFromFile("res/stone_wall.png");
-    //state.texture2.loadFromFile("res/horde.png");
+    state.texture1.loadFromFile("res/stone_wall.png");
+    state.texture2.loadFromFile("res/horde.png");
 
     smpl::Texture2D first_texture2d;
     smpl::Texture2D second_texture2d;
@@ -249,6 +249,8 @@ namespace
 
     void input(smpl::Window& window, GlobalState& state)
     {
+        state.camera.getViewMatrix();
+
         if (smpl::Input::isKeyReleased(smpl::Key::Code::Escape))
         {
             window.close();
