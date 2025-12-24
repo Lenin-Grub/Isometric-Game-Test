@@ -119,9 +119,13 @@ int main()
     vertex_shader3.release();
     fragment_shader3.release();
 
-    smpl::Sprite sprite1 (shader_plane);
-    smpl::Sprite sprite2 (shader_plane);
-    smpl::Sprite sprite3 (shader_plane);
+    smpl::Sprite sprite1;
+    smpl::Sprite sprite2;
+    smpl::Sprite sprite3;
+
+    sprite1.setShader(shader_plane);
+    sprite2.setShader(shader_plane);
+    sprite3.setShader(shader_plane);
 
     smpl::Grid grid (shader_grid);
     
@@ -149,11 +153,14 @@ int main()
     vao->addVertexBuffer(*vbo);
     vao->setIndexBuffer(*index_buffer);
 
-    state.texture1.loadFromFile("res/stone_wall.png");
-    state.texture2.loadFromFile("res/horde.png");
+    //state.texture1.loadFromFile("res/stone_wall.png");
+    //state.texture2.loadFromFile("res/horde.png");
 
-    smpl::Texture2D first_texture2d  = smpl::Texture2D::loadTextureFromFile("res/ussr.png");
-    smpl::Texture2D second_texture2d = smpl::Texture2D::loadTextureFromFile("res/Spearman.png");
+    smpl::Texture2D first_texture2d;
+    smpl::Texture2D second_texture2d;
+
+    first_texture2d.loadTextureFromFile("res/ussr.png");
+    second_texture2d.loadTextureFromFile("res/Spearman.png");
 
     smpl::Input::init(window);
 
@@ -171,7 +178,7 @@ int main()
         window.clear(smpl::Color(50, 50, 50));
 
         // Cubes
-        renderCubes(*vao, shader_cube, positions, state.camera, state);
+        //renderCubes(*vao, shader_cube, positions, state.camera, state);
 
         // Gird
         grid.draw(state.camera);

@@ -12,9 +12,11 @@ namespace smpl
     class Sprite
     {
     public:
-        Sprite(smpl::ShaderProgram& shader);
+        Sprite();
 
         ~Sprite();
+
+        void setShader(smpl::ShaderProgram& shader);
 
     public:
 
@@ -49,7 +51,7 @@ namespace smpl
         void initRenderData();
 
     private:
-        smpl::ShaderProgram& m_shader;
+        smpl::ShaderProgram* m_shader = nullptr;
 
         glm::vec3 m_position;
         glm::vec3 m_rotation;

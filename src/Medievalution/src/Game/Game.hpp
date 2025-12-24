@@ -55,6 +55,8 @@ private:
     smpl::ShaderProgram program;
     smpl::Shader fragment_shader;
     smpl::Shader vertex_shader;
+    smpl::Sprite sprite;
+    smpl::Texture2D texture;
 
     smpl::Camera camera;
 

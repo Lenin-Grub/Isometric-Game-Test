@@ -116,8 +116,17 @@ namespace smpl
         , m_wrap_t(GL_REPEAT)
         , m_filter_min(GL_LINEAR)
         , m_filter_max(GL_LINEAR)
+        , m_id(0)
     {
-        glGenTextures(1, &m_id);
+    }
+
+    Texture2D::~Texture2D()
+    {
+        if (m_id != 0)
+        {
+            glDeleteTextures(1, &m_id);
+            m_id = 0;
+        }
     }
 
     void Texture2D::generate(int width, int height, unsigned char* data)
@@ -141,84 +150,85 @@ namespace smpl
 
     void Texture2D::bind() const
     {
-        glBindTexture(GL_TEXTURE_2D, m_id);
+        if (m_id != 0)
+            glBindTexture(GL_TEXTURE_2D, m_id);
+        else
+            glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture2D Texture2D::loadTextureFromFile(const std::filesystem::path& path, bool alpha)
+    bool Texture2D::loadTextureFromFile(const std::filesystem::path& path, bool alpha)
     {
-        if (!std::filesystem::exists(path)) 
+        glGenTextures(1, &m_id);
+
+        if (!std::filesystem::exists(path))
         {
             LOG_ERROR("Texture file does not exist. Path: {}", path.string());
-            return Texture2D();
+            return false;
         }
 
-        if (!std::filesystem::is_regular_file(path)) 
+        if (!std::filesystem::is_regular_file(path))
         {
             LOG_ERROR("Path is not a regular file (might be a directory or other). Path: {}", path.string());
-            return Texture2D();
+            return false;
         }
 
         unsigned char* data = nullptr;
 
         std::string path_str = path.string();
-        int width{ 0 }, height{ 0 }, channels{ 0 };
 
-        if (alpha) 
+        if (alpha)
         {
-            data = stbi_load(path_str.c_str(), &width, &height, &channels, 4);
-            channels = 4;
+            data = stbi_load(path_str.c_str(), &m_width, &m_height, &m_channels, 4);
+            m_channels = 4;
         }
-        else 
+        else
         {
-            data = stbi_load(path_str.c_str(), &width, &height, &channels, 3);
-            channels = 3;
+            data = stbi_load(path_str.c_str(), &m_width, &m_height, &m_channels, 3);
+            m_channels = 3;
         }
 
         if (!data)
         {
             LOG_ERROR("Texture not load. Path: {}", path_str);
-            return Texture2D();
+            return false;
         }
 
-        stbi__vertical_flip(data, width, height, channels);
+        stbi__vertical_flip(data, m_width, m_height, m_channels);
 
         GLenum internal_format;
         GLenum format;
 
-        if (channels == 1)
+        if (m_channels == 1)
         {
             internal_format = GL_RED;
             format = GL_RED;
         }
-        else if (channels == 2)
+        else if (m_channels == 2)
         {
             internal_format = GL_RG;
             format = GL_RG;
         }
-        else if (channels == 3)
+        else if (m_channels == 3)
         {
             internal_format = GL_RGB;
             format = GL_RGB;
         }
-        else if (channels == 4)
+        else if (m_channels == 4)
         {
             internal_format = GL_RGBA;
             format = GL_RGBA;
         }
         else
         {
-            LOG_ERROR("Unsupported number of channels: %i", channels);
+            LOG_ERROR("Unsupported number of channels: {}", m_channels);
             stbi_image_free(data);
             data = nullptr;
-            return Texture2D();
+            return false;
         }
 
-        Texture2D texture;
-        texture.generate(width, height, data);
-
+        this->generate(m_width, m_height, data);
         LOG_DEBUG("Texture loaded: \"{}\".", path_str);
-
         stbi_image_free(data);
-        return texture;
+        return true;
     }
 }
