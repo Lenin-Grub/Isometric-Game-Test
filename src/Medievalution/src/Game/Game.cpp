@@ -96,17 +96,17 @@ void Game::input()
 
     if (smpl::Input::isKeyReleased(smpl::Key::Code::Space))
     {
-        LOG_INFO("Space key relesed!");
+        LOG_INFO("Space key released!");
     }
 
     if (smpl::Input::isMousePressed(smpl::Mouse::Button::Left))
     {
-        LOG_DEBUG("Mouse left ckicked!");
+        LOG_DEBUG("Mouse left clicked!");
     }
 
     if (smpl::Input::isMouseReleased(smpl::Mouse::Button::Left))
     {
-        LOG_INFO("Mouse left relesed!");
+        LOG_INFO("Mouse left released!");
     }
 
     if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Up))
@@ -204,7 +204,7 @@ void Game::showVideoSettings()
 
     ImGui::Checkbox("Fullscreen", &m_settings.window.fullscreen);
 
-    if (ImGui::Button("Applay"))
+    if (ImGui::Button("Apply"))
     {
         const smpl::VideoMode& mode = m_available_modes[m_selected_index];
         m_window.setVideoMode(mode, m_settings.window.fullscreen);

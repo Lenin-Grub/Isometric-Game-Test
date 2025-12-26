@@ -15,7 +15,7 @@ namespace smpl
             Isometric
         };
 
-        // TODO Make Frustrum & View class
+        // TODO Make Frustum & View class
 
         Camera(const glm::vec3& position = { 0, 0, 0 },
                const glm::vec3& rotation = { 0, 0, 0 },
@@ -46,8 +46,7 @@ namespace smpl
         const glm::vec3& getPosition() const;
         const glm::vec3& getRotation() const;
 
-        void addMovementAndRotation(const glm::vec3& movement_delta,
-                                    const glm::vec3& rotation_delta);
+        void addMovementAndRotation(const glm::vec3& movement_delta, const glm::vec3& rotation_delta);
 
     private:
         void updateViewMatrix();

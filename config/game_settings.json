@@ -4,7 +4,8 @@
         "width": 1920,
         "height": 1080,
         "fullscreen": false,
-        "vertical_sync": false,
+        "vertical_sync": true,
+        "resizable": false,
         "fps_limit": 60
     },
     "audio": {

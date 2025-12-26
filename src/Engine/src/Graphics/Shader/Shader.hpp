@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include <Utils/NonCopyable.hpp>
+
 namespace smpl
 {
     class Shader
@@ -27,20 +29,19 @@ namespace smpl
     private:
         bool getFileContents(const std::string& filename, std::vector<char>& buffer);
 
-        uint32_t shader_id;
-        uint32_t shader_type;
-        bool     is_loaded;
-        bool     is_compiled;
+        uint32_t m_shader_id;
+        uint32_t m_shader_type;
+        bool     m_is_loaded;
+        bool     m_is_compiled;
     };
 
     class ShaderProgram
+        : public smpl::NonCopyable
     {
     public:
         ShaderProgram();
         ~ShaderProgram();
         ShaderProgram(smpl::ShaderProgram&& other) noexcept;
-        ShaderProgram(const smpl::ShaderProgram&) = delete;
-        smpl::ShaderProgram& operator=(const smpl::ShaderProgram&) = delete;
         smpl::ShaderProgram& operator=(smpl::ShaderProgram&& other) noexcept;
 
         void create();
@@ -71,7 +72,7 @@ namespace smpl
         const bool isLinked() const;
 
     private:
-        uint32_t program_id;
-        bool     is_linked;
+        uint32_t m_id;
+        bool     m_is_linked;
     };
 }

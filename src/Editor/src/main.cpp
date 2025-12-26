@@ -162,10 +162,179 @@ int main()
     first_texture2d.loadTextureFromFile("res/ussr.png");
     second_texture2d.loadTextureFromFile("res/rus.png");
 
-    smpl::Input::init(window);
+    //smpl::Input::init(window);
 
-    state.camera.setViewportSize(settings.window.mode.width, settings.window.mode.height);
-   
+
+    window.EventCallback = [&window, &state, &settings](Core::Event& event)
+        {
+            LOG_INFO("{}", event.toString());
+
+            Core::EventDispatcher dispatcher(event);
+
+            dispatcher.dispatch<Core::KeyPressedEvent>([&window, &state](Core::KeyPressedEvent& e)
+                {
+                    int keycode = e.getKeyCode();
+
+                    if (keycode == smpl::Key::Code::Escape)
+                    {
+                        window.close();
+                        return true;
+                    }
+
+                    if (state.camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
+                    {
+                        float camera_speed = 30.0f * state.delta_time;
+
+                        if (keycode == smpl::Key::Code::W)
+                            state.camera.moveForward(camera_speed);
+                        else if (keycode == smpl::Key::Code::S)
+                            state.camera.moveForward(-camera_speed);
+                        else if (keycode == smpl::Key::Code::A)
+                            state.camera.moveRight(-camera_speed);
+                        else if (keycode == smpl::Key::Code::D)
+                            state.camera.moveRight(camera_speed);
+                        else if (keycode == smpl::Key::Code::Space)
+                            state.camera.moveUp(camera_speed);
+                        else if (keycode == smpl::Key::Code::LCtrl)
+                            state.camera.moveUp(-camera_speed);
+
+                        float rot_speed = 50.0f * state.delta_time;
+                        glm::vec3 rot_delta(0);
+
+                        if (keycode == smpl::Key::Code::Up)
+                            rot_delta.x += rot_speed;
+                        else if (keycode == smpl::Key::Code::Down)
+                            rot_delta.x -= rot_speed;
+                        else if (keycode == smpl::Key::Code::Left)
+                            rot_delta.y += rot_speed;
+                        else if (keycode == smpl::Key::Code::Right)
+                            rot_delta.y -= rot_speed;
+
+                        if (rot_delta != glm::vec3(0))
+                            state.camera.setRotation(state.camera.getRotation() + rot_delta);
+                    }
+
+                    if (state.camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+                    {
+                        float camera_speed = 30.0f * state.delta_time;
+                        glm::vec3 pos = state.camera.getPosition();
+
+                        if (keycode == smpl::Key::Code::W)
+                        {
+                            pos.x -= camera_speed;
+                            pos.y += camera_speed;
+                        }
+                        else if (keycode == smpl::Key::Code::S)
+                        {
+                            pos.x += camera_speed;
+                            pos.y -= camera_speed;
+                        }
+                        else if (keycode == smpl::Key::Code::A)
+                        {
+                            pos.x -= camera_speed;
+                            pos.y -= camera_speed;
+                        }
+                        else if (keycode == smpl::Key::Code::D)
+                        {
+                            pos.x += camera_speed;
+                            pos.y += camera_speed;
+                        }
+                        else if (keycode == smpl::Key::Code::Space)
+                            pos.z += camera_speed;
+                        else if (keycode == smpl::Key::Code::LCtrl)
+                            pos.z -= camera_speed;
+
+                        state.camera.setPosition(pos);
+                    }
+
+                    return true;
+                });
+
+            static bool first_mouse = true;
+            static double last_mouse_x = 0.0;
+            static double last_mouse_y = 0.0;
+
+            dispatcher.dispatch<Core::MouseMovedEvent>([&state, &window](Core::MouseMovedEvent& e)
+                {
+                    if (glfwGetInputMode(&window.getWindow(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+                    {
+                        double current_mouse_x = e.getX();
+                        double current_mouse_y = e.getY();
+
+                        if (first_mouse)
+                        {
+                            last_mouse_x = current_mouse_x;
+                            last_mouse_y = current_mouse_y;
+                            first_mouse = false;
+                        }
+
+                        float mouse_sensitivity = 0.1f;
+                        float delta_x = (current_mouse_x - last_mouse_x) * mouse_sensitivity;
+                        float delta_y = (last_mouse_y - current_mouse_y) * mouse_sensitivity;
+                        last_mouse_x = current_mouse_x;
+                        last_mouse_y = current_mouse_y;
+
+                        if (state.camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
+                        {
+                            glm::vec3 current_rot = state.camera.getRotation();
+                            current_rot.y -= delta_x;
+                            current_rot.x += delta_y;
+
+                            current_rot.x = glm::clamp(current_rot.x, -89.0f, 89.0f);
+
+                            state.camera.setRotation(current_rot);
+                        }
+                    }
+                    return true;
+                });
+
+            dispatcher.dispatch<Core::MouseButtonPressedEvent>([&window](Core::MouseButtonPressedEvent& e)
+                {
+                    if (e.getMouseButton() == static_cast<int>(smpl::Mouse::Button::Right))
+                    {
+                        if (glfwGetInputMode(&window.getWindow(), GLFW_CURSOR) != GLFW_CURSOR_DISABLED)
+                        {
+                            glfwSetInputMode(&window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                        }
+                    }
+                    return true;
+                });
+
+            dispatcher.dispatch<Core::MouseButtonReleasedEvent>([&window](Core::MouseButtonReleasedEvent& e)
+                {
+                    if (e.getMouseButton() == static_cast<int>(smpl::Mouse::Button::Right))
+                    {
+                        if (glfwGetInputMode(&window.getWindow(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+                        {
+                            glfwSetInputMode(&window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                            first_mouse = true;
+                        }
+                    }
+                    return true;
+                });
+
+            dispatcher.dispatch<Core::MouseScrolledEvent>([&state](Core::MouseScrolledEvent& e)
+                {
+                    float scroll_y = static_cast<float>(e.getYOffset());
+
+                    if (state.camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
+                    {
+                        float rot_speed = 50.0f * state.delta_time;
+                        state.camera.moveUp(scroll_y > 0 ? rot_speed : -rot_speed);
+                    }
+                    else if (state.camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+                    {
+                        float scroll_sensitivity = 1.0f;
+                        float new_zoom = state.zoom - scroll_y * scroll_sensitivity;
+                        state.zoom = glm::clamp(new_zoom, 1.0f, 100.0f);
+                        state.camera.setZoom(state.zoom);
+                    }
+                    return true;
+                });
+
+            return false;
+        };
+
     while (window.isOpen())
     {
         float current_frame = static_cast<float>(glfwGetTime());
@@ -173,7 +342,7 @@ int main()
         state.last_frame = current_frame;
 
         glfwPollEvents();
-        input(window, state);
+        //input(window, state);
 
         window.clear(smpl::Color(50, 50, 50));
 
@@ -184,8 +353,6 @@ int main()
         grid.draw(state.camera);
 
         // Sprites
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         sprite1.setPosition(glm::vec3(0, 0, 7));
         sprite1.setScale(glm::vec3(7, 4, 1));
         sprite1.draw(second_texture2d, state.camera);
@@ -210,10 +377,6 @@ namespace
 {
     void renderCubes(smpl::VertexArray& vao, smpl::ShaderProgram& program, const std::array<glm::vec3, 6>& positions, smpl::Camera& camera, const GlobalState& state)
     {
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(GL_TRUE);
-        glDisable(GL_BLEND);
-
         vao.bind();
 
         glActiveTexture(GL_TEXTURE0);
@@ -348,25 +511,25 @@ namespace
 
             glm::vec3 pos = state.camera.getPosition();
 
-            if (smpl::Input::isKeyPressed(smpl::Key::Code::A))
-            {
-                pos.x -= camera_speed;
-                pos.y += camera_speed;
-            }
-            if (smpl::Input::isKeyPressed(smpl::Key::Code::D))
-            {
-                pos.x += camera_speed;
-                pos.y -= camera_speed;
-            }
             if (smpl::Input::isKeyPressed(smpl::Key::Code::W))
             {
-                pos.x += camera_speed;
+                pos.x -= camera_speed;
                 pos.y += camera_speed;
             }
             if (smpl::Input::isKeyPressed(smpl::Key::Code::S))
             {
+                pos.x += camera_speed;
+                pos.y -= camera_speed;
+            }
+            if (smpl::Input::isKeyPressed(smpl::Key::Code::A))
+            {
                 pos.x -= camera_speed;
                 pos.y -= camera_speed;
+            }
+            if (smpl::Input::isKeyPressed(smpl::Key::Code::D))
+            {
+                pos.x += camera_speed;
+                pos.y += camera_speed;
             }
             if (smpl::Input::isKeyPressed(smpl::Key::Code::Space))
                 pos.z += camera_speed;

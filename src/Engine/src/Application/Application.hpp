@@ -8,7 +8,8 @@ namespace smpl
     public:
         virtual void create() = 0;
         virtual void run()    = 0;
-        bool isRuning()
+
+        bool isRunning() const
         {
             return m_running;
         };

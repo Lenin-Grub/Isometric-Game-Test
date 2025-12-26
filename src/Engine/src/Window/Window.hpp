@@ -1,11 +1,14 @@
 #pragma once
+#include <glm/glm.hpp>
+#include <queue>
 
 #include <Graphics/Color/Color.hpp>
 #include <Window/VideoMode.hpp>
 #include <Settings/Settings.hpp>
 
-#include <glm/glm.hpp>
-#include <queue>
+#include <Event/WindowEvents.hpp>
+#include <Event/InputEvents.hpp>
+#include <Event/Event.hpp>
 
 class GLFWwindow;
 
@@ -50,6 +53,11 @@ namespace smpl
         static VideoMode getDesktopResolution();
 
         glm::vec2 getCursorPos() const;
+
+        void raiseEvent(Core::Event& event);
+
+        using EventCallbackFn = std::function<void(Core::Event&)>;
+        EventCallbackFn EventCallback;
 
     private:
         GLFWwindow* m_window = nullptr;

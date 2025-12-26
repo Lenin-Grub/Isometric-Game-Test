@@ -8,9 +8,6 @@ int main()
     if (!settings.loadFromFile("config/game_settings.json"))
         return 1;
 
-    //settings.window.mode       = smpl::Window::getDesktopResolution();
-    //settings.window.fullscreen = true;
-
     Game game(settings);
     game.create();
     game.run();

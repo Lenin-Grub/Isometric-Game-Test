@@ -5,9 +5,7 @@
 
 namespace smpl 
 {
-    Camera::Camera(const glm::vec3& position,
-        const glm::vec3& rotation,
-        const Projection projection_mode)
+    Camera::Camera(const glm::vec3& position, const glm::vec3& rotation, const Projection projection_mode)
         : m_projection_mode( projection_mode )
         , m_position       ( position )
         , m_rotation       ( rotation )
@@ -70,7 +68,7 @@ namespace smpl
             const float pitch = glm::radians(m_rotation.x);
             const float yaw   = glm::radians(m_rotation.y);
 
-            glm::mat4 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw, m_world_up);
+            glm::mat4 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw, -m_world_up);
             glm::mat3 pitch_mat = glm::rotate(yaw_mat, pitch, m_world_right);
 
             m_direction        = glm::normalize(glm::vec3(pitch_mat * glm::vec4(m_world_forward, 0.0f)));
@@ -83,7 +81,7 @@ namespace smpl
             const float pitch = glm::radians(m_rotation.x);
             const float yaw   = glm::radians(m_rotation.y);
 
-            glm::vec3 direction;
+            glm::vec3 direction{0};
             direction.x = cos(yaw) * cos(pitch);
             direction.y = sin(yaw) * cos(pitch);
             direction.z = sin(pitch);
@@ -152,7 +150,7 @@ namespace smpl
 
     void Camera::setViewportSize(const float width, const float height)
     {
-        m_viewport_width = width;
+        m_viewport_width  = width;
         m_viewport_height = height;
         updateProjectionMatrix();
     }

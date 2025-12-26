@@ -31,10 +31,8 @@ namespace smpl
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        if (isResizable())
-            glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        else
-            glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, m_window_settings.resizable ? 1 : 0);
+        glfwSwapInterval(m_window_settings.vertical_sync ? 1 : 0);
 
         GLFWmonitor* monitor    = nullptr;
         const GLFWvidmode* mode = nullptr;
@@ -71,6 +69,7 @@ namespace smpl
         }
 
         glfwMakeContextCurrent(m_window);
+        glfwSetWindowUserPointer(m_window, this);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -82,6 +81,80 @@ namespace smpl
 
         glfwSetWindowUserPointer(m_window, this);
         glEnable(GL_DEPTH_TEST);
+
+        glfwSetWindowCloseCallback(m_window, [](GLFWwindow* handle)
+            {
+                Window& window = *((Window*)glfwGetWindowUserPointer(handle));
+                Core::WindowClosedEvent event;
+                window.raiseEvent(event);
+            });
+
+        glfwSetWindowSizeCallback(m_window, [](GLFWwindow* handle, int width, int height)
+            {
+                glViewport(0, 0, width, height);
+                Window& window = *((Window*)glfwGetWindowUserPointer(handle));
+                Core::WindowResizeEvent event((uint32_t)width, (uint32_t)height);
+                window.raiseEvent(event);
+            });
+
+        glfwSetKeyCallback(m_window, [](GLFWwindow* handle, int key, int scancode, int action, int mods)
+            {
+                Window& window = *((Window*)glfwGetWindowUserPointer(handle));
+
+                switch (action)
+                {
+                case GLFW_PRESS:
+                case GLFW_REPEAT:
+                {
+                    Core::KeyPressedEvent event(key, action == GLFW_REPEAT);
+                    window.raiseEvent(event);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    Core::KeyReleasedEvent event(key);
+                    window.raiseEvent(event);
+                    break;
+                }
+                }
+            });
+
+        glfwSetMouseButtonCallback(m_window, [](GLFWwindow* handle, int button, int action, int mods)
+            {
+                Window& window = *((Window*)glfwGetWindowUserPointer(handle));
+
+                switch (action)
+                {
+                case GLFW_PRESS:
+                {
+                    Core::MouseButtonPressedEvent event(button);
+                    window.raiseEvent(event);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    Core::MouseButtonReleasedEvent event(button);
+                    window.raiseEvent(event);
+                    break;
+                }
+                }
+            });
+
+        glfwSetScrollCallback(m_window, [](GLFWwindow* handle, double xOffset, double yOffset)
+            {
+                Window& window = *((Window*)glfwGetWindowUserPointer(handle));
+
+                Core::MouseScrolledEvent event(xOffset, yOffset);
+                window.raiseEvent(event);
+            });
+
+        glfwSetCursorPosCallback(m_window, [](GLFWwindow* handle, double x, double y)
+            {
+                Window& window = *((Window*)glfwGetWindowUserPointer(handle));
+
+                Core::MouseMovedEvent event(x, y);
+                window.raiseEvent(event);
+            });
 
         return true;
     }
@@ -109,6 +182,9 @@ namespace smpl
     {
         glClearColor(color.r, color.g, color.b, color.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     void Window::display()
@@ -256,5 +332,11 @@ namespace smpl
         double y_pos;
         glfwGetCursorPos(m_window, &x_pos, &y_pos);
         return { x_pos, y_pos };
+    }
+
+    void Window::raiseEvent(Core::Event& event)
+    {
+        if (EventCallback)
+            EventCallback(event);
     }
 }

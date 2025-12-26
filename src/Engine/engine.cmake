@@ -8,6 +8,9 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Event/Keyboard.hpp
     src/Event/Mouse.hpp
     src/Event/Input.hpp
+    src/Event/Event.hpp
+    src/Event/InputEvents.hpp
+    src/Event/WindowEvents.hpp
 
     src/Log/Log.hpp
     src/ImGui/SetImGui.cpp

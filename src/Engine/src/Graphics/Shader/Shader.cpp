@@ -28,10 +28,10 @@ namespace smpl
 {
 
     Shader::Shader()
-        : is_loaded{ false }
-        , is_compiled{ false }
-        , shader_id{ 0 }
-        , shader_type{ 0 }
+        : m_is_loaded{ false }
+        , m_is_compiled{ false }
+        , m_shader_id{ 0 }
+        , m_shader_type{ 0 }
     {
         //Do nothing
     }
@@ -45,56 +45,56 @@ namespace smpl
             return false;
         }
 
-        shader_type = getType(type);
+        m_shader_type = getType(type);
 
-        shader_id = glCreateShader(shader_type);
+        m_shader_id = glCreateShader(m_shader_type);
 
         const char* src = shader.data();
-        glShaderSource(shader_id, 1, &src, nullptr);
+        glShaderSource(m_shader_id, 1, &src, nullptr);
 
-        glCompileShader(shader_id);
+        glCompileShader(m_shader_id);
 
         GLint compileStatus;
-        glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compileStatus);
+        glGetShaderiv(m_shader_id, GL_COMPILE_STATUS, &compileStatus);
 
         if (compileStatus != GL_TRUE)
         {
             GLint logLength;
-            glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &logLength);
+            glGetShaderiv(m_shader_id, GL_INFO_LOG_LENGTH, &logLength);
 
             std::vector<char> log(logLength);
-            glGetShaderInfoLog(shader_id, logLength, nullptr, log.data());
+            glGetShaderInfoLog(m_shader_id, logLength, nullptr, log.data());
 
             LOG_ERROR("Shader compilation failed for '{}':\n{}", filename, std::string(log.data()));
 
-            glDeleteShader(shader_id);
+            glDeleteShader(m_shader_id);
             return false;
         }
 
-        is_compiled = true;
-        is_loaded = true;
+        m_is_compiled = true;
+        m_is_loaded = true;
         LOG_DEBUG("Shader loaded: \"{}\" and compile.", filename);
         return true;
     }
 
     bool Shader::isLoaded() const
     {
-        return is_loaded;
+        return m_is_loaded;
     }
 
     bool Shader::isCompiled() const
     {
-        return is_compiled;
+        return m_is_compiled;
     }
 
     void Shader::release()
     {
-        glDeleteShader(shader_id);
+        glDeleteShader(m_shader_id);
     }
 
     GLuint Shader::getID() const
     {
-        return shader_id;
+        return m_shader_id;
     }
 
     bool Shader::getFileContents(const std::string& filename, std::vector<char>& buffer)
@@ -120,40 +120,40 @@ namespace smpl
     }
 
     ShaderProgram::ShaderProgram()
-        : program_id{ 0 }
-        , is_linked{ false }
+        : m_id{ 0 }
+        , m_is_linked{ false }
     {
         // Do nothing
     }
 
     ShaderProgram::~ShaderProgram()
     {
-        glDeleteProgram(program_id);
+        glDeleteProgram(m_id);
     }
 
     ShaderProgram::ShaderProgram(smpl::ShaderProgram&& other) noexcept
-        : program_id(other.program_id)
-        , is_linked(other.is_linked)
+        : m_id(other.m_id)
+        , m_is_linked(other.m_is_linked)
     {
-        other.program_id = 0;
-        other.is_linked = false;
+        other.m_id = 0;
+        other.m_is_linked = false;
     }
 
     ShaderProgram& smpl::ShaderProgram::operator=(smpl::ShaderProgram&& other) noexcept
     {
-        glDeleteProgram(program_id);
-        program_id = other.program_id;
-        is_linked = other.is_linked;
+        glDeleteProgram(m_id);
+        m_id = other.m_id;
+        m_is_linked = other.m_is_linked;
 
-        other.program_id = 0;
-        other.is_linked = false;
+        other.m_id = 0;
+        other.m_is_linked = false;
 
         return *this;
     }
 
     void ShaderProgram::create()
     {
-        program_id = glCreateProgram();
+        m_id = glCreateProgram();
     }
 
     bool ShaderProgram::bind(const Shader& shader) const
@@ -161,31 +161,31 @@ namespace smpl
         if (!shader.isCompiled())
             return false;
 
-        glAttachShader(program_id, shader.getID());
+        glAttachShader(m_id, shader.getID());
         return true;
     }
 
     bool ShaderProgram::link()
     {
-        if (is_linked)
+        if (m_is_linked)
             return true;
 
-        glLinkProgram(program_id);
+        glLinkProgram(m_id);
         GLint linkStatus;
-        glGetProgramiv(program_id, GL_LINK_STATUS, &linkStatus);
-        is_linked = linkStatus == GL_TRUE;
+        glGetProgramiv(m_id, GL_LINK_STATUS, &linkStatus);
+        m_is_linked = linkStatus == GL_TRUE;
 
-        if (!is_linked)
+        if (!m_is_linked)
         {
             LOG_ERROR("Shader program wasn't linked!");
 
             GLint logLength;
-            glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &logLength);
+            glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &logLength);
 
             if (logLength > 0)
             {
                 GLchar* logMessage = new GLchar[logLength];
-                glGetProgramInfoLog(program_id, logLength, nullptr, logMessage);
+                glGetProgramInfoLog(m_id, logLength, nullptr, logMessage);
                 LOG_ERROR("The linker returned: {}", logMessage);
                 delete[] logMessage;
             }
@@ -193,26 +193,26 @@ namespace smpl
             return false;
         }
 
-        return is_linked;
+        return m_is_linked;
     }
 
     void ShaderProgram::use() const
     {
-        if (program_id == 0)
+        if (m_id == 0)
         {
             LOG_ERROR("Attempt to use uninitialized shader program!");
             return;
         }
-        if (!is_linked)
+        if (!m_is_linked)
         {
             LOG_WARN("Shader program is not linked!");
         }
-        glUseProgram(program_id);
+        glUseProgram(m_id);
     }
 
     void ShaderProgram::setUniform1i(const std::string& name, int x) const
     {
-        GLint location = glGetUniformLocation(program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_id, name.c_str());
 
         if (location == -1)
         {
@@ -225,7 +225,7 @@ namespace smpl
 
     void ShaderProgram::setUniform1f(const std::string& name, float x) const
     {
-        GLint location = glGetUniformLocation(program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_id, name.c_str());
 
         if (location == -1)
         {
@@ -238,7 +238,7 @@ namespace smpl
 
     void ShaderProgram::setUniform3f(const std::string& name, float x, float y, float z) const
     {
-        GLint location = glGetUniformLocation(program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_id, name.c_str());
 
         if (location == -1)
         {
@@ -251,7 +251,7 @@ namespace smpl
 
     void ShaderProgram::setUniform3f(const std::string& name, const glm::vec3& xyz) const
     {
-        GLint location = glGetUniformLocation(program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_id, name.c_str());
 
         if (location == -1)
         {
@@ -264,7 +264,7 @@ namespace smpl
 
     void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat4& matrix) const
     {
-        GLint location = glGetUniformLocation(program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_id, name.c_str());
 
         if (location == -1)
         {
@@ -277,7 +277,7 @@ namespace smpl
 
     void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat3& matrix) const
     {
-        GLint location = glGetUniformLocation(program_id, name.c_str());
+        GLint location = glGetUniformLocation(m_id, name.c_str());
 
         if (location == -1)
         {
@@ -290,11 +290,11 @@ namespace smpl
 
     GLuint ShaderProgram::getID() const
     {
-        return program_id;
+        return m_id;
     }
 
     const bool ShaderProgram::isLinked() const
     {
-        return program_id;
+        return m_id;
     }
 }
