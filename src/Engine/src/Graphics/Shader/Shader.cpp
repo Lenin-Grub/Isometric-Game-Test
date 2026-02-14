@@ -46,6 +46,7 @@ namespace smpl
         }
 
         m_shader_type = getType(type);
+        m_current_type = type;
 
         m_shader_id = glCreateShader(m_shader_type);
 
@@ -90,6 +91,11 @@ namespace smpl
     void Shader::release()
     {
         glDeleteShader(m_shader_id);
+    }
+
+    smpl::Shader::Type Shader::getCurrentType() const
+    {
+        return m_current_type;
     }
 
     GLuint Shader::getID() const
@@ -151,7 +157,64 @@ namespace smpl
         return *this;
     }
 
-    void ShaderProgram::create()
+    bool ShaderProgram::create(smpl::Shader& vertex_shader, smpl::Shader& fragment_shader)
+    {
+        bool is_create = false;
+        createProgram();
+
+        // Vertex
+        if (vertex_shader.getCurrentType() == smpl::Shader::Vertex)
+        {
+            if (!bind(vertex_shader))
+            {
+                vertex_shader.release();
+                fragment_shader.release();
+                return is_create;
+            }
+        }
+        else
+        {
+            LOG_ERROR("Incorrect type of shader! Should be \"Vertex\".");
+            vertex_shader.release();
+            fragment_shader.release();
+            LOG_ERROR("Vertex shader bind failed.");
+            return is_create;
+        }
+
+        // Fragment
+        if (fragment_shader.getCurrentType() == smpl::Shader::Fragment)
+        {
+            if (!bind(fragment_shader))
+            {
+                vertex_shader.release();
+                fragment_shader.release();
+                LOG_ERROR("Fragment shader bind failed.");
+                return is_create;
+            }
+        }
+        else
+        {
+            LOG_ERROR("Incorrect type of shader! Should be \"Fragment\".");
+            vertex_shader.release();
+            fragment_shader.release();
+            return is_create;
+        }
+
+        if (!link())
+        {
+            vertex_shader.release();
+            fragment_shader.release();
+            return is_create;
+        }
+
+        vertex_shader.release();
+        fragment_shader.release();
+
+        is_create = true;
+        return is_create;
+    }
+
+    void ShaderProgram::createProgram()
     {
         m_id = glCreateProgram();
     }

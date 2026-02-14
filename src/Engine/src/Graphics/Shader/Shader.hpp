@@ -24,6 +24,7 @@ namespace smpl
         bool isCompiled() const;
         void release();
 
+        smpl::Shader::Type getCurrentType() const;
         uint32_t getID()   const;
 
     private:
@@ -33,6 +34,7 @@ namespace smpl
         uint32_t m_shader_type;
         bool     m_is_loaded;
         bool     m_is_compiled;
+        smpl::Shader::Type m_current_type;
     };
 
     class ShaderProgram
@@ -44,9 +46,7 @@ namespace smpl
         ShaderProgram(smpl::ShaderProgram&& other) noexcept;
         smpl::ShaderProgram& operator=(smpl::ShaderProgram&& other) noexcept;
 
-        void create();
-        bool bind(const Shader& shader) const;
-        bool link();
+        bool create(smpl::Shader& vertex_shader, smpl::Shader& fragment_shader);
         void use() const;
 
         void setUniform1i(const std::string& name, int x) const;
@@ -67,8 +67,12 @@ namespace smpl
         void setUniformMatrix(const std::string& name, const glm::mat4& matrix) const;
         void setUniformMatrix(const std::string& name, const glm::mat3& matrix) const;
 
-
         uint32_t getID() const;
+    private:
+
+        void createProgram();
+        bool bind(const Shader& shader) const;
+        bool link();
         const bool isLinked() const;
 
     private:

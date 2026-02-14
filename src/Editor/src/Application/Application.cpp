@@ -11,41 +11,17 @@ namespace EDITOR
         // Cube shader with mixed 2 texture
         m_vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
         m_fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
-        m_shader_cube.create();
-        m_shader_cube.bind(m_vertex_shader);
-        m_shader_cube.bind(m_fragment_shader);
-
-        if (!m_shader_cube.link())
-           LOG_ERROR("Failed to link cube shader");
-
-        m_vertex_shader.release();
-        m_fragment_shader.release();
+        m_shader_cube.create(m_vertex_shader, m_fragment_shader);
 
         // Grid shader
         m_vertex_shader2.loadFromFile("shaders/grid_shader.vert", smpl::Shader::Type::Vertex);
         m_fragment_shader2.loadFromFile("shaders/grid_shader.frag", smpl::Shader::Type::Fragment);
-        m_shader_grid.create();
-        m_shader_grid.bind(m_vertex_shader2);
-        m_shader_grid.bind(m_fragment_shader2);
-
-        if (!m_shader_grid.link())
-           LOG_ERROR("Failed to link grid shader");
-
-        m_vertex_shader2.release();
-        m_fragment_shader2.release();
+        m_shader_grid.create(m_vertex_shader2, m_fragment_shader2);
 
         // Sprite shader
         m_vertex_shader3.loadFromFile("shaders/plane_1texture_shader.vert", smpl::Shader::Type::Vertex);
         m_fragment_shader3.loadFromFile("shaders/plane_1texture_shader.frag", smpl::Shader::Type::Fragment);
-        m_shader_plane.create();
-        m_shader_plane.bind(m_vertex_shader3);
-        m_shader_plane.bind(m_fragment_shader3);
-
-        if (!m_shader_plane.link())
-            LOG_ERROR("Failed to link plane shader");
-
-        m_vertex_shader3.release();
-        m_fragment_shader3.release();
+        m_shader_plane.create(m_vertex_shader3, m_fragment_shader3);
     }
 
     void Application::initTextures() 
@@ -278,8 +254,6 @@ namespace EDITOR
         m_sprite3.setPosition(glm::vec3(-15, -15, 7));
         m_sprite3.setScale(glm::vec3(10, 10, 1));
         m_sprite3.draw(m_first_texture2d, m_state.camera);
-
-        initGui();
 
         m_window->display();
     }

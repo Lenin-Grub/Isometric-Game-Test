@@ -63,15 +63,7 @@ bool Game::init()
 
     vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
     fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
-    program.create();
-    program.bind(vertex_shader);
-    program.bind(fragment_shader);
-
-    if (!program.link())
-        return false;
-
-    vertex_shader.release();
-    fragment_shader.release();
+    program.create(vertex_shader, fragment_shader);
 
     texture.loadTextureFromFile("res/stone_wall.png");
 

@@ -44,7 +44,6 @@ namespace EDITOR
         void initShaders();
         void initTextures();
         void initObjects();
-        void initGui();
 
         void setupEventCallbacks();
 
