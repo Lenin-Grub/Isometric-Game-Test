@@ -1,4 +1,4 @@
-#include <ImGui/SetImGui.hpp>
+﻿#include <ImGui/SetImGui.hpp>
 #include <Log/Log.hpp>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -28,6 +28,9 @@ namespace smpl
                 LOG_CRITICAL("Failed create context to ImGui!");
                 return false;
             }
+
+            ImGuiIO& io = ImGui::GetIO();
+            io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
             if (!ImGui_ImplGlfw_InitForOpenGL(&window.getWindow(), true))
             {

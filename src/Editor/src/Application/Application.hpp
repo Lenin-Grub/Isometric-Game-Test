@@ -23,9 +23,10 @@
 #include <Settings/Settings.hpp>
 
 #include "../Scene/Scene.hpp"
-#include "../UI/Log/LogDisplay.hpp"
+#include "../UI/Display/Displays.hpp"
 
-namespace EDITOR
+
+namespace Editor
 {    
 class Application
     {
@@ -67,8 +68,6 @@ class Application
         float zoom       = 0.f;
     };
         GlobalState m_state;
-
-        Editor::LogDisplay m_log_display;
-
+        Editor::Displays m_displays;
     };
 }

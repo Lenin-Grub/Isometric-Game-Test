@@ -1,9 +1,9 @@
 #include "Application.hpp"
 
-namespace EDITOR
+namespace Editor
 {
     Application::Application()
-        : m_main_scene("MainScene")
+        : m_main_scene("MainScene"), m_displays(m_main_scene)
     {
     }
 
@@ -11,7 +11,7 @@ namespace EDITOR
     {
         m_window->EventCallback = [this](Core::Event& event)
         {
-            //LOG_INFO("{}", event.toString());
+            //LOG_DEBUG("{}", event.toString());
 
             Core::EventDispatcher dispatcher(event);
 
@@ -31,19 +31,19 @@ namespace EDITOR
 
                     if (camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
                     {
-                        float camera_speed = 30.0f * m_state.delta_time;
+                        float camera_speed = 50.0f * m_state.delta_time;
 
                         if (keycode == smpl::Key::Code::W)
                             camera.moveForward(camera_speed);
-                        else if (keycode == smpl::Key::Code::S)
+                        if (keycode == smpl::Key::Code::S)
                             camera.moveForward(-camera_speed);
-                        else if (keycode == smpl::Key::Code::A)
+                        if (keycode == smpl::Key::Code::A)
                             camera.moveRight(-camera_speed);
-                        else if (keycode == smpl::Key::Code::D)
+                        if (keycode == smpl::Key::Code::D)
                             camera.moveRight(camera_speed);
-                        else if (keycode == smpl::Key::Code::Space)
+                        if (keycode == smpl::Key::Code::Space)
                             camera.moveUp(camera_speed);
-                        else if (keycode == smpl::Key::Code::LCtrl)
+                        if (keycode == smpl::Key::Code::LCtrl)
                             camera.moveUp(-camera_speed);
 
                         float rot_speed = 50.0f * m_state.delta_time;
@@ -51,11 +51,11 @@ namespace EDITOR
 
                         if (keycode == smpl::Key::Code::Up)
                             rot_delta.x += rot_speed;
-                        else if (keycode == smpl::Key::Code::Down)
+                        if (keycode == smpl::Key::Code::Down)
                             rot_delta.x -= rot_speed;
-                        else if (keycode == smpl::Key::Code::Left)
+                        if (keycode == smpl::Key::Code::Left)
                             rot_delta.y += rot_speed;
-                        else if (keycode == smpl::Key::Code::Right)
+                        if (keycode == smpl::Key::Code::Right)
                             rot_delta.y -= rot_speed;
 
                         if (rot_delta != glm::vec3(0))
@@ -197,18 +197,13 @@ namespace EDITOR
     {
         m_window->clear(smpl::Color(50, 50, 50));
 
-        // Delegate rendering to the scene
         m_main_scene.render();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        m_log_display.show();
-
+        m_displays.show();
         ImGui::Render();
-
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         m_window->display();
     }
 
@@ -228,7 +223,6 @@ namespace EDITOR
 
         setupEventCallbacks();
 
-        // Initialize and load the main scene
         if (!m_main_scene.load())
         {
             LOG_ERROR("Failed to load main scene");
@@ -249,10 +243,7 @@ namespace EDITOR
 
             glfwPollEvents();
 
-            // Update scene state with delta time
             m_main_scene.getState().delta_time = m_state.delta_time;
-
-            // Update and render the scene
             m_main_scene.update();
 
             render();
