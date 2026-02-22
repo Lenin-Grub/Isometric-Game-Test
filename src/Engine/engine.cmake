@@ -27,6 +27,8 @@ set (ENGINE_PUBLIC_INCLUDES
     
     src/Graphics/Primitives/Cube/Cube.hpp
     src/Graphics/Primitives/Grid/Grid.hpp
+
+    src/Layer/ILayer.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES

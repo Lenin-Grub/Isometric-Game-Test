@@ -38,6 +38,10 @@ target_link_libraries     (imgui PRIVATE glfw glad)
 add_library(stb_image INTERFACE)
 target_compile_definitions(stb_image INTERFACE STB_IMAGE_IMPLEMENTATION)
 
+add_library(entt INTERFACE)
+target_compile_definitions(entt INTERFACE ${CMAKE_SOURCE_DIR})
+
+
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     
@@ -47,6 +51,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${EXTERNAL_DIR}/glm
     ${EXTERNAL_DIR}/imgui
     ${EXTERNAL_DIR}/imgui/backends
+    # ${EXTERNAL_DIR}/entt
     ${CMAKE_SOURCE_DIR}/ext_libs
 )
 
@@ -59,6 +64,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog
     stb_image
     imgui
+    entt
 )
 
 #target_precompile_headers(${PROJECT_NAME} PRIVATE src/stdafx.hpp)

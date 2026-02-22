@@ -24,10 +24,12 @@
 
 #include "../Scene/Scene.hpp"
 #include "../UI/Display/Displays.hpp"
-
+#include "../Layer/LayerManager.hpp"
+#include "../Layer/BaseLayer.hpp"
+#include "../Layer/UILayer.hpp"
 
 namespace Editor
-{    
+{   
 class Application
     {
     public:
@@ -46,6 +48,9 @@ class Application
         std::unique_ptr<smpl::Window> m_window;
 
         Editor::Scene m_main_scene;
+        Editor::LayerManager m_layer_manager;
+        std::shared_ptr<Editor::BaseLayer> m_base_layer;
+        std::shared_ptr<Editor::UILayer> m_ui_layer;
 
     struct GlobalState
     {
@@ -69,5 +74,7 @@ class Application
     };
         GlobalState m_state;
         Editor::Displays m_displays;
+        mutable bool m_was_f1_pressed = false;
+        mutable bool m_ui_layer_visible = true;
     };
 }

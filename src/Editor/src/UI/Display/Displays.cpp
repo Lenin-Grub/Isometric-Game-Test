@@ -1,4 +1,4 @@
-﻿#include "Displays.hpp"
+#include "Displays.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -48,7 +48,7 @@ namespace Editor
         if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
             ImGui::PopStyleVar();
 
-        ImGui::PopStyleColor(2);
+         ImGui::PopStyleColor(2);
 
         return true;
     }
