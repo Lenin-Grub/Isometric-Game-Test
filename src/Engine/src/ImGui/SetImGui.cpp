@@ -30,6 +30,7 @@ namespace smpl
             }
 
             ImGuiIO& io = ImGui::GetIO();
+            // io.ConfigFlags |= ImGuiConfigFlags_Docking
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
             if (!ImGui_ImplGlfw_InitForOpenGL(&window.getWindow(), true))
