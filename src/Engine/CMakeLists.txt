@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
+﻿cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
 project(SamopalEngine)
 
@@ -36,10 +36,10 @@ target_link_libraries     (imgui PRIVATE glfw glad)
 
 #stb image
 add_library(stb_image INTERFACE)
-target_compile_definitions(stb_image INTERFACE STB_IMAGE_IMPLEMENTATION)
+target_include_directories(stb_image INTERFACE ${EXTERNAL_DIR}/stb_image)
 
 add_library(entt INTERFACE)
-target_compile_definitions(entt INTERFACE ${CMAKE_SOURCE_DIR})
+target_include_directories(entt INTERFACE "${CMAKE_SOURCE_DIR}/ext_libs")
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -51,7 +51,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${EXTERNAL_DIR}/glm
     ${EXTERNAL_DIR}/imgui
     ${EXTERNAL_DIR}/imgui/backends
-    # ${EXTERNAL_DIR}/entt
     ${CMAKE_SOURCE_DIR}/ext_libs
 )
 
@@ -66,5 +65,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     imgui
     entt
 )
-
-#target_precompile_headers(${PROJECT_NAME} PRIVATE src/stdafx.hpp)

@@ -76,12 +76,12 @@ namespace smpl
             m_up               = glm::cross(m_right, m_direction);
             m_view_matrix      = glm::lookAt(m_position, m_position + m_direction, m_up);
         }
-        else
+        else if (m_projection_mode == Projection::Perspective)
         {
             const float pitch = glm::radians(m_rotation.x);
             const float yaw   = glm::radians(m_rotation.y);
 
-            glm::vec3 direction{0};
+            glm::vec3 direction{ 0 };
             direction.x = cos(yaw) * cos(pitch);
             direction.y = sin(yaw) * cos(pitch);
             direction.z = sin(pitch);
@@ -90,6 +90,12 @@ namespace smpl
             m_right       = glm::normalize(glm::cross(m_direction, m_world_up));
             m_up          = glm::normalize(glm::cross(m_right, m_direction));
             m_view_matrix = glm::lookAt(m_position, m_position + m_direction, m_up);
+        }
+        else 
+        {
+            m_direction = glm::vec3(0, 0, 1);
+            m_right     = glm::vec3(1, 0, 0);
+            m_up        = glm::vec3(0, 1, 0);
         }
     }
 

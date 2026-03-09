@@ -29,6 +29,12 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Graphics/Primitives/Grid/Grid.hpp
 
     src/Layer/ILayer.hpp
+
+    src/ECS/ISystems.hpp
+    src/ECS/Components.hpp
+    src/ECS/GameObject/GameObject.hpp
+    src/ECS/GameObject/GameObject.inl
+    src/ECS/SceneManager/SceneManager.hpp
 )
 
 set (ENGINE_PUBLIC_SOURCES
@@ -53,4 +59,7 @@ set (ENGINE_PUBLIC_SOURCES
     
     src/Graphics/Primitives/Cube/Cube.cpp
     src/Graphics/Primitives/Grid/Grid.cpp
+
+    src/ECS/GameObject/GameObject.cpp
+    src/ECS/SceneManager/SceneManager.cpp
 )

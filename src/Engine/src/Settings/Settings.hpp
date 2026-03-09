@@ -23,7 +23,7 @@ namespace smpl
     {
         // FOV
         // Distance
-        // Frustrum
+        // Frustum
         // etc.
     };
 

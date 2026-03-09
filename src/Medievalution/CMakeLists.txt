@@ -25,7 +25,7 @@ target_include_directories(Medievalution PRIVATE
 
 target_compile_features(Medievalution PUBLIC cxx_std_20)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SamopalEngine)
+target_link_libraries(${PROJECT_NAME} PRIVATE SamopalEngine stb_image)
 add_dependencies(${PROJECT_NAME} SamopalEngine)
 
 add_custom_command(TARGET Medievalution POST_BUILD

@@ -19,11 +19,11 @@ namespace Engine
 
         virtual bool isVisible() { return m_isVisible; };
 
-        virtual bool init() = 0;
+        virtual bool init() { return false; };
 
-        virtual void update(float deltaTime) = 0;
+        virtual void update(float deltaTime) {};
 
-        virtual void render() = 0;
+        virtual void render() {};
 
     private:
         bool m_isActive  = false;
