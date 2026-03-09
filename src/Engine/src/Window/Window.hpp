@@ -52,7 +52,11 @@ namespace smpl
 
         static VideoMode getDesktopResolution();
 
+        void setCursorPos(glm::vec2 position);
+
         glm::vec2 getCursorPos() const;
+
+        void setIcon(const std::string& path);
 
         void raiseEvent(Core::Event& event);
 

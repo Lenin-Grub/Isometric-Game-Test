@@ -6,6 +6,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <Settings/Settings.hpp>
+#include <stb_image.h>
 
 namespace smpl
 {
@@ -313,6 +314,13 @@ namespace smpl
         return smpl::VideoMode(640, 480);
     }
 
+    void Window::setCursorPos(glm::vec2 position)
+    {
+        if (!m_window)
+            return ;
+        glfwSetCursorPos(m_window, position.x, position.y);
+    }
+
     bool Window::isOpen()
     {
         if (!m_window)
@@ -331,7 +339,25 @@ namespace smpl
         double x_pos;
         double y_pos;
         glfwGetCursorPos(m_window, &x_pos, &y_pos);
+        LOG_INFO("Cursor position: {0} {1}", x_pos, y_pos);
         return { x_pos, y_pos };
+    }
+
+    void Window::setIcon(const std::string& path)
+    {
+        int width, height, channels;
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
+
+        if (data) 
+        {
+            GLFWimage icon;
+            icon.width  = width;
+            icon.height = height;
+            icon.pixels = data;
+
+            glfwSetWindowIcon(m_window, 1, &icon);
+            stbi_image_free(data);
+        }
     }
 
     void Window::raiseEvent(Core::Event& event)
