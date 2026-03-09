@@ -11,18 +11,21 @@ namespace smpl
     class Grid
     {
     public:
-        Grid(smpl::ShaderProgram& shader);
+        Grid();
         ~Grid();
 
     public:
 
+        bool init();
         void draw(smpl::Camera camera);
 
     private:
-        void initRenderData();
+        bool initRenderData();
 
     private:
-        smpl::ShaderProgram& m_shader;
+        smpl::ShaderProgram m_shader;
+        smpl::Shader m_vertex_shader;
+        smpl::Shader m_fragment_shader;
 
         GLuint vao = 0;
         GLuint vbo = 0;

@@ -6,10 +6,8 @@
 
 namespace smpl
 {
-    Grid::Grid(smpl::ShaderProgram& shader)
-        : m_shader (shader)
+    Grid::Grid()
     {
-        initRenderData();
     }
 
     Grid::~Grid()
@@ -17,6 +15,19 @@ namespace smpl
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
         glDeleteBuffers(1, &ibo);
+    }
+
+    bool Grid::init()
+    {
+        if (!m_vertex_shader.loadFromFile("shaders/grid_shader.vert", smpl::Shader::Type::Vertex))
+            return false;
+        if (!m_fragment_shader.loadFromFile("shaders/grid_shader.frag", smpl::Shader::Type::Fragment))
+            return false;
+        if (!m_shader.create(m_vertex_shader, m_fragment_shader))
+            return false;
+        if (!initRenderData())
+            return false;
+        return true;
     }
 
     void Grid::draw(smpl::Camera camera)
@@ -36,8 +47,9 @@ namespace smpl
         glBindVertexArray(0);
     }
 
-    void Grid::initRenderData()
+    bool Grid::initRenderData()
     {
+        bool result = false;
         // (x, y, z), UV (u, v)
         float vertices[] = { -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
                               1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
@@ -67,5 +79,6 @@ namespace smpl
 
         // Off VAO
         glBindVertexArray(0);
+        return result = true;
     }
 }

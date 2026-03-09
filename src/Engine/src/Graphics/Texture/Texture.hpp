@@ -8,27 +8,6 @@
 
 namespace smpl
 {
-    class Texture
-    {
-    public:
-        Texture();
-        ~Texture();
-
-        bool loadFromFile(const std::string& filepath);
-
-        unsigned int getTextureID() const;
-
-        int getHeight()   const;
-        int getWidth()    const;
-        int getChannels() const;
-
-    private:
-        unsigned int m_texture_id;
-        int m_width;
-        int m_height;
-        int m_channels;
-    };
-
     class Texture2D
         : public smpl::NonCopyable
         , public smpl::NonMovable
@@ -48,10 +27,10 @@ namespace smpl
         unsigned int getChannels() const;
 
     private:
-        unsigned int m_id;
         int m_width;
         int m_height;
         int m_channels;
+        unsigned int m_id;
         unsigned int m_internal_format;
         unsigned int m_image_format;
         unsigned int m_wrap_s;

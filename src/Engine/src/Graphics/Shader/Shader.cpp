@@ -325,6 +325,19 @@ namespace smpl
         glUniform3f(location, xyz.x, xyz.y, xyz.z);
     }
 
+    void ShaderProgram::setUniform4f(const std::string& name, const glm::vec4& xyzw) const
+    {
+        GLint location = glGetUniformLocation(m_id, name.c_str());
+
+        if (location == -1)
+        {
+            LOG_WARN("Uniform \"{}\" not found.", name);
+            return;
+        }
+
+        glUniform4f(location, xyzw.x, xyzw.y, xyzw.z, xyzw.w);
+    }
+
     void ShaderProgram::setUniformMatrix(const std::string& name, const glm::mat4& matrix) const
     {
         GLint location = glGetUniformLocation(m_id, name.c_str());

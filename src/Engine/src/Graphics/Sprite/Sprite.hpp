@@ -6,6 +6,7 @@
 #include <Graphics/Texture/Texture.hpp>
 #include <Graphics/Shader/Shader.hpp>
 #include <Camera/Camera.hpp>
+#include <Log/Log.hpp>
 
 namespace smpl 
 {
@@ -20,7 +21,7 @@ namespace smpl
 
     public:
 
-        void draw(const Texture2D& texture, smpl::Camera camera);
+        void draw(const Texture2D& texture, smpl::Camera& camera);
 
         void setPosition(const glm::vec3& pos)
         {
@@ -37,7 +38,7 @@ namespace smpl
             m_scale = scale;
         }
 
-        void setColor(const glm::vec3& color)
+        void setColor(const glm::vec4& color)
         {
             m_color = color;
         }
@@ -56,7 +57,7 @@ namespace smpl
         glm::vec3 m_position;
         glm::vec3 m_rotation;
         glm::vec3 m_scale;
-        glm::vec3 m_color;
+        glm::vec4 m_color;
 
         GLuint vao = 0;
         GLuint vbo = 0;

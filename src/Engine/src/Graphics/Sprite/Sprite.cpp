@@ -27,7 +27,7 @@ namespace smpl
         initRenderData();
     }
 
-    void Sprite::draw(const Texture2D& texture, smpl::Camera camera)
+    void Sprite::draw(const Texture2D& texture, smpl::Camera& camera)
     {
         glm::mat4 model = glm::mat4(1.0f);
         model           = glm::translate(model, m_position);
@@ -41,6 +41,7 @@ namespace smpl
         m_shader->use();
         m_shader->setUniformMatrix("model", model);
         m_shader->setUniform1i("texture1", 0);
+        m_shader->setUniform4f("sprite_color", m_color);
         m_shader->setUniformMatrix("projection", camera.getProjectionMatrix());
         m_shader->setUniformMatrix("view", camera.getViewMatrix());
 
