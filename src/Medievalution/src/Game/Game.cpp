@@ -15,6 +15,7 @@
 Game::Game(smpl::Settings& settings)
     : m_settings{ settings }
     , m_window  { settings }
+    , m_game_obj{ m_scene  }
 {
     // Do nothing
 };
@@ -58,16 +59,30 @@ void Game::run()
 
 bool Game::init()
 {
+    m_window.setIcon("res/icon.png");
+
+    camera.setProjection(smpl::Camera::Projection::Orthographic);
+
     if(!smpl::Gui::initBackEndImGui())
         return false;
+
+    m_game_obj.create();
+    m_game_obj.addComponent<smpl::ECS::Components::Color>();
+    m_game_obj.addComponent<smpl::ECS::Components::Transform>(
+        glm::vec3(0.0f, 0.0f, 1.0f),    // position
+        glm::vec3(0.0f, 0.0f, 0.0f),    // rotation  
+        glm::vec3(10.0f, 10.0f, 0.0f)   // scale 
+    );
 
     vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
     fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
     program.create(vertex_shader, fragment_shader);
-
-    texture.loadTextureFromFile("res/stone_wall.png");
-
+    texture.loadTextureFromFile("res/Spearman.png");
     sprite.setShader(program);
+
+    // Grid shader
+    m_grid = std::make_unique<smpl::Grid>();
+    m_grid->init();
 
     return true;
 }
@@ -113,14 +128,28 @@ void Game::input()
 
 void Game::draw()
 {
+
+    m_grid->draw(camera);
     ImGui::NewFrame();
     ImGui::ShowDemoWindow();
     showVideoSettings();
 
+    ImGui::Begin("Entities");
+
+    auto& color = m_game_obj.getComponent<smpl::ECS::Components::Color>();
+
+    ImGui::ColorPicker4("Sprite color", glm::value_ptr(color.value));
+    ImGui::End();
+
+    sprite.setColor(color.value);
+
+    auto& transform = m_game_obj.getComponent<smpl::ECS::Components::Transform>();
+
     sprite.draw(texture, camera);
-    sprite.setPosition(pos);
-    sprite.setRotation(rot);
-    sprite.setScale(size);
+    sprite.setPosition(transform.position);
+    sprite.setRotation(transform.rotation);
+    sprite.setColor(color.value);
+    sprite.setScale(transform.scale);
 
     smpl::Gui::drawImGuiGL();
 }
@@ -204,9 +233,11 @@ void Game::showVideoSettings()
         updateImGuiDisplaySize();
     }
 
-    ImGui::SliderFloat3("Scale", glm::value_ptr(size), 0.5f, 10.0f);
-    ImGui::SliderFloat3("Translate", glm::value_ptr(pos), -100.0f, 100.0f);
-    ImGui::SliderFloat3("Rotate", glm::value_ptr(rot), 0.0f, 360.0f);
+    auto& transform = m_game_obj.getComponent<smpl::ECS::Components::Transform>();
+
+    ImGui::SliderFloat3("Scale",     glm::value_ptr(transform.scale),       0.5f,  10.0f);
+    ImGui::SliderFloat3("Translate", glm::value_ptr(transform.position), -100.0f, 100.0f);
+    ImGui::SliderFloat3("Rotate",    glm::value_ptr(transform.rotation),    0.0f, 360.0f);
 
     ImGui::End();
 }

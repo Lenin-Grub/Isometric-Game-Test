@@ -18,6 +18,10 @@
 #include <Settings/Settings.hpp>
 #include <Camera/Camera.hpp>
 
+#include <ECS/GameObject/GameObject.hpp>
+#include <ECS/Components.hpp>
+#include <Graphics/Primitives/Grid/Grid.hpp>
+
 class Game
 {
 public:
@@ -58,15 +62,13 @@ private:
     smpl::Sprite sprite;
     smpl::Texture2D texture;
 
-    smpl::Camera camera;
+    glm::vec3 camera_pos = { 0.f, 0.f, 25.f };
+    glm::vec3 camera_rot = { -90.f, -90.f,  0.f };
 
-    glm::vec3 pos{25,2.5,2.5};
-    glm::vec3 rot{90,0,270};
-    glm::vec3 size{10,10,10};
+    std::unique_ptr<smpl::Grid> m_grid;
 
-    float m_animation_timer    = 0.0f;
-    float m_animation_interval = 0.1f;
-    int m_current_frame        = 0;
-    int m_max_frames           = 11;
-    int m_frame_width          = 64;
+    smpl::Camera camera{ camera_pos, camera_rot };
+
+    smpl::ECS::GameObject m_game_obj;
+    entt::registry m_scene;
 };
