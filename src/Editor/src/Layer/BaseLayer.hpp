@@ -43,10 +43,6 @@ namespace Editor
         smpl::Shader m_fragment_shader;
         smpl::ShaderProgram m_shader_cube;
 
-        smpl::Shader m_vertex_shader2;
-        smpl::Shader m_fragment_shader2;
-        smpl::ShaderProgram m_shader_grid;
-
         smpl::Shader m_vertex_shader3;
         smpl::Shader m_fragment_shader3;
         smpl::ShaderProgram m_shader_plane;
@@ -63,11 +59,9 @@ namespace Editor
         std::unique_ptr<smpl::VertexBuffer> m_vbo;
         std::unique_ptr<smpl::IndexBuffer>  m_index_buffer;
 
-        smpl::Texture2D m_first_texture2d;
-        smpl::Texture2D m_second_texture2d;
-
-        smpl::Texture m_texture1;
-        smpl::Texture m_texture2;
+        smpl::Texture2D m_texture_horde;
+        smpl::Texture2D m_texture_rus;
+        smpl::Texture2D m_texture_stonewall;
 
         smpl::Camera* m_camera;
         bool m_initialized;

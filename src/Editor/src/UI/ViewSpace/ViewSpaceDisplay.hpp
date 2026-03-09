@@ -9,20 +9,19 @@ namespace Editor
     class ViewSpaceDisplay
     {
     public:
-        ViewSpaceDisplay(Scene& scene);
+        ViewSpaceDisplay();
         ~ViewSpaceDisplay();
 
         void show();
 
     private:
-        Scene& m_scene;
         bool m_show_scene = true;
 
         unsigned int m_framebuffer;
         unsigned int m_framebuffer_texture;
         unsigned int m_depth_renderbuffer;
-        int m_current_width = 1024;
-        int m_current_height = 768;
+        int m_current_width;
+        int m_current_height;
 
         void initializeFramebuffer();
         void resizeFramebuffer(int width, int height);

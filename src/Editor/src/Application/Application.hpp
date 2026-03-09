@@ -22,7 +22,6 @@
 #include <Log/Log.hpp>
 #include <Settings/Settings.hpp>
 
-#include "../Scene/Scene.hpp"
 #include "../UI/Display/Displays.hpp"
 #include "../Layer/LayerManager.hpp"
 #include "../Layer/BaseLayer.hpp"
@@ -44,18 +43,19 @@ class Application
         void render();
 
     private:
-        smpl::Settings m_settings;
-        std::unique_ptr<smpl::Window> m_window;
+        smpl::Settings                     m_settings;
+        std::unique_ptr<smpl::Window>      m_window;
 
-        Editor::Scene m_main_scene;
-        Editor::LayerManager m_layer_manager;
+        Editor::LayerManager               m_layer_manager;
         std::shared_ptr<Editor::BaseLayer> m_base_layer;
-        std::shared_ptr<Editor::UILayer> m_ui_layer;
+        std::shared_ptr<Editor::UILayer>   m_ui_layer;
 
     struct GlobalState
     {
         glm::vec3 camera_pos = { 0.f, -30.f, 15.f };
         glm::vec3 camera_rot = {-45.f, 90.f,  0.f };
+
+        smpl::Camera camera { camera_pos, camera_rot };
 
         glm::vec3 scale      = { 1.f, 1.f, 1.f };
         glm::vec3 translate  = { 0.f, 0.f, 0.f };
@@ -72,9 +72,10 @@ class Application
         float fov        = 0.f;
         float zoom       = 0.f;
     };
-        GlobalState m_state;
-        Editor::Displays m_displays;
-        mutable bool m_was_f1_pressed = false;
-        mutable bool m_ui_layer_visible = true;
+
+        GlobalState             m_state;
+        Editor::Displays        m_displays;
+        bool m_was_f1_pressed   = false;
+        bool m_ui_layer_visible = true;
     };
 }

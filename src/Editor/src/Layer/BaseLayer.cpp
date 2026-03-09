@@ -9,37 +9,31 @@
 namespace Editor 
 {
 
-    BaseLayer::BaseLayer() 
+    BaseLayer::BaseLayer()
         : m_camera(nullptr)
-        , m_initialized(false) 
+        , m_initialized(false)
     {
         LOG_INFO("BaseLayer created");
     }
 
     void BaseLayer::initShaders() 
     {
-        // Grid shader
-        m_vertex_shader2.loadFromFile("shaders/grid_shader.vert", smpl::Shader::Type::Vertex);
-        m_fragment_shader2.loadFromFile("shaders/grid_shader.frag", smpl::Shader::Type::Fragment);
-        m_shader_grid.create(m_vertex_shader2, m_fragment_shader2);
-
         // Cube shader with mixed 2 texture
         m_vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
         m_fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
         m_shader_cube.create(m_vertex_shader, m_fragment_shader);
 
         // Sprite shader
-        m_vertex_shader3.loadFromFile("shaders/plane_1texture_shader.vert", smpl::Shader::Type::Vertex);
-        m_fragment_shader3.loadFromFile("shaders/plane_1texture_shader.frag", smpl::Shader::Type::Fragment);
+        m_vertex_shader3.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
+        m_fragment_shader3.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
         m_shader_plane.create(m_vertex_shader3, m_fragment_shader3);
     }
 
     void BaseLayer::initTextures() 
     {
-        m_texture1.loadFromFile("res/stone_wall.png");
-        m_texture2.loadFromFile("res/horde.png");
-        m_first_texture2d.loadTextureFromFile("res/ussr.png");
-        m_second_texture2d.loadTextureFromFile("res/rus.png");
+        m_texture_horde.loadTextureFromFile("res/horde.png");
+        m_texture_rus.loadTextureFromFile("res/rus.png");
+        m_texture_stonewall.loadTextureFromFile("res/stone_wall.png");
     }
 
     void BaseLayer::initObjects() 
@@ -48,7 +42,8 @@ namespace Editor
         m_sprite2.setShader(m_shader_plane);
         m_sprite3.setShader(m_shader_plane);
 
-        m_grid = std::make_unique<smpl::Grid>(m_shader_grid);
+        m_grid = std::make_unique<smpl::Grid>();
+        m_grid->init();
 
         m_positions = {
             glm::vec3(-2.f, -2.f, -4.f),
@@ -78,15 +73,16 @@ namespace Editor
         m_vao->bind();
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_texture1.getTextureID());
+        glBindTexture(GL_TEXTURE_2D, m_texture_stonewall.getID());
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, m_texture2.getTextureID());
+        glBindTexture(GL_TEXTURE_2D, m_texture_horde.getID());
 
         m_shader_cube.use();
         m_shader_cube.setUniform1i("texture1", 0);
         m_shader_cube.setUniform1i("texture2", 1);
         m_shader_cube.setUniformMatrix("view", m_camera->getViewMatrix());
         m_shader_cube.setUniformMatrix("projection", m_camera->getProjectionMatrix());
+        m_shader_cube.setUniform4f("sprite_color", glm::vec4(1.0f));
 
         glm::mat4 base_transform = glm::mat4(1.0f);
         glm::mat4 rotation       = glm::mat4(1.0f);
@@ -133,7 +129,7 @@ namespace Editor
         if (!isVisible() || !m_initialized || !m_camera)
             return;
 
-        // Grid
+         //Grid
         m_grid->draw(*m_camera);
 
         // Cubes
@@ -144,9 +140,8 @@ namespace Editor
         m_sprite1.setScale(glm::vec3(7, 4, 1));
         m_sprite3.setPosition(glm::vec3(-15, -15, 7));
         m_sprite3.setScale(glm::vec3(10, 10, 1));
-        m_sprite3.draw(m_first_texture2d, *m_camera);
-        m_sprite1.draw(m_second_texture2d, *m_camera);
-        m_sprite2.draw(m_second_texture2d, *m_camera);
+        m_sprite3.draw(m_texture_horde, *m_camera);
+        m_sprite1.draw(m_texture_rus, *m_camera);
+        m_sprite2.draw(m_texture_rus, *m_camera);
     }
-
-} // namespace Editor
+}

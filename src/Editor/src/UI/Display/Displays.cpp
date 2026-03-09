@@ -4,9 +4,8 @@
 
 namespace Editor
 {
-    Displays::Displays(Editor::Scene& scene)
-        : m_view_space(scene)
-        , m_docking_layout_initialized(false)
+    Displays::Displays()
+        : m_docking_layout_initialized(false)
     {
     }
 
@@ -31,7 +30,7 @@ namespace Editor
                             ImGuiWindowFlags_NoResize   | ImGuiWindowFlags_NoMove |
                             ImGuiWindowFlags_NoBackground;
 
-            //window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
         }
 
         if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)

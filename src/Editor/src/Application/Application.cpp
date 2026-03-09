@@ -3,20 +3,22 @@
 namespace Editor
 {
     Application::Application()
-        : m_main_scene("MainScene")
-        , m_displays(m_main_scene)
     {
     }
 
     void Application::setupEventCallbacks()
     {
         m_window->EventCallback = [this](Core::Event& event)
-        {
-            //LOG_INFO("{}", event.toString());
+            {
+                //LOG_INFO("{}", event.toString());
 
-            Core::EventDispatcher dispatcher(event);
+                Core::EventDispatcher dispatcher(event);
 
-            dispatcher.dispatch<Core::KeyPressedEvent>([this](Core::KeyPressedEvent& e)
+                static bool   first_mouse = true;
+                static double last_mouse_x = 0.0;
+                static double last_mouse_y = 0.0;
+
+                dispatcher.dispatch<Core::KeyPressedEvent>([this](Core::KeyPressedEvent& e)
                     {
                         int keycode = e.getKeyCode();
 
@@ -26,75 +28,74 @@ namespace Editor
                             return true;
                         }
 
-                        if (m_main_scene.isActive())
+
+                        if (m_state.camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
                         {
-                            smpl::Camera& camera = m_main_scene.getCamera();
+                            float camera_speed = 50.0f * m_state.delta_time;
 
-                            if (camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
+                            if (keycode == smpl::Key::Code::LAlt)
+                                m_state.camera.setProjection(smpl::Camera::Projection::Orthographic);
+
+                            if (keycode == smpl::Key::Code::W)
+                                m_state.camera.moveForward(camera_speed);
+                            if (keycode == smpl::Key::Code::S)
+                                m_state.camera.moveForward(-camera_speed);
+                            if (keycode == smpl::Key::Code::A)
+                                m_state.camera.moveRight(-camera_speed);
+                            if (keycode == smpl::Key::Code::D)
+                                m_state.camera.moveRight(camera_speed);
+                            if (keycode == smpl::Key::Code::Space)
+                                m_state.camera.moveUp(camera_speed);
+                            if (keycode == smpl::Key::Code::LCtrl)
+                                m_state.camera.moveUp(-camera_speed);
+
+                            float rot_speed = 50.0f * m_state.delta_time;
+                            glm::vec3 rot_delta(0);
+
+                            if (keycode == smpl::Key::Code::Up)
+                                rot_delta.x += rot_speed;
+                            if (keycode == smpl::Key::Code::Down)
+                                rot_delta.x -= rot_speed;
+                            if (keycode == smpl::Key::Code::Left)
+                                rot_delta.y += rot_speed;
+                            if (keycode == smpl::Key::Code::Right)
+                                rot_delta.y -= rot_speed;
+
+                            if (rot_delta != glm::vec3(0))
+                                m_state.camera.setRotation(m_state.camera.getRotation() + rot_delta);
+                        }
+
+                        if (m_state.camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+                        {
+                            float camera_speed = 30.0f * m_state.delta_time;
+                            glm::vec3 pos = m_state.camera.getPosition();
+
+                            if (keycode == smpl::Key::Code::W)
                             {
-                                float camera_speed = 50.0f * m_state.delta_time;
-
-                                if (keycode == smpl::Key::Code::W)
-                                    camera.moveForward(camera_speed);
-                                if (keycode == smpl::Key::Code::S)
-                                    camera.moveForward(-camera_speed);
-                                if (keycode == smpl::Key::Code::A)
-                                    camera.moveRight(-camera_speed);
-                                if (keycode == smpl::Key::Code::D)
-                                    camera.moveRight(camera_speed);
-                                if (keycode == smpl::Key::Code::Space)
-                                    camera.moveUp(camera_speed);
-                                if (keycode == smpl::Key::Code::LCtrl)
-                                    camera.moveUp(-camera_speed);
-
-                                float rot_speed = 50.0f * m_state.delta_time;
-                                glm::vec3 rot_delta(0);
-
-                                if (keycode == smpl::Key::Code::Up)
-                                    rot_delta.x += rot_speed;
-                                if (keycode == smpl::Key::Code::Down)
-                                    rot_delta.x -= rot_speed;
-                                if (keycode == smpl::Key::Code::Left)
-                                    rot_delta.y += rot_speed;
-                                if (keycode == smpl::Key::Code::Right)
-                                    rot_delta.y -= rot_speed;
-
-                                if (rot_delta != glm::vec3(0))
-                                    camera.setRotation(camera.getRotation() + rot_delta);
+                                pos.x -= camera_speed;
+                                pos.y += camera_speed;
                             }
-
-                            if (camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+                            else if (keycode == smpl::Key::Code::S)
                             {
-                                float camera_speed = 30.0f * m_state.delta_time;
-                                glm::vec3 pos = camera.getPosition();
-
-                                if (keycode == smpl::Key::Code::W)
-                                {
-                                    pos.x -= camera_speed;
-                                    pos.y += camera_speed;
-                                }
-                                else if (keycode == smpl::Key::Code::S)
-                                {
-                                    pos.x += camera_speed;
-                                    pos.y -= camera_speed;
-                                }
-                                else if (keycode == smpl::Key::Code::A)
-                                {
-                                    pos.x -= camera_speed;
-                                    pos.y -= camera_speed;
-                                }
-                                else if (keycode == smpl::Key::Code::D)
-                                {
-                                    pos.x += camera_speed;
-                                    pos.y += camera_speed;
-                                }
-                                else if (keycode == smpl::Key::Code::Space)
-                                    pos.z += camera_speed;
-                                else if (keycode == smpl::Key::Code::LCtrl)
-                                    pos.z -= camera_speed;
-
-                                camera.setPosition(pos);
+                                pos.x += camera_speed;
+                                pos.y -= camera_speed;
                             }
+                            else if (keycode == smpl::Key::Code::A)
+                            {
+                                pos.x -= camera_speed;
+                                pos.y -= camera_speed;
+                            }
+                            else if (keycode == smpl::Key::Code::D)
+                            {
+                                pos.x += camera_speed;
+                                pos.y += camera_speed;
+                            }
+                            else if (keycode == smpl::Key::Code::Space)
+                                pos.z += camera_speed;
+                            else if (keycode == smpl::Key::Code::LCtrl)
+                                pos.z -= camera_speed;
+
+                            m_state.camera.setPosition(pos);
                         }
 
 
@@ -131,11 +132,7 @@ namespace Editor
                         return true;
                     });
 
-            static bool first_mouse = true;
-            static double last_mouse_x = 0.0;
-            static double last_mouse_y = 0.0;
-
-            dispatcher.dispatch<Core::KeyReleasedEvent>([this](Core::KeyReleasedEvent& e)
+                dispatcher.dispatch<Core::KeyReleasedEvent>([this](Core::KeyReleasedEvent& e)
                     {
                         int keycode = e.getKeyCode();
                         if (keycode == smpl::Key::Code::F1)
@@ -145,7 +142,7 @@ namespace Editor
                         return false;
                     });
 
-            dispatcher.dispatch<Core::MouseMovedEvent>([this](Core::MouseMovedEvent& e)
+                dispatcher.dispatch<Core::MouseMovedEvent>([this](Core::MouseMovedEvent& e)
                     {
                         if (glfwGetInputMode(&m_window->getWindow(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
                         {
@@ -165,25 +162,21 @@ namespace Editor
                             last_mouse_x = current_mouse_x;
                             last_mouse_y = current_mouse_y;
 
-                            if (m_main_scene.isActive())
+                            if (m_state.camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
                             {
-                                smpl::Camera& camera = m_main_scene.getCamera();
-                                if (camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
-                                {
-                                    glm::vec3 current_rot = camera.getRotation();
-                                    current_rot.y -= delta_x;
-                                    current_rot.x += delta_y;
+                                glm::vec3 current_rot = m_state.camera.getRotation();
+                                current_rot.y -= delta_x;
+                                current_rot.x += delta_y;
 
-                                    current_rot.x = glm::clamp(current_rot.x, -89.0f, 89.0f);
+                                current_rot.x = glm::clamp(current_rot.x, -89.0f, 89.0f);
 
-                                    camera.setRotation(current_rot);
-                                }
+                                m_state.camera.setRotation(current_rot);
                             }
                         }
                         return true;
                     });
 
-            dispatcher.dispatch<Core::MouseButtonPressedEvent>([this](Core::MouseButtonPressedEvent& e)
+                dispatcher.dispatch<Core::MouseButtonPressedEvent>([this](Core::MouseButtonPressedEvent& e)
                     {
                         if (e.getMouseButton() == static_cast<int>(smpl::Mouse::Button::Right))
                         {
@@ -195,7 +188,7 @@ namespace Editor
                         return true;
                     });
 
-            dispatcher.dispatch<Core::MouseButtonReleasedEvent>([this](Core::MouseButtonReleasedEvent& e)
+                dispatcher.dispatch<Core::MouseButtonReleasedEvent>([this](Core::MouseButtonReleasedEvent& e)
                     {
                         if (e.getMouseButton() == static_cast<int>(smpl::Mouse::Button::Right))
                         {
@@ -208,38 +201,34 @@ namespace Editor
                         return true;
                     });
 
-            dispatcher.dispatch<Core::MouseScrolledEvent>([this](Core::MouseScrolledEvent& e)
+                dispatcher.dispatch<Core::MouseScrolledEvent>([this](Core::MouseScrolledEvent& e)
                     {
                         float scroll_y = static_cast<float>(e.getYOffset());
 
-                        if (m_main_scene.isActive())
+
+                        if (m_state.camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
                         {
-                            smpl::Camera& camera = m_main_scene.getCamera();
-                            if (camera.getProjectionMode() == smpl::Camera::Projection::Perspective)
-                            {
-                                float rot_speed = 50.0f * m_state.delta_time;
-                                camera.moveUp(scroll_y > 0 ? rot_speed : -rot_speed);
-                            }
-                            else if (camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
-                            {
-                                float scroll_sensitivity = 1.0f;
-                                float new_zoom = m_state.zoom - scroll_y * scroll_sensitivity;
-                                m_state.zoom = glm::clamp(new_zoom, 1.0f, 100.0f);
-                                camera.setZoom(m_state.zoom);
-                            }
+                            float rot_speed = 50.0f * m_state.delta_time;
+                            m_state.camera.moveUp(scroll_y > 0 ? rot_speed : -rot_speed);
+                        }
+                        else if (m_state.camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
+                        {
+                            float scroll_sensitivity = 1.0f;
+                            float new_zoom = m_state.zoom - scroll_y * scroll_sensitivity;
+                            m_state.zoom = glm::clamp(new_zoom, 1.0f, 100.0f);
+                            m_state.camera.setZoom(m_state.zoom);
                         }
                         return true;
                     });
 
-            return false;
-        };
+                return false;
+            };
     }
 
     void Application::render()
     {
         m_window->clear(smpl::Color(50, 50, 50));
 
-        // Update and render all layers
         m_layer_manager.updateAll(m_state.delta_time);
         m_layer_manager.renderAll();
 
@@ -260,20 +249,15 @@ namespace Editor
         if (!smpl::Gui::initImGuiFont())
             return false;
 
-        setupEventCallbacks();
+        m_window->setIcon("res/map.png");
 
-        if (!m_main_scene.load())
-        {
-            LOG_ERROR("Failed to load main scene");
-            return false;
-        }
-        m_main_scene.activate();
+        setupEventCallbacks();
 
         // Initialize layer system
         m_base_layer = std::make_shared<Editor::BaseLayer>();
         m_ui_layer   = std::make_shared<Editor::UILayer>();
 
-        m_base_layer->SetCamera(m_main_scene.getCamera());
+        m_base_layer->SetCamera(m_state.camera);
         m_ui_layer->setWindow(m_window.get());
         m_ui_layer->setDisplays(&m_displays);
 
@@ -298,10 +282,6 @@ namespace Editor
             m_state.last_frame = current_frame;
 
             glfwPollEvents();
-
-            m_main_scene.getState().delta_time = m_state.delta_time;
-            m_main_scene.update();
-
             render();
         }
     }

@@ -1,6 +1,5 @@
 set (EDITOR_PUBLIC_INCLUDES 
 	src/Application/Application.hpp
-    src/Scene/Scene.hpp
 
     src/UI/Log/LogDisplay.hpp
     src/UI/Display/Displays.hpp
@@ -19,7 +18,6 @@ set (EDITOR_PUBLIC_INCLUDES
 
 set (EDITOR_PUBLIC_SOURCES 
     src/Application/Application.cpp
-    src/Scene/Scene.cpp
 
     src/UI/Log/LogDisplay.cpp
     src/UI/Display/Displays.cpp

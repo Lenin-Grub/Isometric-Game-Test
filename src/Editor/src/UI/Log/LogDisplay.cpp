@@ -64,37 +64,34 @@ namespace Editor
 
     void LogDisplay::show()
     {
-        //ImGui::Begin(SET_ICON_TEXT((Icon::SCRIPT), " Logs"));
         ImGui::Begin("Logs");
 
+        if (ImGui::Button("Settings"))
+        {
+            ImGui::OpenPopup("SettingsPopup");
+        }
+
+        if (ImGui::BeginPopup("SettingsPopup"))
+        {
+            ImGui::SeparatorText("Log Levels:");
+            ImGui::Checkbox("Debug", &m_show_debug);
+            ImGui::Checkbox("Info", &m_show_info);
+            ImGui::Checkbox("Warning", &m_show_warn);
+            ImGui::Checkbox("Error", &m_show_error);
+            ImGui::Checkbox("Critical", &m_show_critical);
+
+            ImGui::SeparatorText("Others:");
+            ImGui::Checkbox("Auto-scroll", &m_auto_scroll);
+            ImGui::Checkbox("Show timestamps", &m_show_timestamps);
+
+            ImGui::EndPopup();
+        }
+
+        ImGui::SameLine();
         if (ImGui::Button("Clear"))
         {
             log_sink->clear_logs();
         }
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Auto-scroll", &m_auto_scroll);
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Show timestamps", &m_show_timestamps);
-
-        ImGui::SameLine();
-        ImGui::Text("Levels:");
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Debug", &m_show_debug);
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Info", &m_show_info);
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Warn", &m_show_warn);
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Error", &m_show_error);
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Critical", &m_show_critical);
 
         ImGui::SameLine();
         ImGui::SetNextItemWidth(300.0f);

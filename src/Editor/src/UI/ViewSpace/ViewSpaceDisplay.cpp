@@ -1,18 +1,16 @@
 #include "ViewSpaceDisplay.hpp"
 #include <imgui.h>
-#include "../../Scene/Scene.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace Editor
 {
-    ViewSpaceDisplay::ViewSpaceDisplay(Scene& scene)
-        : m_scene(scene)
-        , m_framebuffer_texture(0)
+    ViewSpaceDisplay::ViewSpaceDisplay()
+        : m_framebuffer_texture(0)
         , m_depth_renderbuffer(0)
         , m_framebuffer(0)
-        , m_current_width(1024)
-        , m_current_height(768)
+        , m_current_width(640)
+        , m_current_height(480)
     {
     }
 
@@ -93,7 +91,7 @@ namespace Editor
     {
         if (m_show_scene)
         {
-            ImGui::Begin("Scene", &m_show_scene);
+            ImGui::Begin("Scene");
 
             ImVec2 window_size = ImGui::GetContentRegionAvail();
             ImVec2 scene_pos = ImGui::GetCursorScreenPos();
@@ -110,7 +108,7 @@ namespace Editor
                 }
             }
             else if (static_cast<int>(scene_size.x) != m_current_width ||
-                     static_cast<int>(scene_size.y) != m_current_height)
+                static_cast<int>(scene_size.y) != m_current_height)
             {
                 resizeFramebuffer(static_cast<int>(scene_size.x), static_cast<int>(scene_size.y));
                 m_current_width = static_cast<int>(scene_size.x);
@@ -125,20 +123,18 @@ namespace Editor
                 glGetIntegerv(GL_FRAMEBUFFER_BINDING, &last_framebuffer);
 
                 glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-
                 glViewport(0, 0, static_cast<GLsizei>(scene_size.x), static_cast<GLsizei>(scene_size.y));
 
                 glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glEnable(GL_DEPTH_TEST);
 
-                if (m_scene.isActive())
-                    m_scene.render();
+                //layer.show();
 
                 glBindFramebuffer(GL_FRAMEBUFFER, last_framebuffer);
                 glViewport(last_viewport[0], last_viewport[1], last_viewport[2], last_viewport[3]);
 
-                ImGui::Image((void*)(intptr_t)m_framebuffer_texture, scene_size, ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::Image((void*)(uintptr_t)m_framebuffer_texture, scene_size, ImVec2(0, 1), ImVec2(1, 0));
             }
             else
             {
