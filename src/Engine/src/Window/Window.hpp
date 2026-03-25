@@ -58,6 +58,8 @@ namespace smpl
 
         void setIcon(const std::string& path);
 
+        const double getFPS();
+
         void raiseEvent(Core::Event& event);
 
         using EventCallbackFn = std::function<void(Core::Event&)>;
@@ -66,5 +68,7 @@ namespace smpl
     private:
         GLFWwindow* m_window = nullptr;
         smpl::WindowSettings& m_window_settings;
+        double m_last_frame_time;
+        double m_fps;
     };
 }

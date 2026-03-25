@@ -13,6 +13,8 @@ namespace smpl
     Window::Window(smpl::Settings& settings)
         : m_window( nullptr )
         , m_window_settings( settings.window )
+        , m_last_frame_time(glfwGetTime())
+        , m_fps(0)
     {
     }
 
@@ -358,6 +360,19 @@ namespace smpl
             glfwSetWindowIcon(m_window, 1, &icon);
             stbi_image_free(data);
         }
+    }
+
+    const double Window::getFPS()
+    {
+        double m_current_time = glfwGetTime();
+        double m_delta_time = m_current_time - m_last_frame_time;
+
+        if (m_delta_time > 0.0)
+            m_fps = 1.0 / m_delta_time;
+
+        m_last_frame_time = m_current_time;
+
+        return m_fps;
     }
 
     void Window::raiseEvent(Core::Event& event)

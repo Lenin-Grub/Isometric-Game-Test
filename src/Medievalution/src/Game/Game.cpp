@@ -239,6 +239,8 @@ void Game::showVideoSettings()
     ImGui::SliderFloat3("Translate", glm::value_ptr(transform.position), -100.0f, 100.0f);
     ImGui::SliderFloat3("Rotate",    glm::value_ptr(transform.rotation),    0.0f, 360.0f);
 
+    ImGui::Text("FPS: %.2f", m_window.getFPS());
+
     ImGui::End();
 }
 
