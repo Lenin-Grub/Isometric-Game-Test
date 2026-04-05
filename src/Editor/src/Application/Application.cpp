@@ -34,7 +34,10 @@ namespace Editor
                             float camera_speed = 50.0f * m_state.delta_time;
 
                             if (keycode == smpl::Key::Code::LAlt)
-                                m_state.camera.setProjection(smpl::Camera::Projection::Orthographic);
+                            {
+                                m_state.camera.setProjection(smpl::Camera::Projection::Isometric);
+                                m_state.camera.setRotation(glm::vec3(35.264f, 45.0f, 0));
+                            }
 
                             if (keycode == smpl::Key::Code::W)
                                 m_state.camera.moveForward(camera_speed);
@@ -67,25 +70,25 @@ namespace Editor
 
                         if (m_state.camera.getProjectionMode() == smpl::Camera::Projection::Isometric)
                         {
-                            float camera_speed = 30.0f * m_state.delta_time;
+                            float camera_speed = 50.0f * m_state.delta_time;
                             glm::vec3 pos = m_state.camera.getPosition();
 
-                            if (keycode == smpl::Key::Code::W)
+                            if (keycode == smpl::Key::Code::A)
                             {
                                 pos.x -= camera_speed;
                                 pos.y += camera_speed;
                             }
-                            else if (keycode == smpl::Key::Code::S)
+                            else if (keycode == smpl::Key::Code::D)
                             {
                                 pos.x += camera_speed;
                                 pos.y -= camera_speed;
                             }
-                            else if (keycode == smpl::Key::Code::A)
+                            else if (keycode == smpl::Key::Code::S)
                             {
                                 pos.x -= camera_speed;
                                 pos.y -= camera_speed;
                             }
-                            else if (keycode == smpl::Key::Code::D)
+                            else if (keycode == smpl::Key::Code::W)
                             {
                                 pos.x += camera_speed;
                                 pos.y += camera_speed;
@@ -170,6 +173,7 @@ namespace Editor
 
                                 current_rot.x = glm::clamp(current_rot.x, -89.0f, 89.0f);
 
+                                //m_ui_layer->setViewAngle(current_rot.y);
                                 m_state.camera.setRotation(current_rot);
                             }
                         }
@@ -258,6 +262,7 @@ namespace Editor
         m_ui_layer   = std::make_shared<Editor::UILayer>();
 
         m_base_layer->SetCamera(m_state.camera);
+
         m_ui_layer->setWindow(m_window.get());
         m_ui_layer->setDisplays(&m_displays);
 
@@ -280,7 +285,6 @@ namespace Editor
             float current_frame = static_cast<float>(glfwGetTime());
             m_state.delta_time = current_frame - m_state.last_frame;
             m_state.last_frame = current_frame;
-
             glfwPollEvents();
             render();
         }

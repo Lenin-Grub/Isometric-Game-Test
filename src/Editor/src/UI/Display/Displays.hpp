@@ -7,6 +7,7 @@
 #include "../SceneHierarchy/SceneHierarchy.hpp"
 #include "../Tools/ToolsDisplay.hpp"
 #include "../Assets/AssetsDisplay.hpp"
+#include "../Compass/Compass.hpp"
 
 namespace Editor
 {
@@ -30,6 +31,7 @@ namespace Editor
         Editor::SceneHierarchy       m_scene_hierarchy;
         Editor::ViewSpaceDisplay     m_view_space;
         Editor::ObjectDetailsDisplay m_object_details;
+        Editor::Compass              m_compass;
         bool m_docking_layout_initialized;
     };
 }

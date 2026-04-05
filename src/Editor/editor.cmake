@@ -10,6 +10,7 @@ set (EDITOR_PUBLIC_INCLUDES
     src/UI/Tools/ToolsDisplay.hpp
     src/UI/Assets/AssetsDisplay.hpp
     src/UI/SettingsOverlay/SettingsOverlay.hpp
+	src/UI/Compass/Compass.hpp
 
     src/Layer/BaseLayer.hpp
     src/Layer/UILayer.hpp
@@ -28,6 +29,7 @@ set (EDITOR_PUBLIC_SOURCES
     src/UI/Tools/ToolsDisplay.cpp
     src/UI/Assets/AssetsDisplay.cpp
     src/UI/SettingsOverlay/SettingsOverlay.cpp
+	src/UI/Compass/Compass.cpp
 
     src/Layer/BaseLayer.cpp
     src/Layer/UILayer.cpp

@@ -52,8 +52,8 @@ class Application
 
     struct GlobalState
     {
-        glm::vec3 camera_pos = { 0.f, -30.f, 15.f };
-        glm::vec3 camera_rot = {-45.f, 90.f,  0.f };
+        glm::vec3 camera_pos = {  0.f, -30.f, 15.f };
+        glm::vec3 camera_rot = { 45.f,  90.f,  0.f };
 
         smpl::Camera camera { camera_pos, camera_rot };
 

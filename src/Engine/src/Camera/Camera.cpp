@@ -65,7 +65,7 @@ namespace smpl
     {
         if (m_projection_mode == Projection::Isometric)
         {
-            const float pitch = glm::radians(m_rotation.x);
+            const float pitch = glm::radians(-m_rotation.x);
             const float yaw   = glm::radians(m_rotation.y);
 
             glm::mat4 yaw_mat   = glm::rotate(glm::mat4(1.0f), yaw, -m_world_up);
@@ -78,7 +78,7 @@ namespace smpl
         }
         else if (m_projection_mode == Projection::Perspective)
         {
-            const float pitch = glm::radians(m_rotation.x);
+            const float pitch = glm::radians(-m_rotation.x);
             const float yaw   = glm::radians(m_rotation.y);
 
             glm::vec3 direction{ 0 };

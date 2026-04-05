@@ -27,10 +27,10 @@ namespace Editor
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
             window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                            ImGuiWindowFlags_NoResize   | ImGuiWindowFlags_NoMove |
+                            ImGuiWindowFlags_NoResize   | ImGuiWindowFlags_NoMove     |
                             ImGuiWindowFlags_NoBackground;
 
-            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus ;
         }
 
         if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
@@ -60,6 +60,7 @@ namespace Editor
         m_scene_hierarchy.show();
         m_view_space.show();
         m_assets_display.show();
+        m_compass.show();
 
         if (m_tab_menu.show_demo_window)
             ImGui::ShowDemoWindow(&m_tab_menu.show_demo_window);
@@ -98,18 +99,19 @@ namespace Editor
                 ImGui::DockBuilderSetNodeSize(dock_space_id, ImGui::GetMainViewport()->Size);
 
                 auto center       = dock_space_id;
-                auto left         = ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.20f,  nullptr, &center);
-                auto right        = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.25f, nullptr, &center);
-                auto bottom       = ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.25f,  nullptr, &center);
-                auto right_bottom = ImGui::DockBuilderSplitNode(right,  ImGuiDir_Down, 0.25f,  nullptr, &right);
-                auto top          = ImGui::DockBuilderSplitNode(center, ImGuiDir_Up, 0.20f,    nullptr, &center);
+                auto left         = ImGui::DockBuilderSplitNode(center, ImGuiDir_Left,  0.20f,  nullptr, &center);
+                auto right        = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.25f,  nullptr, &center);
+                auto bottom       = ImGui::DockBuilderSplitNode(center, ImGuiDir_Down,  0.25f,  nullptr, &center);
+                auto right_bottom = ImGui::DockBuilderSplitNode(right,  ImGuiDir_Down,  0.25f,  nullptr, &right);
+                auto top          = ImGui::DockBuilderSplitNode(center, ImGuiDir_Up,    0.20f,  nullptr, &center);
 
+                ImGui::DockBuilderDockWindow("Compass",         top);
                 ImGui::DockBuilderDockWindow("Scene Hierarchy", left);
-                ImGui::DockBuilderDockWindow("Scene", right_bottom);
-                ImGui::DockBuilderDockWindow("Logs", bottom);
-                ImGui::DockBuilderDockWindow("Assets", bottom);
-                ImGui::DockBuilderDockWindow("Inspector", right);
-                ImGui::DockBuilderDockWindow("Object Details", right);
+                ImGui::DockBuilderDockWindow("Inspector",       right);
+                ImGui::DockBuilderDockWindow("Object Details",  right);
+                ImGui::DockBuilderDockWindow("Scene",           right_bottom);
+                ImGui::DockBuilderDockWindow("Logs",            bottom);
+                ImGui::DockBuilderDockWindow("Assets",          bottom);
                 ImGui::DockBuilderFinish(dock_space_id);
             }
         }
