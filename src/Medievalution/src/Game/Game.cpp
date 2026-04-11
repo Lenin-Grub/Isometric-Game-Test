@@ -83,7 +83,6 @@ bool Game::init()
     // Grid shader
     m_grid = std::make_unique<smpl::Grid>();
     m_grid->init();
-
     return true;
 }
 
@@ -92,38 +91,7 @@ void Game::input()
     glfwPollEvents();
 
     if (smpl::Input::isKeyPressed(smpl::Key::Code::Escape))
-    {
         m_window.close();
-    }
-
-    if (smpl::Input::isKeyPressed(smpl::Key::Code::Space))
-    {
-        LOG_DEBUG("Space key pressed!");
-    }
-
-    if (smpl::Input::isKeyReleased(smpl::Key::Code::Space))
-    {
-        LOG_INFO("Space key released!");
-    }
-
-    if (smpl::Input::isMousePressed(smpl::Mouse::Button::Left))
-    {
-        LOG_DEBUG("Mouse left clicked!");
-    }
-
-    if (smpl::Input::isMouseReleased(smpl::Mouse::Button::Left))
-    {
-        LOG_INFO("Mouse left released!");
-    }
-
-    if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Up))
-    {
-        LOG_DEBUG("Mouse scrolled up!");
-    }
-    if (smpl::Input::isMouseScrolled(smpl::Mouse::Scroll::Down))
-    {
-        LOG_DEBUG("Mouse scrolled down!");
-    }
 }
 
 void Game::draw()
@@ -235,7 +203,7 @@ void Game::showVideoSettings()
 
     auto& transform = m_game_obj.getComponent<smpl::ECS::Components::Transform>();
 
-    ImGui::SliderFloat3("Scale",     glm::value_ptr(transform.scale),       0.5f,  10.0f);
+    ImGui::SliderFloat3("Scale",     glm::value_ptr(transform.scale),       0.5f,  50.0f);
     ImGui::SliderFloat3("Translate", glm::value_ptr(transform.position), -100.0f, 100.0f);
     ImGui::SliderFloat3("Rotate",    glm::value_ptr(transform.rotation),    0.0f, 360.0f);
 

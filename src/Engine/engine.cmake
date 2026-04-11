@@ -1,5 +1,7 @@
 set (ENGINE_PUBLIC_INCLUDES
 	src/Utils/NonCopyable.hpp
+	src/Utils/ObjectPicker/ObjectPicker.hpp
+
     src/Window/Window.hpp
     src/Window/VideoMode.hpp
 
@@ -11,7 +13,7 @@ set (ENGINE_PUBLIC_INCLUDES
     src/Event/WindowEvents.hpp
 
     src/Log/Log.hpp
-    src/ImGui/SetImGui.cpp
+    src/ImGui/SetImGui.hpp
 
     src/Camera/Camera.hpp
     src/Settings/Settings.hpp	
@@ -33,11 +35,16 @@ set (ENGINE_PUBLIC_INCLUDES
     src/ECS/ISystems.hpp
     src/ECS/Components.hpp
     src/ECS/GameObject/GameObject.hpp
-    src/ECS/GameObject/GameObject.inl
     src/ECS/SceneManager/SceneManager.hpp
 )
 
+set (ENGINE_PUBLIC_INLINES
+	src/ECS/GameObject/GameObject.inl
+)
+
 set (ENGINE_PUBLIC_SOURCES
+	src/Utils/ObjectPicker/ObjectPicker.cpp
+
     src/Window/Window.cpp
     src/Window/VideoMode.cpp
 
@@ -45,7 +52,8 @@ set (ENGINE_PUBLIC_SOURCES
     src/Event/Mouse.cpp
     src/Event/Input.cpp
 
-    src/ImGui/SetImGui.hpp
+    src/Log/Log.cpp
+    src/ImGui/SetImGui.cpp
     src/Camera/Camera.cpp
     src/Settings/Settings.cpp
     src/FileSystem/FileSystem.cpp

@@ -169,7 +169,7 @@ namespace Editor
                             {
                                 glm::vec3 current_rot = m_state.camera.getRotation();
                                 current_rot.y -= delta_x;
-                                current_rot.x += delta_y;
+                                current_rot.x -= delta_y;
 
                                 current_rot.x = glm::clamp(current_rot.x, -89.0f, 89.0f);
 
@@ -274,6 +274,8 @@ namespace Editor
         // Activate both layers by default
         m_layer_manager.activateLayer(0);
         m_layer_manager.activateLayer(1);
+
+        m_state.zoom = m_state.camera.getZoom();
 
         return true;
     }
