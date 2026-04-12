@@ -62,8 +62,8 @@ private:
     smpl::Sprite sprite;
     smpl::Texture2D texture;
 
-    glm::vec3 camera_pos = { 0.f, 0.f, 25.f };
-    glm::vec3 camera_rot = { -90.f, -90.f,  0.f };
+    glm::vec3 camera_pos = {  0.f, 0.f, 25.f };
+    glm::vec3 camera_rot = { 90.f, 0.f,  0.f };
 
     std::unique_ptr<smpl::Grid> m_grid;
 

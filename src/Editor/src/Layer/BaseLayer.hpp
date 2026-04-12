@@ -35,7 +35,6 @@ namespace Editor
         void initShaders();
         void initTextures();
         void initObjects();
-        void renderCubes();
 
     private:
         // Rendering resources
@@ -52,12 +51,6 @@ namespace Editor
         smpl::Sprite m_sprite3;
 
         std::unique_ptr<smpl::Grid> m_grid;
-        smpl::Cube                  m_cube;
-
-        std::array<glm::vec3, 6>            m_positions;
-        std::unique_ptr<smpl::VertexArray>  m_vao;
-        std::unique_ptr<smpl::VertexBuffer> m_vbo;
-        std::unique_ptr<smpl::IndexBuffer>  m_index_buffer;
 
         smpl::Texture2D m_texture_horde;
         smpl::Texture2D m_texture_rus;

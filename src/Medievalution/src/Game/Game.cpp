@@ -69,8 +69,8 @@ bool Game::init()
     m_game_obj.create();
     m_game_obj.addComponent<smpl::ECS::Components::Color>();
     m_game_obj.addComponent<smpl::ECS::Components::Transform>(
-        glm::vec3(0.0f, 0.0f, 1.0f),    // position
-        glm::vec3(0.0f, 0.0f, 0.0f),    // rotation  
+        glm::vec3( 0.0f,  0.0f,  1.0f), // position
+        glm::vec3( 0.0f,  0.0f, 90.0f), // rotation  
         glm::vec3(10.0f, 10.0f, 0.0f)   // scale 
     );
 
@@ -96,7 +96,6 @@ void Game::input()
 
 void Game::draw()
 {
-
     m_grid->draw(camera);
     ImGui::NewFrame();
     ImGui::ShowDemoWindow();

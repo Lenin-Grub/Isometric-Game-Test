@@ -1,5 +1,6 @@
 #include "Sprite.hpp"
 #include <Camera/Camera.hpp>
+#include <Graphics/VertexBuffer/VertexBuffer.hpp>
 
 namespace smpl 
 {
@@ -11,7 +12,6 @@ namespace smpl
         , m_color(1.0f)
         , m_indices{0}
     {
-        //initRenderData();
     }
 
     Sprite::~Sprite()
@@ -71,13 +71,12 @@ namespace smpl
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        // XYZ
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        // UV
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
+        smpl::BufferLayout layout
+        {
+            smpl::ShaderDataType::Float3, // position
+            smpl::ShaderDataType::Float2  // texture2D
+        };
+        layout.setLayout();
 
         glGenBuffers(1, &ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

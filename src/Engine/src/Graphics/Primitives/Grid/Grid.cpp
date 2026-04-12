@@ -3,6 +3,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include <array>
+#include <Graphics/VertexBuffer/VertexBuffer.hpp>
 
 namespace smpl
 {
@@ -71,11 +72,12 @@ namespace smpl
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices.data(), GL_STATIC_DRAW);
 
         // BufferLayout
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
+        smpl::BufferLayout layout
+        {
+            smpl::ShaderDataType::Float3, // position
+            smpl::ShaderDataType::Float2  // texture2D
+        };
+        layout.setLayout();
 
         // Off VAO
         glBindVertexArray(0);

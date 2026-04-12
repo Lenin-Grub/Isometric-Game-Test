@@ -1,9 +1,12 @@
 #pragma once
+#include <Log/Log.hpp>
+#include <glad/glad.h>
+
 #include <cstdint>
 #include <vector>
-#include <Utils/NonCopyable.hpp>
+#include <string>
 
-namespace smpl
+namespace smpl 
 {
     enum class ShaderDataType
     {
@@ -11,71 +14,110 @@ namespace smpl
         Float2,
         Float3,
         Float4,
+        Mat3,
+        Mat4,
         Int,
         Int2,
         Int3,
         Int4,
+        Bool
     };
 
-    struct BufferElement
+    static unsigned int GetShaderDataComponentCount(ShaderDataType type)
     {
-        ShaderDataType type;
-        uint32_t component_type;
-        size_t components_count;
-        size_t size;
-        size_t offset;
+        switch (type)
+        {
+        case ShaderDataType::Float:   return 1;
+        case ShaderDataType::Float2:  return 2;
+        case ShaderDataType::Float3:  return 3;
+        case ShaderDataType::Float4:  return 4;
+        case ShaderDataType::Mat3:    return 12;
+        case ShaderDataType::Mat4:    return 16;
+        case ShaderDataType::Int:     return 1;
+        case ShaderDataType::Int2:    return 2;
+        case ShaderDataType::Int3:    return 3;
+        case ShaderDataType::Int4:    return 4;
+        case ShaderDataType::Bool:    return 1;
+        }
+        return 0;
+    }
 
-        BufferElement(const ShaderDataType type);
-    };
+    static unsigned int GetShaderDataSize(ShaderDataType type)
+    {
+        switch (type)
+        {
+        case ShaderDataType::Float:   return 4;
+        case ShaderDataType::Float2:  return 8;
+        case ShaderDataType::Float3:  return 12;
+        case ShaderDataType::Float4:  return 16;
+        case ShaderDataType::Mat3:    return 36;
+        case ShaderDataType::Mat4:    return 64;
+        case ShaderDataType::Int:     return 4;
+        case ShaderDataType::Int2:    return 8;
+        case ShaderDataType::Int3:    return 12;
+        case ShaderDataType::Int4:    return 16;
+        case ShaderDataType::Bool:    return 1;
+        }
+        return 0;
+    }
+
+    static GLenum GetShaderDataTypeOpenGL(ShaderDataType type)
+    {
+        switch (type)
+        {
+        case ShaderDataType::Float:
+        case ShaderDataType::Float2:
+        case ShaderDataType::Float3:
+        case ShaderDataType::Float4:
+            return GL_FLOAT;
+
+        case ShaderDataType::Int:
+        case ShaderDataType::Int2:
+        case ShaderDataType::Int3:
+        case ShaderDataType::Int4:
+            return GL_INT;
+
+        case ShaderDataType::Bool:
+            return GL_BOOL;
+
+        case ShaderDataType::Mat3:
+        case ShaderDataType::Mat4:
+            return GL_FLOAT;
+        }
+        return 0;
+    }
 
     class BufferLayout
     {
     public:
-        BufferLayout(std::initializer_list<smpl::BufferElement> elements)
-            : m_elements(std::move(elements))
+        struct Element
         {
-            size_t offset = 0;
-            m_stride = 0;
-            for (auto& element : m_elements)
-            {
-                element.offset = offset;
-                offset += element.size;
-                m_stride += element.size;
-            }
-        }
+            ShaderDataType type;
+            size_t         offset;
+            unsigned int   count;
+            unsigned int   index;
 
-        const std::vector<smpl::BufferElement>& getElements() const { return m_elements; }
-        size_t getStride() const { return m_stride; }
+            Element(ShaderDataType type, unsigned int index);
+            ~Element() = default;
 
-    private:
-        std::vector<smpl::BufferElement> m_elements;
-        size_t m_stride = 0;
-    };
-
-    class VertexBuffer
-        : public smpl::NonCopyable
-    {
-    public:
-
-        enum class Usage
-        {
-            Static,
-            Dynamic,
-            Stream
+            unsigned int getSize() const;
         };
 
-        VertexBuffer(const void* data, const size_t size, smpl::BufferLayout buffer_layout,const smpl::VertexBuffer::Usage usage = smpl::VertexBuffer::Usage::Static);
-        ~VertexBuffer();
-
-        smpl::VertexBuffer& operator=(smpl::VertexBuffer&& vertex_buffer) noexcept;
-        VertexBuffer(VertexBuffer&& vertex_buffer) noexcept;
-
-        void bind() const;
-        static void unbind();
-
-        const smpl::BufferLayout& getLayout() const;
     private:
-        unsigned int m_id;
-        smpl::BufferLayout buffer_layout;
+        std::vector<Element> m_elements;
+        size_t m_stride;
+
+    public:
+        BufferLayout(std::initializer_list<ShaderDataType> types);
+        ~BufferLayout() = default;
+
+        void setLayout();
+        const std::vector<Element>& getElements() const;
+        size_t getStride() const;
+        void printInfo(); //tmp delete later
+
+    private:
+        std::string toString(ShaderDataType type);
+        void calculate();
     };
-}
+};
