@@ -1,30 +1,29 @@
 #pragma once
-#include <Graphics/VertexBuffer/VertexBuffer.hpp>
-#include <Graphics/IndexBuffer/IndexBuffer.hpp>
-#include <Utils/NonCopyable.hpp>
+#include <glad/glad.h>
 
-namespace smpl
+class VertexArray
 {
-    class VertexArray
-        : public smpl::NonCopyable
+private:
+    unsigned int m_RendererID = 0;
+public:
+    VertexArray()
     {
-    public:
-        VertexArray();
-        ~VertexArray();
+        glGenVertexArrays(1, &m_RendererID);
+    }
+    ~VertexArray()
+    {
+        glDeleteVertexArrays(1, &m_RendererID);
+    }
 
-        smpl::VertexArray& operator=(smpl::VertexArray&& vertex_array) noexcept;
-        VertexArray(smpl::VertexArray&& vertex_array) noexcept;
+    void bind() const
+    {
+        glBindVertexArray(m_RendererID);
+    }
 
-        void addVertexBuffer(const smpl::VertexBuffer& vertex_array);
-        void setIndexBuffer(const smpl::IndexBuffer& index_array);
-        void bind() const;
-        static void unbind();
+    void unbind() const
+    {
+        glBindVertexArray(0);
+    }
 
-        size_t getIndexesCount() const;
-
-    private:
-        unsigned int m_id;
-        unsigned int m_elements_count;
-        size_t m_indexes;
-    };
-}
+    unsigned int getID() const { return m_RendererID; }
+};

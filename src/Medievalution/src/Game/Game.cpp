@@ -74,13 +74,10 @@ bool Game::init()
         glm::vec3(10.0f, 10.0f, 0.0f)   // scale 
     );
 
-    vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
-    fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
-    program.create(vertex_shader, fragment_shader);
     texture.loadTextureFromFile("res/Spearman.png");
-    sprite.setShader(program);
+    sprite.init();
 
-    // Grid shader
+    // Grid
     m_grid = std::make_unique<smpl::Grid>();
     m_grid->init();
     return true;
@@ -113,6 +110,7 @@ void Game::draw()
     auto& transform = m_game_obj.getComponent<smpl::ECS::Components::Transform>();
 
     sprite.draw(texture, camera);
+
     sprite.setPosition(transform.position);
     sprite.setRotation(transform.rotation);
     sprite.setColor(color.value);

@@ -1,26 +1,46 @@
 #pragma once
-#include <Graphics/VertexBuffer/VertexBuffer.hpp>
+#include <glad/glad.h>
 
-namespace smpl
+class IndexBuffer
 {
-    class IndexBuffer 
+private:
+    unsigned int m_RendererID;
+    unsigned int m_Count;
+
+public:
+    IndexBuffer() = default;
+    IndexBuffer(const unsigned int* data, unsigned int count)
+        : m_Count(count)
     {
-    public:
+        glGenBuffers(1, &m_RendererID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
+    }
 
-        IndexBuffer(const void* data, const size_t count, const smpl::VertexBuffer::Usage usage = smpl::VertexBuffer::Usage::Static);
-        ~IndexBuffer();
+    ~IndexBuffer()
+    {
+        glDeleteBuffers(1, &m_RendererID);
+    }
 
-        IndexBuffer(const smpl::IndexBuffer&) = delete;
-        smpl::IndexBuffer& operator=(const smpl::IndexBuffer&) = delete;
-        smpl::IndexBuffer& operator=(smpl::IndexBuffer&& index_buffer) noexcept;
-        IndexBuffer(smpl::IndexBuffer&& index_buffer) noexcept;
+    void bind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
+    }
 
-        void bind() const;
-        static void unbind();
-        size_t getCount() const;
+    void unbind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
 
-    private:
-        unsigned int m_id;
-        size_t m_count;
-    };
-}
+    inline unsigned int getCount() const { return m_Count; }
+
+    void create(const unsigned int* data, unsigned int count) {
+        if (m_RendererID) {
+            glDeleteBuffers(1, &m_RendererID);
+        }
+        m_Count = count;
+        glGenBuffers(1, &m_RendererID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
+    }
+};

@@ -1,30 +1,18 @@
 #include "Sprite.hpp"
 #include <Camera/Camera.hpp>
-#include <Graphics/VertexBuffer/VertexBuffer.hpp>
 
 namespace smpl 
 {
     Sprite::Sprite()
-        : m_shader(nullptr)
-        , m_position(0.0f)
+        : m_position(0.0f)
         , m_rotation(0.0f)
         , m_scale(1.0f)
         , m_color(1.0f)
-        , m_indices{0}
     {
     }
 
     Sprite::~Sprite()
     {
-        if (vao != 0) glDeleteVertexArrays(1, &vao);
-        if (vbo != 0) glDeleteBuffers(1, &vbo);
-        if (ibo != 0) glDeleteBuffers(1, &ibo);
-    }
-
-    void Sprite::setShader(smpl::ShaderProgram& shader)
-    {
-        m_shader = &shader;
-        initRenderData();
     }
 
     void Sprite::draw(const Texture2D& texture, smpl::Camera& camera)
@@ -38,38 +26,57 @@ namespace smpl
         model           = glm::translate(model, glm::vec3(-0.5f * m_scale.x, -0.5f * m_scale.y, 0.0f));
         model           = glm::translate(model, glm::vec3(0.5f * m_scale.x, 0.5f * m_scale.y, 0.0f));
 
-        m_shader->use();
-        m_shader->setUniformMatrix("model", model);
-        m_shader->setUniform1i("texture1", 0);
-        m_shader->setUniform4f("sprite_color", m_color);
-        m_shader->setUniformMatrix("projection", camera.getProjectionMatrix());
-        m_shader->setUniformMatrix("view", camera.getViewMatrix());
+        m_shader.use();
+        m_shader.setUniformMatrix("model", model);
+        m_shader.setUniform1i("texture1", 0);
+        m_shader.setUniform4f("sprite_color", m_color);
+        m_shader.setUniformMatrix("projection", camera.getProjectionMatrix());
+        m_shader.setUniformMatrix("view", camera.getViewMatrix());
 
         glActiveTexture(GL_TEXTURE0);
         texture.bind();
 
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        m_VAO->bind();
+        m_IBO->bind();
+
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_data.size()), GL_UNSIGNED_INT, nullptr);
+
+        m_IBO->unbind();
+        m_VAO->unbind();
     }
 
-    void Sprite::initRenderData()
+    bool Sprite::init()
     {
-        float vertices[] = {
-            //   X     Y     Z     U     V
-            -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-             1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-             1.0f,  1.0f, 0.0f,  1.0f, 1.0f };
+        if (!m_vertex_shader.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex))
+            return false;
+        if (!m_fragment_shader.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment))
+            return false;
+        if (!m_shader.create(m_vertex_shader, m_fragment_shader))
+            return false;
+        if (!initRenderData())
+            return false;
+        return true;
+    }
 
-        m_indices = { 0, 2, 1, 1, 2, 3 };
+    bool Sprite::initRenderData()
+    {
+        m_VAO.reset();
+        m_VBO.reset();
+        m_IBO.reset();
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        m_VAO = std::make_unique<VertexArray>();
+        m_VBO = std::make_unique<VertexBuffer>();
+        m_IBO = std::make_unique<IndexBuffer>();
 
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // (x, y, z), UV (u, v)
+        float vertices[] = { -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+                              1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+                             -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+                              1.0f,  1.0f, 0.0f, 1.0f, 1.0f };
+
+        m_VAO->bind();
+        m_VBO->create(vertices, sizeof(vertices));
+        m_IBO->create(indices_data.data(), static_cast<unsigned int>(indices_data.size()));
 
         smpl::BufferLayout layout
         {
@@ -78,10 +85,6 @@ namespace smpl
         };
         layout.setLayout();
 
-        glGenBuffers(1, &ibo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices.data(), GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
+        return true;
     }
 }

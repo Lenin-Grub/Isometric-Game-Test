@@ -5,6 +5,9 @@
 #include <array>
 #include <Graphics/Shader/Shader.hpp>
 #include <Camera/Camera.hpp>
+#include <Graphics/IndexBuffer/IndexBuffer.hpp>
+#include <Graphics/VertexArray/VertexArray.hpp>
+#include <Graphics/VertexBuffer/VertexBuffer.hpp>
 
 namespace smpl
 {
@@ -27,9 +30,9 @@ namespace smpl
         smpl::Shader m_vertex_shader;
         smpl::Shader m_fragment_shader;
 
-        GLuint vao = 0;
-        GLuint vbo = 0;
-        GLuint ibo = 0;
+        VertexArray  m_VAO;
+        VertexBuffer m_VBO;
+        IndexBuffer  m_IBO;
 
         std::array<GLuint, 6> m_indices = { 0, 1, 2, 1, 3, 2 };
     };

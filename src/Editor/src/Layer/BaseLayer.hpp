@@ -32,20 +32,11 @@ namespace Editor
         void SetCamera(smpl::Camera& camera) { m_camera = &camera; }
 
     private:
-        void initShaders();
         void initTextures();
         void initObjects();
 
     private:
         // Rendering resources
-        smpl::Shader m_vertex_shader;
-        smpl::Shader m_fragment_shader;
-        smpl::ShaderProgram m_shader_cube;
-
-        smpl::Shader m_vertex_shader3;
-        smpl::Shader m_fragment_shader3;
-        smpl::ShaderProgram m_shader_plane;
-
         smpl::Sprite m_sprite1;
         smpl::Sprite m_sprite2;
         smpl::Sprite m_sprite3;

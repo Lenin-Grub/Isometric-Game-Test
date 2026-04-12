@@ -7,6 +7,9 @@
 #include <Graphics/Shader/Shader.hpp>
 #include <Camera/Camera.hpp>
 #include <Log/Log.hpp>
+#include <Graphics/VertexArray/VertexArray.hpp>
+#include <Graphics/IndexBuffer/IndexBuffer.hpp>
+#include <Graphics/VertexBuffer/VertexBuffer.hpp>
 
 namespace smpl 
 {
@@ -17,11 +20,12 @@ namespace smpl
 
         ~Sprite();
 
-        void setShader(smpl::ShaderProgram& shader);
 
     public:
 
         void draw(const Texture2D& texture, smpl::Camera& camera);
+
+        bool init();
 
         void setPosition(const glm::vec3& pos)
         {
@@ -49,20 +53,23 @@ namespace smpl
         glm::vec3 getColor()    const { return m_color; }
 
     private:
-        void initRenderData();
+        bool initRenderData();
 
     private:
-        smpl::ShaderProgram* m_shader = nullptr;
 
         glm::vec3 m_position;
         glm::vec3 m_rotation;
         glm::vec3 m_scale;
         glm::vec4 m_color;
 
-        GLuint vao = 0;
-        GLuint vbo = 0;
-        GLuint ibo = 0;
+        smpl::ShaderProgram m_shader;
+        smpl::Shader m_vertex_shader;
+        smpl::Shader m_fragment_shader;
 
-        std::array<GLuint, 6> m_indices;
+        std::unique_ptr<VertexArray> m_VAO = nullptr;
+        std::unique_ptr<VertexBuffer> m_VBO = nullptr;
+        std::unique_ptr<IndexBuffer> m_IBO = nullptr;
+
+        std::vector<unsigned int> indices_data = { 0, 1, 2, 1, 3, 2 };
     };
 }

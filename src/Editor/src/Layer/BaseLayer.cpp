@@ -16,14 +16,6 @@ namespace Editor
         LOG_INFO("BaseLayer created");
     }
 
-    void BaseLayer::initShaders() 
-    {
-        // Sprite shader
-        m_vertex_shader3.loadFromFile("shaders/primitive_texture_shader.vert", smpl::Shader::Type::Vertex);
-        m_fragment_shader3.loadFromFile("shaders/primitive_texture_shader.frag", smpl::Shader::Type::Fragment);
-        m_shader_plane.create(m_vertex_shader3, m_fragment_shader3);
-    }
-
     void BaseLayer::initTextures() 
     {
         m_texture_horde.loadTextureFromFile("res/horde.png");
@@ -33,9 +25,9 @@ namespace Editor
 
     void BaseLayer::initObjects() 
     {
-        m_sprite1.setShader(m_shader_plane);
-        m_sprite2.setShader(m_shader_plane);
-        m_sprite3.setShader(m_shader_plane);
+        m_sprite1.init();
+        m_sprite2.init();
+        m_sprite3.init();
 
         m_grid = std::make_unique<smpl::Grid>();
         m_grid->init();
@@ -45,7 +37,6 @@ namespace Editor
     {
         if (!m_initialized) 
         {
-            initShaders();
             initTextures();
             initObjects();
             m_initialized = true;

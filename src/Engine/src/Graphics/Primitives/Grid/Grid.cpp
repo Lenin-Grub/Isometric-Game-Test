@@ -3,7 +3,6 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include <array>
-#include <Graphics/VertexBuffer/VertexBuffer.hpp>
 
 namespace smpl
 {
@@ -13,9 +12,6 @@ namespace smpl
 
     Grid::~Grid()
     {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ibo);
     }
 
     bool Grid::init()
@@ -43,9 +39,13 @@ namespace smpl
         m_shader.setUniform1f("grid_step", 0.025f);
         m_shader.setUniform3f("grid_color", 0.6f, 0.6f, 0.6f);
 
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        m_VAO.bind();
+        m_IBO.bind();
+
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
+
+        m_IBO.unbind();
+        m_VAO.unbind();
     }
 
     bool Grid::initRenderData()
@@ -57,21 +57,10 @@ namespace smpl
                              -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
                               1.0f,  1.0f, 0.0f, 1.0f, 1.0f };
 
-        // VAO
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        m_VAO.bind();
+        m_VBO.create(vertices, sizeof(vertices));
+        m_IBO.create(m_indices.data(), static_cast<unsigned int>(m_indices.size()));
 
-        // VBO
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        // IBO
-        glGenBuffers(1, &ibo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices.data(), GL_STATIC_DRAW);
-
-        // BufferLayout
         smpl::BufferLayout layout
         {
             smpl::ShaderDataType::Float3, // position
@@ -79,8 +68,8 @@ namespace smpl
         };
         layout.setLayout();
 
-        // Off VAO
-        glBindVertexArray(0);
+        m_VAO.unbind();
+
         return result = true;
     }
 }

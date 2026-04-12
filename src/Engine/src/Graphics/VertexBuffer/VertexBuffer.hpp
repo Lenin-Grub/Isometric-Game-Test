@@ -121,3 +121,49 @@ namespace smpl
         void calculate();
     };
 };
+
+class VertexBuffer
+{
+public:
+    VertexBuffer() 
+        : m_RendererID(0) 
+    {
+    }
+
+    VertexBuffer(const void* data, unsigned int size)
+        : m_RendererID(0)
+    {
+        glGenBuffers(1, &m_RendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    }
+
+    void create(const void* data, unsigned int size)
+    {
+        if (m_RendererID) {
+            glDeleteBuffers(1, &m_RendererID);
+        }
+        glGenBuffers(1, &m_RendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+        glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    }
+
+    ~VertexBuffer()
+    {
+        if (m_RendererID) 
+            glDeleteBuffers(1, &m_RendererID);
+    }
+
+    void bind() const
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+    }
+
+    void unbind() const
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+private:
+    unsigned int m_RendererID = 0;
+};
